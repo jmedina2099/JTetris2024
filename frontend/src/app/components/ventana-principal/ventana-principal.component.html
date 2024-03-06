@@ -1,0 +1,12 @@
+<div class="ventana">
+  <div>
+    <input type="button" value="Next" (click)="nextFigure()" />
+  </div>
+  <div class="panel">
+    <div
+      class="box"
+      *ngFor="let box of fallingFigure.boxes"
+      [style.top]="box.y + 'px'"
+      [style.left]="box.x + 'px'"></div>
+  </div>
+</div>

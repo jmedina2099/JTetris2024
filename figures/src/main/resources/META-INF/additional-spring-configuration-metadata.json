@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "figures.topic.next-figure",
+    "type": "java.lang.String",
+    "description": "A description for 'figures.topic.next-figure'"
+  },
+  {
+    "name": "figures.groupId.message-test",
+    "type": "java.lang.String",
+    "description": "A description for 'figures.groupId.message-test'"
+  },
+  {
+    "name": "management.context-path",
+    "type": "java.lang.String",
+    "description": "A description for 'management.context-path'"
+  }
+]}

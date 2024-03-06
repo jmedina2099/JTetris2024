@@ -1,0 +1,40 @@
+server:
+  port: ${app.api.port}
+spring:
+  application:
+    name: ${app.api.name}
+  webflux:
+    base-path: ${app.api.context.path} # reactive
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${app.eureka.server}
+  instance:
+    hostname: ${app.api.eureka.instance.host}
+    preferIpAddress: false
+    statusPageUrlPath: ${management.context-path}/actuator/info
+    healthCheckUrlPath: ${management.context-path}/actuator/health
+management:
+  context-path: ${app.api.context.path}
+  info:
+    java:
+      enabled: true
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: health,info,beans,env
+# Api App
+api:
+  engine:
+    base-url: http://localhost:9083/service-engine/engine
+  cors:
+    origin: http://localhost:8080,http://localhost:9081,http://localhost:4200

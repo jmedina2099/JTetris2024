@@ -1,0 +1,32 @@
+{"properties": [
+  {
+    "name": "management.context-path",
+    "type": "java.lang.String",
+    "description": "A description for 'management.context-path'"
+  },
+  {
+    "name": "engine.topic.next-figure",
+    "type": "java.lang.String",
+    "description": "A description for 'engine.topic.next-figure'"
+  },
+  {
+    "name": "engine.groupId.message",
+    "type": "java.lang.String",
+    "description": "A description for 'engine.groupId.message'"
+  },
+  {
+    "name": "engine.topic.figure",
+    "type": "java.lang.String",
+    "description": "A description for 'engine.topic.figure'"
+  },
+  {
+    "name": "engine.figures.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'engine.figures.base-url'"
+  },
+  {
+    "name": "engine.figures.askForNextFigureUri",
+    "type": "java.lang.String",
+    "description": "A description for 'engine.figures.askForNextFigureUri'"
+  }
+]}

@@ -1,0 +1,55 @@
+server:
+  port: ${app.figures.port}
+spring:
+  application:
+    name: ${app.figures.name}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    defer-datasource-initialization: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MySQLDialect
+  kafka:
+    bootstrap-servers: ${app.kafka.servers}
+    producer:
+      client-id: figuresProducerClientId
+  sql:
+    init:
+      mode: never
+  datasource:
+    url: jdbc:mysql://${app.mysql.server}/jtetris
+    username: jmedina
+    password: jmedina
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  webflux:
+    base-path: ${app.figures.context.path} # reactive
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${app.eureka.server}
+  instance:
+    hostname: ${app.figures.eureka.instance.host}
+    preferIpAddress: false
+    statusPageUrlPath: ${management.context-path}/actuator/info
+    healthCheckUrlPath: ${management.context-path}/actuator/health
+management:
+  context-path: ${app.figures.context.path}
+  info:
+    java:
+      enabled: true
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: health,info,beans,env
+# Figures App
+figures:
+  topic:
+    nextFigure: nextFigureTopic

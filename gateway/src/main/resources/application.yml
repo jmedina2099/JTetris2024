@@ -1,0 +1,42 @@
+server:
+  port: ${app.gateway.port}
+spring:
+  application:
+    name: ${app.gateway.name}
+  cloud:
+    gateway:
+      httpclient:
+        wiretap: true
+      httpserver:
+        wiretap: true
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${app.eureka.server}
+  instance:
+    hostname: ${app.gateway.eureka.instance.host}
+    preferIpAddress: false
+    statusPageUrlPath: ${management.context-path}/actuator/info
+    healthCheckUrlPath: ${management.context-path}/actuator/health
+management:
+  context-path: ${app.gateway.context.path}
+  info:
+    java:
+      enabled: true
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: health,info,beans,env
+logging:
+  level:
+    reactor:
+      netty: INFO
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE

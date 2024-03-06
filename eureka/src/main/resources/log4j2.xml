@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration strict="true"
+			   xmlns="http://logging.apache.org/log4j/2.0/config"
+			   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			   xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config 
+			   https://raw.githubusercontent.com/apache/logging-log4j2/master/log4j-core/src/main/resources/Log4j-config.xsd"
+			   status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN_COLORS">%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{${LOG_LEVEL_PATTERN:-%5p}}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=green, TRACE=green} %style{${sys:PID}}{magenta} --- [%15.15t] %style{%-60.60c}{cyan} :%L: %m%n%ex</Property>
+        <Property name="LOG_PATTERN_FILE">%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${sys:PID} --- [%15.15t] %-60.60c :%L: %m%n%ex</Property>
+        <Property name="APP_LOG_ROOT">${app.eureka.log.path}</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN_COLORS}" />
+        </Console>
+        <RollingFile name="appLogEureka"
+                fileName="${APP_LOG_ROOT}/${app.eureka.log.name}.log"
+                filePattern="${APP_LOG_ROOT}/${app.eureka.log.name}-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${LOG_PATTERN_FILE}" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="19500KB" />
+            </Policies>
+            <DefaultRolloverStrategy max="1" />
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.jmedina.jtetris.eureka" additivity="false" level="debug" includeLocation="true">
+            <AppenderRef ref="appLogEureka" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Root level="info" includeLocation="true">
+            <AppenderRef ref="appLogEureka" />
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>

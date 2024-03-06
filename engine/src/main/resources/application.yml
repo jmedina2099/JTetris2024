@@ -1,0 +1,44 @@
+server:
+  port: ${app.engine.port}
+spring:
+  application:
+    name: ${app.engine.name}
+  kafka:
+    bootstrap-servers: ${app.kafka.servers}
+    producer:
+      client-id: engineProducerClientId
+  webflux:
+    base-path: ${app.engine.context.path} # reactive
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${app.eureka.server}
+  instance:
+    hostname: ${app.engine.eureka.instance.host}
+    preferIpAddress: false
+    statusPageUrlPath: ${management.context-path}/actuator/info
+    healthCheckUrlPath: ${management.context-path}/actuator/health
+management:
+  context-path: ${app.engine.context.path}
+  info:
+    java:
+      enabled: true
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: health,info,beans,env
+# Engine App
+engine:
+  topic:
+    nextFigure: nextFigureTopic
+    figure: figureTopic
+  groupId:
+    message: figureMessage
+  figures:
+    base-url: http://localhost:9083/service-figures/figures
+    askForNextFigureUri: /askForNextFigure

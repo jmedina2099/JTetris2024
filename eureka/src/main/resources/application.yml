@@ -1,0 +1,32 @@
+server:
+  port: ${app.eureka.port}
+  servlet:
+    context-path: ${app.eureka.context.path} # webmvc
+spring:
+  application:
+    name: ${app.eureka.name}
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    service-url:
+      defaultZone: ${app.eureka.server}
+  instance:
+    hostname: ${app.eureka.instance.host}
+    preferIpAddress: false
+    statusPageUrlPath: ${management.context-path}/actuator/info
+    healthCheckUrlPath: ${management.context-path}/actuator/health
+management:
+  context-path: ${app.eureka.context.path}
+  info:
+    java:
+      enabled: true
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: health,info,beans,env
