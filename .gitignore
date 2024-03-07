@@ -1,2 +1,7 @@
 .project
 .settings/*
+eureka/target/*
+gateway/target/*
+api/target/*
+engine/target/*
+figures/target/*
