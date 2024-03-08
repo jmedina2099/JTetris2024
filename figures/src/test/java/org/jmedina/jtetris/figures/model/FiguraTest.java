@@ -14,7 +14,7 @@ class FiguraTest {
 	@Test
 	@DisplayName("Test for Figura model")
 	void testFiguraModel() {
-		long id = 1L;
+		String id = "figCaja";
 		String name = "Caja";
 		String boxes = "(0,0)-(0,1)-(1,0)-(1,1)";
 		Figura figura = new Figura();

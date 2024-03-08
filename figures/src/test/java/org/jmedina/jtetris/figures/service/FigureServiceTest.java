@@ -6,18 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.service.impl.FigureServiceImpl;
-import org.jmedina.jtetris.figures.service.impl.KafkaServiceImpl;
 import org.jmedina.jtetris.figures.util.RandomUtil;
-import org.jmedina.jtetris.figures.util.SerializeUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 /**
  * @author Jorge Medina
@@ -28,16 +26,10 @@ class FigureServiceTest {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Mock
-	private KafkaServiceImpl kafkaService;
-
-	@Mock
-	private SerializeUtil serializeUtil;
-
-	@Mock
+	@MockBean
 	private RandomUtil randomUtil;
 
-	@InjectMocks
+	@Autowired
 	private FigureServiceImpl figureService;
 
 	@Test

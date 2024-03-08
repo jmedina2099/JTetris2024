@@ -16,9 +16,10 @@ import lombok.Setter;
 @Setter
 public abstract class Figure {
 
-	protected final List<Box> boxes = new ArrayList<>();
+	protected List<Box> boxes;
 
 	protected boolean init(FiguraEnumeration f) {
+		this.boxes = new ArrayList<>();
 		f.getTuplas().stream().forEach(t -> this.boxes.add(new Box(t.getLeft(), t.getRight())));
 		return true;
 	}

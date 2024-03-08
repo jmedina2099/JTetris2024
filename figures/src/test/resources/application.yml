@@ -3,27 +3,13 @@ server:
 spring:
   application:
     name: ${app.figures.name}
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    defer-datasource-initialization: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-    database-platform: org.hibernate.dialect.MySQLDialect
+  data:
+    mongodb:
+      uri: mongodb://${app.mongo.sever}/jtetris
   kafka:
     bootstrap-servers: ${app.kafka.servers}
     producer:
       client-id: figuresProducerClientId
-  sql:
-    init:
-      mode: always
-  datasource:
-    url: jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1;NON_KEYWORDS=KEY,VALUE
-    username: 
-    password: 
-    driver-class-name: org.h2.Driver
   webflux:
     base-path: ${app.figures.context.path}
 eureka:

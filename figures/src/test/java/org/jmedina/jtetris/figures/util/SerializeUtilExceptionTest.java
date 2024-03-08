@@ -7,11 +7,11 @@ import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,23 +23,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class SerializeUtilExceptionTest {
 
-	@Mock
+	@MockBean
 	private ObjectMapper mapper;
 
-	@InjectMocks
+	@Autowired
 	private SerializeUtil serializeUtil;
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Test
 	@DisplayName("Test for convertStringToFigure with Exception")
 	void testConvertStringToFigure() throws ServiceException {
-		String cajaJson = "{\"boxes\":[{\"y\":0.0,\"x\":0.0},{\"y\":20.0,\"x\":0.0},{\"y\":0.0,\"x\":20.0},{\"y\":20.0,\"x\":20.0}]}";
 		try {
 			Mockito.when(mapper.readValue(Mockito.anyString(), Mockito.any(Class.class)))
 					.thenThrow(new JsonMappingException("ERROR"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		String cajaJson = "{\"boxes\":[{\"y\":0.0,\"x\":0.0},{\"y\":20.0,\"x\":0.0},{\"y\":0.0,\"x\":20.0},{\"y\":20.0,\"x\":20.0}]}";
 		ServiceException exception = assertThrows(ServiceException.class, () -> {
 			this.serializeUtil.convertStringToFigure(cajaJson, Caja.class);
 		});
@@ -50,13 +50,13 @@ class SerializeUtilExceptionTest {
 	@Test
 	@DisplayName("Test for convertFigureToString with Exception")
 	void testConvertFigureToString() throws Exception {
-		Caja caja = new Caja();
 		try {
 			Mockito.when(mapper.writeValueAsString(Mockito.any(Object.class)))
 					.thenThrow(new JsonMappingException("ERROR"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		Caja caja = new Caja();
 		ServiceException exception = assertThrows(ServiceException.class, () -> {
 			this.serializeUtil.convertFigureToString(caja);
 		});

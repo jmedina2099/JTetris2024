@@ -19,7 +19,7 @@
 		<app.figures.log.path>/var/log/jtetris</app.figures.log.path>
 		<app.figures.log.name>jtetris-figures</app.figures.log.name>		
 		<app.kafka.servers>localhost:9092</app.kafka.servers>
-		<app.mysql.server>localhost:3306</app.mysql.server>
+		<app.mongo.sever>localhost:27017</app.mongo.sever>
 		<jacoco.ut.file>
 			${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.file>
 		<jacoco.it.file>
@@ -96,15 +96,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -145,6 +141,12 @@
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>4.12.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -5,7 +5,6 @@ import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
-import org.jmedina.jtetris.figures.repository.FigureRepository;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.util.RandomUtil;
 import org.jmedina.jtetris.figures.util.SerializeUtil;
@@ -27,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class FigureServiceImpl implements FigureService, ApplicationListener<ContextRefreshedEvent> {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final FigureRepository figureRepository;
+	private final FigureTemplateOperations figureTemplateOperations;
 	private final KafkaServiceImpl kafkaService;
 	private final SerializeUtil serializeUtil;
 	private final RandomUtil random;
@@ -62,8 +61,8 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 
 	private void loadDB() {
 		this.logger.debug("==> FigureService.loadDB()");
-		this.figureRepository.findAll()
-				.forEach(f -> FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes()));
+		this.figureTemplateOperations.findAll()
+				.subscribe(f -> FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes()));
 	}
 
 }
