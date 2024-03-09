@@ -17,9 +17,10 @@
 		<app.figures.context.path>/figures</app.figures.context.path>
 		<app.figures.eureka.instance.host>localhost</app.figures.eureka.instance.host>
 		<app.figures.log.path>/var/log/jtetris</app.figures.log.path>
-		<app.figures.log.name>jtetris-figures</app.figures.log.name>		
+		<app.figures.log.name>jtetris-figures</app.figures.log.name>
 		<app.kafka.servers>localhost:9092</app.kafka.servers>
 		<app.mongo.sever>localhost:27017</app.mongo.sever>
+		<app.mongo.db.name>jtetris</app.mongo.db.name>
 		<jacoco.ut.file>
 			${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.file>
 		<jacoco.it.file>
@@ -147,6 +148,17 @@
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
 			<version>4.12.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>kafka</artifactId>
+			<version>1.19.7</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

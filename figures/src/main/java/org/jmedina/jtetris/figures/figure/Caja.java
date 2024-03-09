@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.figures.figure;
 
-import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
+import static org.jmedina.jtetris.figures.enumeration.FiguraEnumeration.CAJA;
 
 /**
  * @author Jorge Medina
@@ -9,7 +9,6 @@ import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 public class Caja extends Figure {
 
 	public Caja() {
-		super.init(FiguraEnumeration.CAJA);
+		super.init(CAJA);
 	}
-
 }

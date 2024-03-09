@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,14 +17,18 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@EqualsAndHashCode
 public abstract class Figure {
 
 	protected List<Box> boxes;
 
-	protected boolean init(FiguraEnumeration f) {
-		this.boxes = new ArrayList<>();
-		f.getTuplas().stream().forEach(t -> this.boxes.add(new Box(t.getLeft(), t.getRight())));
-		return true;
-	}
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
+	protected FiguraEnumeration type;
 
+	protected void init(FiguraEnumeration type) {
+		this.boxes = new ArrayList<>();
+		this.type = type;
+		this.type.getTuplas().stream().forEach(t -> this.boxes.add(new Box(t.getLeft(), t.getRight())));
+	}
 }

@@ -3,6 +3,7 @@ package org.jmedina.jtetris.figures.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 class FiguraTest {
 
 	@Test
+	@Order(1)
 	@DisplayName("Test for Figura model")
 	void testFiguraModel() {
 		String id = "figCaja";

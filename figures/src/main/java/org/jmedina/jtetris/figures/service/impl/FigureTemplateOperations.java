@@ -14,10 +14,10 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 @Service
 public class FigureTemplateOperations {
- 
-    private final ReactiveMongoTemplate template;
 
-    public Flux<Figura> findAll() {
-        return template.findAll(Figura.class);
-    } 
+	private final ReactiveMongoTemplate template;
+
+	public Flux<Figura> findAll() {
+		return template.findAll(Figura.class);
+	}
 }

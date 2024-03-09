@@ -7,4 +7,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
  * @author Jorge Medina
  *
  */
-public interface FigureRepository extends ReactiveMongoRepository<Figura, String> {}
+public interface FigureRepository extends ReactiveMongoRepository<Figura, String> {
+}

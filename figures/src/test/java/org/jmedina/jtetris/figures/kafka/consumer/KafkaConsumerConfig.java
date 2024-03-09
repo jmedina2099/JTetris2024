@@ -26,7 +26,7 @@ public class KafkaConsumerConfig {
 
 	@Value("${figures.groupId.messageTest}")
 	public String messageTestGroupId;
-
+	
 	@Bean
 	ConsumerFactory<String, String> consumerFactory() {
 		Map<String, Object> props = new HashMap<>();

@@ -6,10 +6,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import lombok.Getter;
+
 /**
  * @author Jorge Medina
  *
  */
+@Getter
 public enum FiguraEnumeration {
 
 	CAJA, ELE;
@@ -24,9 +27,4 @@ public enum FiguraEnumeration {
 			});
 		}
 	}
-
-	public List<Pair<Integer, Integer>> getTuplas() {
-		return tuplas;
-	}
-
 }

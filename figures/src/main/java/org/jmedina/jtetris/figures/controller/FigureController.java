@@ -1,8 +1,8 @@
 package org.jmedina.jtetris.figures.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.service.FigureService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping
 public class FigureController {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final FigureService figureService;
 
 	@GetMapping("/hello")
@@ -33,7 +33,8 @@ public class FigureController {
 	@GetMapping("/askForNextFigure")
 	public Mono<ResponseEntity<Boolean>> askForNextFigure() {
 		this.logger.debug("===> FigureHandler.askForNextFigure()");
-		return Mono.just(ResponseEntity.status(HttpStatus.OK).body(this.figureService.askForNextFigure()));
+		this.figureService.askForNextFigure();
+		return Mono.just(ResponseEntity.status(HttpStatus.OK).body(true));
 	}
 
 }

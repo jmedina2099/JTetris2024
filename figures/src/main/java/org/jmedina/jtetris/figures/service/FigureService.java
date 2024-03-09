@@ -8,5 +8,5 @@ import org.jmedina.jtetris.figures.exception.ServiceException;
  */
 public interface FigureService {
 
-	public boolean askForNextFigure() throws ServiceException;
+	public void askForNextFigure() throws ServiceException;
 }

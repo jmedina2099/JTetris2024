@@ -5,7 +5,7 @@ spring:
     name: ${app.figures.name}
   data:
     mongodb:
-      uri: mongodb://${app.mongo.sever}/jtetris
+      uri: mongodb://${app.mongo.sever}/${figures.mongodb.name}
   kafka:
     bootstrap-servers: ${app.kafka.servers}
     producer:
@@ -25,3 +25,5 @@ figures:
     nextFigure: nextFigureTopic
   groupId:
     messageTest: figureMessageTest
+  mongodb:
+    name: ${app.mongo.db.name}

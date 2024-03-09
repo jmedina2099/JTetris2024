@@ -1,21 +1,23 @@
 package org.jmedina.jtetris.figures.service.impl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
+import org.jmedina.jtetris.figures.model.Figura;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.util.RandomUtil;
 import org.jmedina.jtetris.figures.util.SerializeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Jorge Medina
@@ -25,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Service("figureService")
 public class FigureServiceImpl implements FigureService, ApplicationListener<ContextRefreshedEvent> {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final FigureTemplateOperations figureTemplateOperations;
 	private final KafkaServiceImpl kafkaService;
 	private final SerializeUtil serializeUtil;
@@ -35,7 +37,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	public String nextFigureTopic;
 
 	@Override
-	public boolean askForNextFigure() throws ServiceException {
+	public void askForNextFigure() throws ServiceException {
 		this.logger.debug("==> FigureService.getNextFigure()");
 		Figure figure = null;
 		int value = this.random.nextInt(2);
@@ -50,7 +52,6 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 		}
 		this.kafkaService.sendMessage(this.serializeUtil.convertFigureToString(figure), this.nextFigureTopic);
-		return true;
 	}
 
 	@Override
@@ -61,8 +62,9 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 
 	private void loadDB() {
 		this.logger.debug("==> FigureService.loadDB()");
-		this.figureTemplateOperations.findAll()
-				.subscribe(f -> FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes()));
+		Flux<Figura> listFigures = this.figureTemplateOperations.findAll();
+		listFigures.subscribe(f -> FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes()));
+		listFigures.blockLast();
 	}
 
 }

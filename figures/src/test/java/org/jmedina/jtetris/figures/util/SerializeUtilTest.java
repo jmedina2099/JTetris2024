@@ -1,37 +1,53 @@
 package org.jmedina.jtetris.figures.util;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 import org.jmedina.jtetris.figures.figure.Caja;
+import org.jmedina.jtetris.figures.figure.Ele;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  * @author Jorge Medina
  *
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext
 class SerializeUtilTest {
 
 	@Autowired
 	private SerializeUtil serializeUtil;
 
 	@Test
-	@DisplayName("Test for convertStringToFigure")
-	void testConvertStringToFigure() throws Exception {
-		String json = "{\"boxes\":[{\"y\":0.0,\"x\":0.0},{\"y\":20.0,\"x\":0.0},{\"y\":0.0,\"x\":20.0},{\"y\":20.0,\"x\":20.0}]}";
-		assertTrue(Objects.nonNull(this.serializeUtil.convertStringToFigure(json, Caja.class)));
+	@Order(1)
+	@DisplayName("Test for convertStringToFigure (CAJA)")
+	void testConvertStringToFigureCaja() throws Exception {
+		assertEquals(new Caja(), this.serializeUtil.convertStringToFigure(AssertUtil.JSON_CAJA, Caja.class));
 	}
 
 	@Test
-	@DisplayName("Test for convertFigureToString")
-	void testConvertFigureToString() throws Exception {
-		assertTrue(StringUtils.isNoneEmpty(this.serializeUtil.convertFigureToString(new Caja())));
+	@Order(2)
+	@DisplayName("Test for convertFigureToString (CAJA)")
+	void testConvertFigureToStringCaja() throws Exception {
+		assertEquals(AssertUtil.JSON_CAJA, this.serializeUtil.convertFigureToString(new Caja()));
+	}
+
+	@Test
+	@Order(3)
+	@DisplayName("Test for convertStringToFigure (Ele)")
+	void testConvertStringToFigureEle() throws Exception {
+		assertEquals(new Ele(), this.serializeUtil.convertStringToFigure(AssertUtil.JSON_ELE, Ele.class));
+	}
+
+	@Test
+	@Order(4)
+	@DisplayName("Test for convertFigureToString (Ele)")
+	void testConvertFigureToStringEle() throws Exception {
+		assertEquals(AssertUtil.JSON_ELE, this.serializeUtil.convertFigureToString(new Ele()));
 	}
 }

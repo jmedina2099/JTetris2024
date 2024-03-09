@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.figures.figure;
 
-import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
+import static org.jmedina.jtetris.figures.enumeration.FiguraEnumeration.ELE;
 
 /**
  * @author Jorge Medina
@@ -9,7 +9,6 @@ import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 public class Ele extends Figure {
 
 	public Ele() {
-		super.init(FiguraEnumeration.ELE);
+		super.init(ELE);
 	}
-
 }

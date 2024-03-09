@@ -1,5 +1,6 @@
 package org.jmedina.jtetris.figures;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +18,8 @@ import com.mongodb.reactivestreams.client.MongoClients;
 @SpringBootApplication
 public class FiguresApplication extends AbstractReactiveMongoConfiguration {
 
-	public static void main(String[] args) {
-		SpringApplication.run(FiguresApplication.class, args);
-	}
+	@Value("${figures.mongodb.name}")
+	private String mongoDbName;
 
 	@Bean
 	MongoClient mongoClient() {
@@ -28,7 +28,11 @@ public class FiguresApplication extends AbstractReactiveMongoConfiguration {
 
 	@Override
 	protected String getDatabaseName() {
-		return "jtetris";
+		return mongoDbName;
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(FiguresApplication.class, args);
 	}
 
 }
