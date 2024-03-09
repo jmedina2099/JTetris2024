@@ -45,7 +45,7 @@ class SerializeUtilExceptionTest {
 			e.printStackTrace();
 		}
 		ServiceException exception = assertThrows(ServiceException.class, () -> {
-			this.serializeUtil.convertStringToFigure(AssertUtil.JSON_CAJA, Caja.class);
+			this.serializeUtil.convertStringToFigure(AssertUtilTesting.JSON_CAJA, Caja.class);
 		});
 		assertEquals("com.fasterxml.jackson.databind.JsonMappingException: ERROR", exception.getMessage());
 	}

@@ -3,7 +3,7 @@ package org.jmedina.jtetris.figures.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.service.impl.FigureServiceImpl;
-import org.jmedina.jtetris.figures.util.AssertUtil;
+import org.jmedina.jtetris.figures.util.AssertUtilTesting;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -29,7 +29,7 @@ class FigureServiceDefaultTest {
 	private FigureServiceImpl figureService;
 
 	@Autowired
-	private AssertUtil assertUtil;
+	private AssertUtilTesting assertUtil;
 
 	@BeforeEach
 	void resetState() {

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class AssertUtil {
+public class AssertUtilTesting {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 

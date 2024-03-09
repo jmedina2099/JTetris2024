@@ -9,7 +9,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmedina.jtetris.figures.util.AssertUtil;
+import org.jmedina.jtetris.figures.util.AssertUtilTesting;
 import org.jmedina.jtetris.figures.util.RandomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +40,7 @@ class FigureControllerIT {
 	private RandomUtil random;
 
 	@Autowired
-	private AssertUtil assertUtil;
+	private AssertUtilTesting assertUtil;
 
 	@BeforeEach
 	void resetState() {

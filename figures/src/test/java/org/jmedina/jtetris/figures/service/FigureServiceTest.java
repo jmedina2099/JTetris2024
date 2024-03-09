@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.service.impl.FigureServiceImpl;
-import org.jmedina.jtetris.figures.util.AssertUtil;
+import org.jmedina.jtetris.figures.util.AssertUtilTesting;
 import org.jmedina.jtetris.figures.util.RandomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +39,7 @@ class FigureServiceTest {
 	private FigureServiceImpl figureService;
 
 	@Autowired
-	private AssertUtil assertUtil;
+	private AssertUtilTesting assertUtil;
 
 	@BeforeEach
 	void resetState() {

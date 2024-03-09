@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.service.impl.KafkaServiceImpl;
-import org.jmedina.jtetris.figures.util.AssertUtil;
+import org.jmedina.jtetris.figures.util.AssertUtilTesting;
 import org.jmedina.jtetris.figures.util.SerializeUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +46,7 @@ class KafkaServiceExceptionTest {
 	private KafkaServiceImpl kafkaService;
 
 	@Autowired
-	private AssertUtil assertUtil;
+	private AssertUtilTesting assertUtil;
 
 	@BeforeEach
 	void resetState() {

@@ -27,27 +27,27 @@ class SerializeUtilTest {
 	@Order(1)
 	@DisplayName("Test for convertStringToFigure (CAJA)")
 	void testConvertStringToFigureCaja() throws Exception {
-		assertEquals(new Caja(), this.serializeUtil.convertStringToFigure(AssertUtil.JSON_CAJA, Caja.class));
+		assertEquals(new Caja(), this.serializeUtil.convertStringToFigure(AssertUtilTesting.JSON_CAJA, Caja.class));
 	}
 
 	@Test
 	@Order(2)
 	@DisplayName("Test for convertFigureToString (CAJA)")
 	void testConvertFigureToStringCaja() throws Exception {
-		assertEquals(AssertUtil.JSON_CAJA, this.serializeUtil.convertFigureToString(new Caja()));
+		assertEquals(AssertUtilTesting.JSON_CAJA, this.serializeUtil.convertFigureToString(new Caja()));
 	}
 
 	@Test
 	@Order(3)
 	@DisplayName("Test for convertStringToFigure (Ele)")
 	void testConvertStringToFigureEle() throws Exception {
-		assertEquals(new Ele(), this.serializeUtil.convertStringToFigure(AssertUtil.JSON_ELE, Ele.class));
+		assertEquals(new Ele(), this.serializeUtil.convertStringToFigure(AssertUtilTesting.JSON_ELE, Ele.class));
 	}
 
 	@Test
 	@Order(4)
 	@DisplayName("Test for convertFigureToString (Ele)")
 	void testConvertFigureToStringEle() throws Exception {
-		assertEquals(AssertUtil.JSON_ELE, this.serializeUtil.convertFigureToString(new Ele()));
+		assertEquals(AssertUtilTesting.JSON_ELE, this.serializeUtil.convertFigureToString(new Ele()));
 	}
 }
