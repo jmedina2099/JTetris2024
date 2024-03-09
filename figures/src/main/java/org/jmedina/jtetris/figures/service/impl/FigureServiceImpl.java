@@ -9,6 +9,7 @@ import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
 import org.jmedina.jtetris.figures.service.FigureService;
+import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
 import org.jmedina.jtetris.figures.util.RandomUtil;
 import org.jmedina.jtetris.figures.util.SerializeUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,14 +58,15 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		this.logger.debug("==> FigureService.onApplicationEvent()");
-		this.loadDB();
+		this.loadFigurasFromDB();
 	}
 
-	private void loadDB() {
-		this.logger.debug("==> FigureService.loadDB()");
+	private void loadFigurasFromDB() {
+		this.logger.debug("==> FigureService.loadFigurasFromDB()");
 		Flux<Figura> listFigures = this.figureTemplateOperations.findAll();
 		listFigures.subscribe(f -> FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes()));
 		listFigures.blockLast();
+		this.logger.debug("==> FigureService.loadFigurasFromDB() -- DONE");
 	}
 
 }

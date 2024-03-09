@@ -28,7 +28,7 @@ public enum FiguraEnumeration {
 	public void loadCoordinates(String coords) {
 		if (this.tuplas.isEmpty()) {
 			Arrays.stream(coords.split("-")).forEach(coord -> {
-				String[] xy = coord.replace("(", "").replace(")", "").split(",");
+				String[] xy = coord.replaceFirst("\\(", "").replaceFirst("\\)", "").split(",");
 				this.tuplas.add(Pair.of(Integer.parseInt(xy[0]), Integer.parseInt(xy[1])));
 			});
 		}

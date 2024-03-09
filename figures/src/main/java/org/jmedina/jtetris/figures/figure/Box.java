@@ -2,6 +2,8 @@ package org.jmedina.jtetris.figures.figure;
 
 import java.awt.geom.Rectangle2D;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.EqualsAndHashCode;
@@ -22,9 +24,9 @@ public class Box {
 	@EqualsAndHashCode.Exclude
 	private final Rectangle2D.Double rectangle = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
 
-	public Box(int x, int y) {
-		this.rectangle.x = x * WIDTH;
-		this.rectangle.y = y * HEIGHT;
+	public Box(Pair<Integer, Integer> tupla) {
+		this.rectangle.x = tupla.getLeft() * WIDTH;
+		this.rectangle.y = tupla.getRight() * HEIGHT;
 	}
 
 	@EqualsAndHashCode.Include

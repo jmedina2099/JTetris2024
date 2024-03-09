@@ -1,6 +1,7 @@
 package org.jmedina.jtetris.figures.service.impl;
 
 import org.jmedina.jtetris.figures.domain.Figura;
+import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ import reactor.core.publisher.Flux;
  */
 @RequiredArgsConstructor
 @Service
-public class FigureTemplateOperations {
+public class FigureTemplateOperationsImpl implements FigureTemplateOperations {
 
 	private final ReactiveMongoTemplate template;
 
