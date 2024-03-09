@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
-import org.jmedina.jtetris.figures.listener.MessageListenerTesting;
+import org.jmedina.jtetris.figures.kafka.listener.MessageListenerTesting;
+import org.jmedina.jtetris.figures.service.impl.KafkaServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,19 @@ public class AssertUtil {
 	@Qualifier("messageListener")
 	private MessageListenerTesting listener;
 
+	@Autowired
+	private KafkaServiceImpl kafkaService;
+
 	static final String JSON_CAJA = "{\"boxes\":[{\"x\":0.0,\"y\":0.0},{\"x\":0.0,\"y\":20.0},{\"x\":20.0,\"y\":0.0},{\"x\":20.0,\"y\":20.0}]}";
 	static final String JSON_ELE = "{\"boxes\":[{\"x\":0.0,\"y\":0.0},{\"x\":0.0,\"y\":20.0},{\"x\":0.0,\"y\":40.0},{\"x\":0.0,\"y\":60.0}]}";
 
 	public void resetMessageListener() {
 		this.listener.setMessage(null);
 		this.listener.resetLatch();
+	}
+
+	public void resetKafkaSendMessageWithException() {
+		this.kafkaService.resetLatchForTesting();
 	}
 
 	public void awaitOneSecond() {
@@ -42,6 +50,11 @@ public class AssertUtil {
 	public void assertMessageListenerLatch() throws InterruptedException {
 		this.logger.debug("==> UtilTest.assertMessageListenerLatch() = {}", this.listener);
 		assertTrue(this.listener.getLatch().await(10, TimeUnit.SECONDS));
+	}
+
+	public void assertKafkaSendMessageWithException() throws InterruptedException {
+		this.logger.debug("==> UtilTest.assertKafkaSendMessageWithException() = {}", this.listener);
+		assertTrue(this.kafkaService.getLatchForTesting().await(10, TimeUnit.SECONDS));
 	}
 
 	public void assertMessageCaja() {

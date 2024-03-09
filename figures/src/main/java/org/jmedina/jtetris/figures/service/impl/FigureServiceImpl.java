@@ -2,12 +2,12 @@ package org.jmedina.jtetris.figures.service.impl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.figures.domain.Figura;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
-import org.jmedina.jtetris.figures.model.Figura;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.util.RandomUtil;
 import org.jmedina.jtetris.figures.util.SerializeUtil;

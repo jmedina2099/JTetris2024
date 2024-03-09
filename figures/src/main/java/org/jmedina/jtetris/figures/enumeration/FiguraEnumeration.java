@@ -15,9 +15,15 @@ import lombok.Getter;
 @Getter
 public enum FiguraEnumeration {
 
-	CAJA, ELE;
+	CAJA(1), ELE(2);
+
+	private int id;
 
 	private final List<Pair<Integer, Integer>> tuplas = new ArrayList<>();
+
+	FiguraEnumeration(int id) {
+		this.id = id;
+	}
 
 	public void loadCoordinates(String coords) {
 		if (this.tuplas.isEmpty()) {

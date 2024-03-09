@@ -28,6 +28,11 @@ class FigureTest {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
+	private static final int CAJA_HASH_CODE = -916896875;
+	private static final int ELE_HASH_CODE = 305087440;
+	private static final int BOX_HASH_CODE = 3481;
+	private static final int CAJA_WITHOUT_BOXES_HASH_CODE = 3583;
+
 	@Test
 	@Order(1)
 	@DisplayName("Test for Caja")
@@ -61,7 +66,7 @@ class FigureTest {
 		assertEquals(caja1, caja2);
 		assertNotEquals(caja1, caja3);
 		assertNotEquals(caja1, ele);
-		assertEquals(false,Objects.equals(caja1,null));
+		assertEquals(false, Objects.equals(caja1, null));
 		assertTrue(caja1.canEqual(caja1));
 		assertTrue(caja1.canEqual(caja2));
 		assertFalse(caja3.canEqual(caja1));
@@ -69,7 +74,7 @@ class FigureTest {
 		this.logger.debug("===> caja1.hashCode() = {}", caja1.hashCode());
 		this.logger.debug("===> caja2.hashCode() = {}", caja2.hashCode());
 		this.logger.debug("===> ele.hashCode() = {}", ele.hashCode());
-		assertEquals(caja1.hashCode(), -916900356);
+		assertEquals(CAJA_HASH_CODE, caja1.hashCode());
 		assertEquals(caja1.hashCode(), caja2.hashCode());
 		assertNotEquals(caja1.hashCode(), ele.hashCode());
 		caja4.setBoxes(null);
@@ -79,7 +84,9 @@ class FigureTest {
 		caja4.setBoxes(new ArrayList<>());
 		assertNotEquals(caja1, caja4);
 		this.logger.debug("===> caja1.hashCode() = {}", caja1.hashCode());
-		assertEquals(102, caja1.hashCode());
+		assertEquals(CAJA_WITHOUT_BOXES_HASH_CODE, caja1.hashCode());
+		ele.setBoxes(null);
+		assertNotEquals(caja1, ele); // without boxes.
 	}
 
 	@Test
@@ -102,7 +109,7 @@ class FigureTest {
 		this.logger.debug("===> ele1.hashCode() = {}", ele1.hashCode());
 		this.logger.debug("===> ele2.hashCode() = {}", ele2.hashCode());
 		this.logger.debug("===> caja.hashCode() = {}", caja.hashCode());
-		assertEquals(305083900, ele1.hashCode());
+		assertEquals(ELE_HASH_CODE, ele1.hashCode());
 		assertEquals(ele1.hashCode(), ele2.hashCode());
 		assertNotEquals(ele1.hashCode(), caja.hashCode());
 	}
@@ -134,7 +141,7 @@ class FigureTest {
 		this.logger.debug("===> box1.hashCode() = {}", box1.hashCode());
 		this.logger.debug("===> box2.hashCode() = {}", box2.hashCode());
 		this.logger.debug("===> caja.hashCode() = {}", caja.hashCode());
-		assertEquals(3481, box1.hashCode());
+		assertEquals(BOX_HASH_CODE, box1.hashCode());
 		assertEquals(box1.hashCode(), box2.hashCode());
 		assertNotEquals(box1.hashCode(), caja.hashCode());
 	}

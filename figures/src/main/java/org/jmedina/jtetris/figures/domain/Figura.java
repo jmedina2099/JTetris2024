@@ -1,4 +1,4 @@
-package org.jmedina.jtetris.figures.model;
+package org.jmedina.jtetris.figures.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

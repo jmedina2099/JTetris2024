@@ -1,6 +1,5 @@
 package org.jmedina.jtetris.figures.service;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -10,7 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.service.impl.KafkaServiceImpl;
+import org.jmedina.jtetris.figures.util.AssertUtil;
 import org.jmedina.jtetris.figures.util.SerializeUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,15 @@ class KafkaServiceExceptionTest {
 	@Autowired
 	private KafkaServiceImpl kafkaService;
 
+	@Autowired
+	private AssertUtil assertUtil;
+
+	@BeforeEach
+	void resetState() {
+		this.assertUtil.awaitOneSecond();
+		this.assertUtil.resetKafkaSendMessageWithException();
+	}
+
 	@Test
 	@Order(1)
 	@DisplayName("Test for sendMessage to kafka with Exception")
@@ -54,7 +64,7 @@ class KafkaServiceExceptionTest {
 		});
 		when(this.kafkaTemplate.send(anyString(), anyString())).thenReturn(future);
 		this.kafkaService.sendMessage(this.serializeUtil.convertFigureToString(new Caja()), nextFigureTopic);
-		assertTrue(true);
+		this.assertUtil.assertKafkaSendMessageWithException();
 	}
 
 }

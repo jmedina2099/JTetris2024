@@ -2,6 +2,7 @@ package org.jmedina.jtetris.figures.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.jmedina.jtetris.figures.domain.Figura;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package org.jmedina.jtetris.figures.listener;
+package org.jmedina.jtetris.figures.kafka.listener;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -21,7 +21,7 @@ public class MessageListenerTesting {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 	private String message;
-	
+
 	private CountDownLatch latch = new CountDownLatch(1);
 
 	@KafkaListener(topics = "${figures.topic.nextFigure}", groupId = "${figures.groupId.messageTest}")
@@ -33,5 +33,5 @@ public class MessageListenerTesting {
 
 	public void resetLatch() {
 		this.latch = new CountDownLatch(1);
-    }
+	}
 }

@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.figures.service.impl;
 
-import org.jmedina.jtetris.figures.model.Figura;
+import org.jmedina.jtetris.figures.domain.Figura;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 
