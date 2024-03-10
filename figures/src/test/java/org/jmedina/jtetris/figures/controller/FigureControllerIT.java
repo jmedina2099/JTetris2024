@@ -9,12 +9,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmedina.jtetris.figures.util.AssertUtilTesting;
+import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
 import org.jmedina.jtetris.figures.util.RandomUtil;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -28,8 +29,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
  *
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestInstance(Lifecycle.PER_CLASS)
 @EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
-class FigureControllerIT {
+class FigureControllerIT extends KafkaHelperTesting {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -38,15 +40,6 @@ class FigureControllerIT {
 
 	@MockBean
 	private RandomUtil random;
-
-	@Autowired
-	private AssertUtilTesting assertUtil;
-
-	@BeforeEach
-	void resetState() {
-		this.assertUtil.awaitOneSecond();
-		this.assertUtil.resetMessageListener();
-	}
 
 	@Test
 	@Order(1)
@@ -68,8 +61,8 @@ class FigureControllerIT {
 				.header(ACCEPT, "application/json").accept(APPLICATION_JSON).exchange().expectStatus().isOk()
 				.expectBody(Boolean.class).returnResult();
 		assertTrue(response.getResponseBody());
-		this.assertUtil.assertMessageListenerLatch();
-		this.assertUtil.assertMessageCaja();
+		super.assertMessageListenerLatch();
+		super.assertMessageCaja();
 	}
 
 	@Test
@@ -82,7 +75,7 @@ class FigureControllerIT {
 				.header(ACCEPT, "application/json").accept(APPLICATION_JSON).exchange().expectStatus().isOk()
 				.expectBody(Boolean.class).returnResult();
 		assertTrue(response.getResponseBody());
-		this.assertUtil.assertMessageListenerLatch();
-		this.assertUtil.assertMessageEle();
+		super.assertMessageListenerLatch();
+		super.assertMessageEle();
 	}
 }

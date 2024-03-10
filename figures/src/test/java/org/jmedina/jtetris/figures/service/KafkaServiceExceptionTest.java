@@ -21,14 +21,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.test.annotation.DirtiesContext;
 
 /**
  * @author Jorge Medina
  *
  */
 @SpringBootTest
-@DirtiesContext
 class KafkaServiceExceptionTest {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
@@ -51,7 +49,7 @@ class KafkaServiceExceptionTest {
 	@BeforeEach
 	void resetState() {
 		this.assertUtil.awaitOneSecond();
-		this.assertUtil.resetKafkaSendMessageWithException();
+		this.kafkaService.resetLatchForTesting();
 	}
 
 	@Test
@@ -64,7 +62,7 @@ class KafkaServiceExceptionTest {
 		});
 		when(this.kafkaTemplate.send(anyString(), anyString())).thenReturn(future);
 		this.kafkaService.sendMessage(this.serializeUtil.convertFigureToString(new Caja()), nextFigureTopic);
-		this.assertUtil.assertKafkaSendMessageWithException();
+		this.assertUtil.assertLatch(this.kafkaService.getLatchForTesting());
 	}
 
 }
