@@ -37,6 +37,9 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	@Value("${figures.topic.nextFigure}")
 	public String nextFigureTopic;
 
+	@Value("${figures.mongodb.blockFindAll:false}")
+	private boolean blockFindAll;
+
 	@Override
 	public void askForNextFigure() throws ServiceException {
 		this.logger.debug("==> FigureService.getNextFigure()");
@@ -58,15 +61,20 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		this.logger.debug("==> FigureService.onApplicationEvent()");
-		this.loadFigurasFromDB();
+		this.loadFigurasFromDB(this.blockFindAll);
 	}
 
-	private void loadFigurasFromDB() {
+	public void loadFigurasFromDB(boolean blockLast) {
 		this.logger.debug("==> FigureService.loadFigurasFromDB()");
 		Flux<Figura> listFigures = this.figureTemplateOperations.findAll();
-		listFigures.subscribe(f -> FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes()));
-		listFigures.blockLast();
-		this.logger.debug("==> FigureService.loadFigurasFromDB() -- DONE");
+		listFigures.subscribe(f -> {
+			this.logger.debug("==> loadFigurasFromDB ==> {}", f);
+			FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
+		});
+		if (blockLast) {
+			listFigures.blockLast();
+			this.logger.debug("==> FigureService.loadFigurasFromDB() --> DONE");
+		}
 	}
 
 }

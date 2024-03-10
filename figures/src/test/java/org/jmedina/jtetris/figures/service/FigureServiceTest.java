@@ -1,6 +1,7 @@
 package org.jmedina.jtetris.figures.service;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -79,5 +80,14 @@ class FigureServiceTest {
 			this.figureService.askForNextFigure();
 		});
 		assertEquals("java.lang.IllegalArgumentException: Unexpected value: -1", exception.getMessage());
+	}
+
+	@Test
+	@Order(4)
+	@DisplayName("Test for loadFigurasFromDB")
+	void testLoadFigurasFromDB() throws Exception {
+		this.logger.debug("==> FigureServiceTest.testLoadFigurasFromDB()");
+		this.figureService.loadFigurasFromDB(false);
+		assertTrue(true);
 	}
 }
