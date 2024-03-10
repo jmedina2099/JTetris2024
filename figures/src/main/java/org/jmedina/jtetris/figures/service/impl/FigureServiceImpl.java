@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.figures.service.impl;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,24 +68,21 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	@Override
 	public void loadFigurasFromDB() {
 		this.logger.debug("==> FigureService.loadFigurasFromDB()");
-		AtomicBoolean hasElements = new AtomicBoolean(false);
 		Flux<Figura> listFigures = this.figureTemplateOperations.findAll();
-		listFigures.subscribe(f -> {
-			this.logger.debug("====> loading Figuras (1) ==> {}", f);
-			hasElements.set(true);
-			FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
-		});
-		listFigures.blockLast();
-		if (!hasElements.get()) {
+		listFigures.subscribe(f -> this.loadFigureCoordinates(f, 1));
+		if (Objects.isNull(listFigures.blockFirst())) {
 			this.logger.debug("==> loading initial data...");
-			Flux<Figura> flux = this.figureRepository.saveAll(Flux.just(new Figura(null, "CAJA", "(0,0)-(0,1)-(1,0)-(1,1)"),
-													new Figura(null, "ELE", "(0,0)-(0,1)-(0,2)-(0,3)")));
-			flux.subscribe(f -> {
-				this.logger.debug("====> loading Figuras (2) ==> {}", f);
-				FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
-			});
+			this.figureRepository
+					.saveAll(Flux.just(new Figura(null, "CAJA", "(0,0)-(0,1)-(1,0)-(1,1)"),
+							new Figura(null, "ELE", "(0,0)-(0,1)-(0,2)-(0,3)")))
+					.subscribe(f -> this.loadFigureCoordinates(f, 2));
 		}
 		this.logger.debug("==> FigureService.loadFigurasFromDB() ==> DONE");
+	}
+
+	private void loadFigureCoordinates(Figura f, int id) {
+		this.logger.debug("====> loading Figuras ({}) ==> {}", id, f);
+		FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
 	}
 
 }
