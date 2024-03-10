@@ -1,5 +1,7 @@
 package org.jmedina.jtetris.figures.service.impl;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.domain.Figura;
@@ -8,6 +10,7 @@ import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
+import org.jmedina.jtetris.figures.repository.FigureRepository;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
 import org.jmedina.jtetris.figures.util.RandomUtil;
@@ -30,6 +33,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final FigureTemplateOperations figureTemplateOperations;
+	private final FigureRepository figureRepository;
 	private final KafkaServiceImpl kafkaService;
 	private final SerializeUtil serializeUtil;
 	private final RandomUtil random;
@@ -37,8 +41,11 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	@Value("${figures.topic.nextFigure}")
 	public String nextFigureTopic;
 
-	@Value("${figures.mongodb.blockFindAll:false}")
-	private boolean blockFindAll;
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		this.logger.debug("==> FigureService.onApplicationEvent()");
+		this.loadFigurasFromDB();
+	}
 
 	@Override
 	public void askForNextFigure() throws ServiceException {
@@ -59,22 +66,26 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	}
 
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		this.logger.debug("==> FigureService.onApplicationEvent()");
-		this.loadFigurasFromDB(this.blockFindAll);
-	}
-
-	public void loadFigurasFromDB(boolean blockLast) {
+	public void loadFigurasFromDB() {
 		this.logger.debug("==> FigureService.loadFigurasFromDB()");
+		AtomicBoolean hasElements = new AtomicBoolean(false);
 		Flux<Figura> listFigures = this.figureTemplateOperations.findAll();
 		listFigures.subscribe(f -> {
-			this.logger.debug("==> loadFigurasFromDB ==> {}", f);
+			this.logger.debug("====> loading Figuras (1) ==> {}", f);
+			hasElements.set(true);
 			FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
 		});
-		if (blockLast) {
-			listFigures.blockLast();
-			this.logger.debug("==> FigureService.loadFigurasFromDB() --> DONE");
+		listFigures.blockLast();
+		if (!hasElements.get()) {
+			this.logger.debug("==> loading initial data...");
+			Flux<Figura> flux = this.figureRepository.saveAll(Flux.just(new Figura(null, "CAJA", "(0,0)-(0,1)-(1,0)-(1,1)"),
+													new Figura(null, "ELE", "(0,0)-(0,1)-(0,2)-(0,3)")));
+			flux.subscribe(f -> {
+				this.logger.debug("====> loading Figuras (2) ==> {}", f);
+				FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
+			});
 		}
+		this.logger.debug("==> FigureService.loadFigurasFromDB() ==> DONE");
 	}
 
 }

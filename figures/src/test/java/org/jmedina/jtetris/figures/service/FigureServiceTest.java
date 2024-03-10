@@ -76,7 +76,7 @@ class FigureServiceTest extends KafkaHelperTesting {
 	@DisplayName("Test for loadFigurasFromDB")
 	void testLoadFigurasFromDB() throws Exception {
 		this.logger.debug("==> FigureServiceTest.testLoadFigurasFromDB()");
-		this.figureService.loadFigurasFromDB(false);
+		this.figureService.loadFigurasFromDB();
 		assertTrue(true);
 	}
 }

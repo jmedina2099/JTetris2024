@@ -26,13 +26,13 @@ public class FigureController {
 
 	@GetMapping("/hello")
 	public Mono<ResponseEntity<String>> hello() {
-		this.logger.debug("===> FigureHandler.hello()");
+		this.logger.debug("===> FigureController.hello()");
 		return Mono.just(ResponseEntity.status(HttpStatus.OK).body("Hello from figures reactive!!!"));
 	}
 
 	@GetMapping("/askForNextFigure")
 	public Mono<ResponseEntity<Boolean>> askForNextFigure() {
-		this.logger.debug("===> FigureHandler.askForNextFigure()");
+		this.logger.debug("===> FigureController.askForNextFigure()");
 		this.figureService.askForNextFigure();
 		return Mono.just(ResponseEntity.status(HttpStatus.OK).body(true));
 	}

@@ -27,5 +27,3 @@ figures:
     messageTest: figureMessageTest
   mongodb:
     name: ${app.mongo.db.name}
-    loadInitial: true
-    blockFindAll: true

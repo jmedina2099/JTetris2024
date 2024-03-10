@@ -41,5 +41,3 @@ figures:
     nextFigure: nextFigureTopic
   mongodb:
     name: ${app.mongo.db.name}
-    loadInitial: false
-    blockFindAll: false

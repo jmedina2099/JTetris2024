@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.service.KafkaService;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -29,9 +30,14 @@ public class KafkaServiceImpl implements KafkaService {
 	private CountDownLatch latchForTesting = new CountDownLatch(1);
 
 	@Override
-	public void sendMessage(String message, String topic) {
-		this.logger.debug("==> KafkaService.sendMessage() = {}", message);
-		CompletableFuture<SendResult<String, String>> future = this.kafkaTemplate.send(topic, message);
+	public void sendMessage(String message, String topic) throws ServiceException {
+		this.logger.debug("==> KafkaService.sendMessage() = {} {}", message, topic);
+		CompletableFuture<SendResult<String, String>> future = null;
+		try {
+			future = this.kafkaTemplate.send(topic, message);
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
 		future.whenComplete((result, ex) -> {
 			if (Objects.nonNull(ex)) {
 				this.logger.error("=*=> Unable to send message=[{}] due to : {}", message, ex.getMessage());

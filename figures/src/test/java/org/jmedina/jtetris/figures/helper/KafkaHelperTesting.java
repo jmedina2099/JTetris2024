@@ -1,6 +1,12 @@
 package org.jmedina.jtetris.figures.helper;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +41,7 @@ public class KafkaHelperTesting {
 	@Value("${figures.topic.nextFigure}")
 	public String topicNextFigure;
 
+	@Autowired
 	protected MessageListenerTesting messageListenerTesting;
 
 	@Autowired
@@ -50,20 +57,25 @@ public class KafkaHelperTesting {
 	@Autowired
 	private AssertUtilTesting assertUtil;
 
+	private CountDownLatch latch = new CountDownLatch(1);
+
 	@BeforeAll
-	void startListener() {
-		this.logger.debug("==> FigureServiceDefaultTest.startListener()");
-		this.createAndRegisterListener();
+	protected void startListener() throws InterruptedException {
+		this.logger.debug("==> KafkaHelperTesting.startListener() =" + this.messageListenerTesting);
+		if (!this.listenerIsRunning()) {
+			this.createAndRegisterListener();
+		}
 	}
 
 	@AfterAll
-	void clearListener() {
-		this.logger.debug("==> FigureServiceDefaultTest.clearListener()");
+	protected void clearListener() throws InterruptedException {
+		this.logger.debug("==> KafkaHelperTesting.clearListener() =" + this.messageListenerTesting);
 		this.unRegisterListener();
+		this.logger.debug("==> KafkaHelperTesting.clearListener() ==> DONE");
 	}
 
 	@BeforeEach
-	void resetState() {
+	protected void resetState() {
 		this.assertUtil.awaitOneSecond();
 		this.resetMessageListener();
 	}
@@ -88,9 +100,29 @@ public class KafkaHelperTesting {
 		this.assertUtil.assertMessageFigura(this.messageListenerTesting.getMessage());
 	}
 
-	protected void createAndRegisterListener() {
+	private void createAndRegisterListener() {
 		kafkaListenerEndpointRegistry.registerListenerContainer(createKafkaListenerEndpoint(),
 				kafkaListenerContainerFactory, true);
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean listenerIsRunning() throws InterruptedException {
+		AtomicReference<MessageListenerContainer> listenerRef = new AtomicReference<MessageListenerContainer>();
+		List<MessageListenerContainer> groupList = (List<MessageListenerContainer>) context.getBean("endpointGroup");
+		if (Objects.nonNull(groupList)) {
+			groupList.stream().forEach(l -> {
+				listenerRef.set(l);
+			});
+			MessageListenerContainer listener = listenerRef.get();
+			if (Objects.nonNull(listener)) {
+				if (listener.isRunning()) {
+					this.logger.debug("==> listener = " + listener);
+					return true;
+				}
+				this.unRegisterListener();
+			}
+		}
+		return false;
 	}
 
 	private KafkaListenerEndpoint createKafkaListenerEndpoint() {
@@ -117,19 +149,22 @@ public class KafkaHelperTesting {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void unRegisterListener() {
-		kafkaListenerEndpointRegistry.unregisterListenerContainer("kafkaListener");
-		MessageListenerContainer[] listener = new MessageListenerContainer[1];
+	private void unRegisterListener() throws InterruptedException {
+		AtomicReference<MessageListenerContainer> listener = new AtomicReference<MessageListenerContainer>();
 		List<MessageListenerContainer> groupList = (List<MessageListenerContainer>) context.getBean("endpointGroup");
 		groupList.stream().forEach(l -> {
-			listener[0] = l;
+			listener.set(l);
 			l.stop(() -> {
 				l.destroy();
+				this.latch.countDown();
 			});
 		});
-		groupList.remove(listener[0]);
+		kafkaListenerEndpointRegistry.unregisterListenerContainer("kafkaListener");
+		groupList.remove(listener.get());
 		ContainerGroup containerGroup = (ContainerGroup) context.getBean("endpointGroup.group");
-		containerGroup.removeContainer(listener[0]);
+		containerGroup.removeContainer(listener.get());
 		containerGroup.stop();
+		assertTrue(this.latch.await(10, TimeUnit.SECONDS));
 	}
+
 }

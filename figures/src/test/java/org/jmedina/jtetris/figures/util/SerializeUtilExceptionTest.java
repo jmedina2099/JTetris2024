@@ -6,9 +6,12 @@ import static org.mockito.Mockito.when;
 
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
+import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class SerializeUtilExceptionTest {
+@TestInstance(Lifecycle.PER_CLASS)
+class SerializeUtilExceptionTest extends KafkaHelperTesting {
 
 	@MockBean
 	private ObjectMapper mapper;

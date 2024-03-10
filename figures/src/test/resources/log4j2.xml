@@ -14,8 +14,8 @@
             <PatternLayout pattern="${LOG_PATTERN}" />
         </Console>
         <RollingFile name="appLogFigures"
-                fileName="${APP_LOG_ROOT}/jtetris-figures.log"
-                filePattern="${APP_LOG_ROOT}/jtetris-%d{yyyy-MM-dd}-%i.log">
+                fileName="${APP_LOG_ROOT}/jtetris-figures-test.log"
+                filePattern="${APP_LOG_ROOT}/jtetris-figures-test%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="${LOG_PATTERN}" />
             <Policies>
                 <SizeBasedTriggeringPolicy size="19500KB" />
@@ -25,6 +25,10 @@
     </Appenders>
 
     <Loggers>
+    	<Logger name="org.springframework.kafka" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.jmedina.jtetris.figures" additivity="false" level="debug" includeLocation="true">
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />

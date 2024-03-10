@@ -9,4 +9,6 @@ import org.jmedina.jtetris.figures.exception.ServiceException;
 public interface FigureService {
 
 	public void askForNextFigure() throws ServiceException;
+
+	public void loadFigurasFromDB();
 }
