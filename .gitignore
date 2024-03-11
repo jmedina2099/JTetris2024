@@ -5,3 +5,5 @@ gateway/target/*
 api/target/*
 engine/target/*
 figures/target/*
+frontend/package-lock.json
+node-server/package-lock.json

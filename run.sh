@@ -9,8 +9,7 @@ mysqld --user=root --init-file=/root/installation/create-user.sql &
 
 source /root/.bashrc
 
-cd node-server
+cd /root/installation/node-server
 ./run.sh &
 
-cd ..
 /root/installation/wildfly-preview-26.1.3.Final/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0

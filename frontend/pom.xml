@@ -75,6 +75,12 @@
 							</includes>
 						</fileset>
 						<fileset>
+							<directory>dist</directory>
+							<includes>
+								<include>**</include>
+							</includes>
+						</fileset>
+						<fileset>
 							<directory>node_modules</directory>
 							<includes>
 								<include>**</include>
