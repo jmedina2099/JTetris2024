@@ -26,6 +26,10 @@
     </Appenders>
 
     <Loggers>
+    	<Logger name="org.springframework.kafka" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.jmedina.jtetris.figures" additivity="false" level="debug" includeLocation="true">
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />

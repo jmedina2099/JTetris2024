@@ -54,9 +54,6 @@ public class KafkaHelperTesting {
 	@Autowired
 	private KafkaListenerContainerFactory kafkaListenerContainerFactory;
 
-	@Autowired
-	private AssertUtilTesting assertUtil;
-
 	private CountDownLatch latch = new CountDownLatch(1);
 
 	@BeforeAll
@@ -76,7 +73,7 @@ public class KafkaHelperTesting {
 
 	@BeforeEach
 	protected void resetState() {
-		this.assertUtil.awaitOneSecond();
+		AssertUtilTesting.awaitOneSecond();
 		this.resetMessageListener();
 	}
 
@@ -85,19 +82,19 @@ public class KafkaHelperTesting {
 	}
 
 	protected void assertMessageListenerLatch() throws InterruptedException {
-		this.assertUtil.assertLatch(this.messageListenerTesting.getLatch());
+		AssertUtilTesting.assertLatch(this.messageListenerTesting.getLatch());
 	}
 
 	protected void assertMessageCaja() {
-		this.assertUtil.assertMessageCaja(this.messageListenerTesting.getMessage());
+		AssertUtilTesting.assertMessageCaja(this.messageListenerTesting.getMessage());
 	}
 
 	protected void assertMessageEle() {
-		this.assertUtil.assertMessageEle(this.messageListenerTesting.getMessage());
+		AssertUtilTesting.assertMessageEle(this.messageListenerTesting.getMessage());
 	}
 
 	protected void assertMessageFigure() {
-		this.assertUtil.assertMessageFigura(this.messageListenerTesting.getMessage());
+		AssertUtilTesting.assertMessageFigura(this.messageListenerTesting.getMessage());
 	}
 
 	private void createAndRegisterListener() {

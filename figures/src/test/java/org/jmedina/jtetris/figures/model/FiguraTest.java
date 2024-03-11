@@ -6,11 +6,14 @@ import org.jmedina.jtetris.figures.domain.Figura;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
 /**
  * @author Jorge Medina
  *
  */
+@TestMethodOrder(OrderAnnotation.class)
 class FiguraTest {
 
 	@Test
