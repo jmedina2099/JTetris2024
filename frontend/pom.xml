@@ -69,9 +69,9 @@
 				<configuration>
 					<filesets>
 						<fileset>
-							<directory>dist</directory>
+							<directory>.</directory>
 							<includes>
-								<include>**</include>
+								<include>package-lock.json</include>
 							</includes>
 						</fileset>
 						<fileset>
