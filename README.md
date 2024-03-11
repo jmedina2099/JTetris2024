@@ -16,7 +16,7 @@ mvn clean verify sonar:sonar
 mvn clean spring-boot:run -DskipTests -Ptomcat
 
 # For generating wars
-mvn package -DskipTests -Pjboss
+mvn clean package -DskipTests -Pjboss
 
 # For generating a docker image
 docker image build -t jtetris .
@@ -25,5 +25,5 @@ docker image build -t jtetris .
 docker run -p 8080:8080 -p 9990:9990 -p 4444:4444 -p 9083:9083 jtetris
 
 # For deployment in Wildfly Preview v26.1.3.Final
-mvn wildfly:deploy -DskipTests -Pjboss
+mvn clean wildfly:deploy -DskipTests -Pjboss
 
