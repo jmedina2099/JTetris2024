@@ -35,6 +35,14 @@ SHELL ["/bin/bash", "--login", "-c"]
 RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 RUN nvm install 18.16.0
 
+RUN aptitude install curl -y
+RUN curl -fsSL https://pgp.mongodb.com/server-7.0.asc | gpg  --dearmor -o /etc/apt/trusted.gpg.d/mongodb-server-7.0.gpg
+RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+RUN aptitude update
+RUN aptitude install mongodb-org -y
+
+RUN mkdir -p /var/log/jtetris
+
 ENV JAVA_HOME /usr/lib/jvm/jdk-17-oracle-x64
 RUN export JAVA_HOME
 

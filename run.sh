@@ -1,5 +1,7 @@
 #!/bin/bash
 
+/usr/bin/mongod --config /etc/mongod.conf &
+
 mysqld --user=root --init-file=/root/installation/create-user.sql &
 
 /root/installation/kafka_2.13-3.7.0/bin/zookeeper-server-start.sh /root/installation/kafka_2.13-3.7.0/config/zookeeper.properties &
