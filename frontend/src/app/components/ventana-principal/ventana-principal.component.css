@@ -3,8 +3,8 @@
 }
 
 .panel {
-  width: 202px;
-  height: 402px;
+  width: 201px;
+  height: 401px;
   background-color: black;
   border: 1px solid white;
   position: relative;
@@ -12,8 +12,8 @@
 
 .box {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
   background-color: blue;
   border: 1px solid white;
 }

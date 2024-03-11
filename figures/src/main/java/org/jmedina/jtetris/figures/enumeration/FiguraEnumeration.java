@@ -15,7 +15,7 @@ import lombok.Getter;
 @Getter
 public enum FiguraEnumeration {
 
-	CAJA(1), ELE(2);
+	CAJA(1), ELE(2), TE(3);
 
 	private int id;
 

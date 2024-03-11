@@ -1,6 +1,9 @@
 package org.jmedina.jtetris.figures.service.impl;
 
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +13,7 @@ import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
+import org.jmedina.jtetris.figures.figure.Te;
 import org.jmedina.jtetris.figures.repository.FigureRepository;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
@@ -18,6 +22,7 @@ import org.jmedina.jtetris.figures.util.SerializeUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -39,7 +44,10 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	private final RandomUtil random;
 
 	@Value("${figures.topic.nextFigure}")
-	public String nextFigureTopic;
+	private String nextFigureTopic;
+
+	@Value("classpath:data/initialData.json")
+	private Resource initialDataResource;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -51,13 +59,16 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	public void askForNextFigure() throws ServiceException {
 		this.logger.debug("==> FigureService.getNextFigure()");
 		Figure figure = null;
-		int value = this.random.nextInt(2);
+		int value = this.random.nextInt(FiguraEnumeration.values().length);
 		switch (value) {
 		case 0:
 			figure = new Caja();
 			break;
 		case 1:
 			figure = new Ele();
+			break;
+		case 2:
+			figure = new Te();
 			break;
 		default:
 			throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
@@ -69,20 +80,37 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	public void loadFigurasFromDB() {
 		this.logger.debug("==> FigureService.loadFigurasFromDB()");
 		Flux<Figura> listFigures = this.figureTemplateOperations.findAll();
-		listFigures.subscribe(f -> this.loadFigureCoordinates(f, 1));
+		listFigures.subscribe(f -> loadFigureCoordinates(f, 1));
 		if (Objects.isNull(listFigures.blockFirst())) {
-			this.logger.debug("==> loading initial data...");
-			this.figureRepository
-					.saveAll(Flux.just(new Figura(null, "CAJA", "(0,0)-(0,1)-(1,0)-(1,1)"),
-							new Figura(null, "ELE", "(0,0)-(0,1)-(0,2)-(0,3)")))
-					.subscribe(f -> this.loadFigureCoordinates(f, 2));
+			this.logger.debug("=======> loading initial data...");
+			saveFiguras(generateFigurasFromString(linesFromResource(this.initialDataResource)));
 		}
 		this.logger.debug("==> FigureService.loadFigurasFromDB() ==> DONE");
+	}
+
+	private void saveFiguras(List<Figura> figuras) {
+		this.figureRepository.saveAll(Flux.just(figuras.toArray(new Figura[0])))
+				.subscribe(f -> loadFigureCoordinates(f, 2));
 	}
 
 	private void loadFigureCoordinates(Figura f, int id) {
 		this.logger.debug("====> loading Figuras ({}) ==> {}", id, f);
 		FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
+	}
+
+	private List<String> linesFromResource(Resource input) {
+		List<String> list = null;
+		try {
+			list = Files.readAllLines(input.getFile().toPath());
+		} catch (Exception e) {
+			this.logger.error("=*=> Error trying to read the resource {} = {}", input, e);
+		}
+		return list;
+	}
+
+	private List<Figura> generateFigurasFromString(List<String> lines) {
+		return lines.stream().map(line -> serializeUtil.convertStringToFigure(line, Figura.class))
+				.collect(Collectors.toList());
 	}
 
 }
