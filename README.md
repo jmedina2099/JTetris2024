@@ -60,7 +60,7 @@ mvn clean wildfly:deploy -DskipTests -Pjboss
 docker image build -t jtetris .
 
 # For running the docker image
-docker run -p 8080:8080 -p 9990:9990 -p 4444:4444 -p 9083:9083 jtetris
+docker run -p 8080:8080 -p 9990:9990 -p 4444:4444 -p 9083:9083 -p 27017:27017 jtetris
 
 # For clean
 mvn clean
