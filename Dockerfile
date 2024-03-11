@@ -41,6 +41,8 @@ RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mon
 RUN aptitude update
 RUN aptitude install mongodb-org -y
 
+RUN aptitude install less -y
+
 RUN mkdir -p /var/log/jtetris
 
 ENV JAVA_HOME /usr/lib/jvm/jdk-17-oracle-x64
