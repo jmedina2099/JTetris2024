@@ -18,7 +18,7 @@
 # 3) Compile and run the node-server app using port 4444 (included)
 #########################################################
 
-# Compilation ( java and typescript )
+# Compilation ( Java and Typescript )
 mvn clean compile
 
 # For executing unit tests
