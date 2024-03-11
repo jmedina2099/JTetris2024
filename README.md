@@ -13,7 +13,7 @@
 # Install and run the following:
 # - Kafka v2.13-3.7.0 using port 9092 (optional for tests using the embedded kafka)
 # - MongoDB v6.0.14 using port 27017 (with database name: jtetris)
-# - MySQL v.8.0.36 using port 3306 (with database name: jtetris)
+# - MySQL v8.0.36 using port 3306 (with database name: jtetris)
 #########################################################
 # 3) Compile and run the node-server app using port 4444 (included)
 #########################################################
