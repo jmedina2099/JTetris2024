@@ -35,10 +35,12 @@ mvn clean verify sonar:sonar
 
 # For running the node-server app using port 4444 (socket.io communication with angular)
 cd ./node-server
+
 ./run.sh
 
 # For running the front-end with npm
 cd ./frontend
+
 ./run.sh
 
 # For generating wars for spring-boot
