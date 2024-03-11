@@ -38,7 +38,8 @@ cd ./node-server
 ./run.sh
 
 # For running the front-end with npm
-npm start
+cd ./frontend
+./run.sh
 
 # For generating wars for spring-boot
 mvn clean package -DskipTests -Ptomcat
