@@ -4,7 +4,7 @@
 #########################################################
 # 1) Pre-requisites
 # Having installed:
-# - Java v17.0.6
+# - Java v7.0.6
 # - Maven v3.9.6
 # - Node v18.16.0
 # - Npm v9.5.1
@@ -12,7 +12,7 @@
 # 2) Requisites
 # Install and run the following:
 # - Kafka v2.13-3.7.0 using port 9092 (optional for tests using the embedded kafka)
-# - MongoDB V6.0.14 using port 27017 (with database name: jtetris)
+# - MongoDB v6.0.14 using port 27017 (with database name: jtetris)
 # - MySQL v.8.0.36 using port 3306 (with database name: jtetris)
 #########################################################
 # 3) Compile and run the node-server app using port 4444 (included)
