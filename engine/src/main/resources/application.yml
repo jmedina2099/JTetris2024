@@ -3,6 +3,11 @@ server:
 spring:
   application:
     name: ${app.engine.name}
+  cloud:
+    loadbalancer:
+      enabled: true
+      ribbon:
+        enabled: false
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,6 +31,33 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   webflux:
     base-path: ${app.engine.context.path} # reactive
+reactive:
+  feign:
+    cloud:
+      enabled: true
+    ribbon:
+      enabled: false  
+    loadbalancer:
+      enabled: true
+    client:
+      config:
+        httpBinClient:
+          options:
+            readTimeoutMillis: 2000
+            connectTimeoutMillis: 1000
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+    instances: 
+      HttpBinClient_getBinWithDelayInSeconds_int:
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 50
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 20s
 eureka:
   client:
     serviceUrl:
@@ -45,6 +77,9 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
   endpoints:
     web:
       exposure:

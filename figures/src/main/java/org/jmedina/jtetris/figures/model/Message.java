@@ -1,4 +1,4 @@
-package org.jmedina.jtetris.engine.model;
+package org.jmedina.jtetris.figures.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

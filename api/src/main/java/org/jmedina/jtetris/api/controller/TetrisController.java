@@ -34,9 +34,9 @@ public class TetrisController {
 	}
 
 	@GetMapping("/start")
-	public Mono<Message> start() {
+	public ResponseEntity<Mono<Message>> start() {
 		this.logger.debug("===> TetrisController.start()");
-		return this.engineClient.start();
+		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start());
 	}
 
 	@GetMapping("/moveRight")

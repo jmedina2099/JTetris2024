@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Socket } from 'socket.io-client';
 import { Figure } from 'src/app/model/figure/figure';
+import { Message } from 'src/app/model/message/message';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { WebSocketService } from 'src/app/services/socket-io/web-socket.service';
 
@@ -36,8 +37,8 @@ export class VentanaPrincipalComponent implements OnInit {
   }
 
   nextFigure(): void {
-    this.fetchService.start().subscribe((value: string) => {
-      console.log('start = ' + value);
+    this.fetchService.start().subscribe((value: Message) => {
+      console.log('start = ' + value? value.content: '');
     });
   }
 }

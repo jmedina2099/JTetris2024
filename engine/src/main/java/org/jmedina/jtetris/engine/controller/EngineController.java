@@ -5,9 +5,7 @@ import org.jmedina.jtetris.engine.service.FigureService;
 import org.jmedina.jtetris.engine.tool.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +19,7 @@ import reactor.core.publisher.Mono;
  *
  */
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:9081", "http://localhost:9083"})
+@CrossOrigin(origins = { "http://localhost:9081", "http://localhost:9083" })
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class EngineController {
@@ -39,43 +37,42 @@ public class EngineController {
 	@GetMapping(value = "/start")
 	public Mono<Message> start() {
 		this.logger.debug("===> EngineController.start()");
-		this.figureService.askForNextFigure();
-		return Mono.just(new Message("OK"));
+		return this.figureService.askForNextFigure();
 	}
 
 	@GetMapping(value = "/moveRight")
 	public Mono<Message> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
 		this.engine.moveRight();
-		return Mono.just(new Message("OK"));
+		return Mono.just(new Message("OK from engine!!!"));
 	}
 
 	@GetMapping(value = "/moveLeft")
-	public ResponseEntity<Mono<Message>> moveLeft() {
+	public Mono<Message> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
 		this.engine.moveLeft();
-		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("OK")));
+		return Mono.just(new Message("OK from engine!!!"));
 	}
 
 	@GetMapping(value = "/moveDown")
-	public ResponseEntity<Mono<Message>> moveDown() {
+	public Mono<Message> moveDown() {
 		this.logger.debug("===> EngineController.moveDown()");
 		this.engine.moveDown();
-		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("OK")));
+		return Mono.just(new Message("OK from engine!!!"));
 	}
-	
+
 	@GetMapping(value = "/rotateRight")
-	public ResponseEntity<Mono<Message>> rotateRight() {
+	public Mono<Message> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		this.engine.rotateRight();
-		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("OK")));
+		return Mono.just(new Message("OK from engine!!!"));
 	}
 
 	@GetMapping(value = "/rotateLeft")
-	public ResponseEntity<Mono<Message>> rotateLeft() {
+	public Mono<Message> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		this.engine.rotateLeft();
-		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("OK")));
+		return Mono.just(new Message("OK from engine!!!"));
 	}
-	
+
 }

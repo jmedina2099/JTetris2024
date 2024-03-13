@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Message } from 'src/app/model/message/message';
 
 @Injectable({
   providedIn: 'root',
@@ -11,28 +12,28 @@ export class FetchService {
 
   constructor(private http: HttpClient) {}
 
-  start(): Observable<string> {
-    return this.http.get<string>(this.baseUrl + '/start');
+  start(): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/start');
   }
 
-  moveRight(): Observable<string> {
-    return this.http.get<string>(this.baseUrl + '/moveRight');
+  moveRight(): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/moveRight');
   }
 
-  moveLeft(): Observable<string> {
-    return this.http.get<string>(this.baseUrl + '/moveLeft');
+  moveLeft(): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/moveLeft');
   }
 
-  moveDown(): Observable<string> {
-    return this.http.get<string>(this.baseUrl + '/moveDown');
+  moveDown(): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/moveDown');
   }
 
-  rotateRight(): Observable<string> {
-    return this.http.get<string>(this.baseUrl + '/rotateRight');
+  rotateRight(): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/rotateRight');
   }
 
-  rotateLeft(): Observable<string> {
-    return this.http.get<string>(this.baseUrl + '/rotateLeft');
+  rotateLeft(): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/rotateLeft');
   }
 
 }

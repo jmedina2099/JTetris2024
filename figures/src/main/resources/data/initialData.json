@@ -1,3 +1,4 @@
-{"name":"VERTICAL","boxes":"(0,0)-(0,1)-(0,2)-(0,3)","center":"1,1","numRotations":4}
+{"name":"CAJA","boxes":"(0,0)-(0,1)-(1,0)-(1,1)","center":"0.5,0.5","numRotations":0}
+{"name":"VERTICAL","boxes":"(0,0)-(0,1)-(0,2)-(0,3)","center":"0,1","numRotations":2}
 {"name":"TE","boxes":"(0,0)-(0,1)-(0,2)-(1,1)","center":"1,1","numRotations":4}
 {"name":"ELE","boxes":"(0,0)-(0,1)-(0,2)-(1,2)","center":"1,1","numRotations":4}

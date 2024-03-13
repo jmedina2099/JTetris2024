@@ -1,7 +1,5 @@
 package org.jmedina.jtetris.engine.tool;
 
-import java.awt.geom.Point2D;
-
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.service.KafkaService;
@@ -69,9 +67,13 @@ public class Engine {
 
 	public void rotateRight() {
 		this.logger.debug("==> Engine.rotateRight()");
+		
+		if( this.fallingFigure.numRotations == 0 ) {
+			return;
+		}
 
-		int direction = 1;
-		if( rotate(this.fallingFigure.center, direction) ) {
+		int direction = this.fallingFigure.numRotations == 2? -1: 1;
+		if( rotate(direction) ) {
 			this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessage);
 		}
 	}
@@ -79,21 +81,48 @@ public class Engine {
 	public void rotateLeft() {
 		this.logger.debug("==> Engine.rotateLeft()");
 
+		if( this.fallingFigure.numRotations == 0 ) {
+			return;
+		}
+
 		int direction = -1;
-		if( rotate(this.fallingFigure.center, direction) ) {
+		if( rotate(direction) ) {
 			this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessage);
 		}
 	}
 
-	private boolean rotate(Point2D.Double center, int direction) {
+	private boolean rotate(int direction) {
 		this.logger.debug("==> Engine.rotate()");
-		this.fallingFigure.rotation++;
-		this.fallingFigure.rotation = this.fallingFigure.rotation % this.fallingFigure.numRotations;
 		
-		this.logger.debug("==> center = {}",center);
+		if( this.fallingFigure.numRotations == 2 ) {
+			if( this.fallingFigure.rotation == 0 ) {
+				this.fallingFigure.rotation++;
+			} else {
+				direction *= -1;
+				this.fallingFigure.rotation = 0;
+			}
+		} else {
+			this.fallingFigure.rotation++;
+			this.fallingFigure.rotation = this.fallingFigure.rotation % this.fallingFigure.numRotations;
+		}
 		
-		Figure tmpFigure = RotationUtil.rotateFigure(this.fallingFigure, center, direction);
+		this.logger.debug("==> center = {}",this.fallingFigure.getCenter());
+		
+		Figure tmpFigure = RotationUtil.rotateFigure(this.fallingFigure, direction);
+		double max = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
+		double size = Box.SIZE;
+		while ((max + size) > size * 10) {
+			tmpFigure.moveLeft();
+			max = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
+		}
+		double min = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
+		while (min < 0) {
+			tmpFigure.moveRight();
+			min = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
+		}
+		
 		this.fallingFigure.setBoxes(tmpFigure.getBoxes());
+		this.fallingFigure.setCenter(tmpFigure.getCenter());
 		return true;
 	}
 }

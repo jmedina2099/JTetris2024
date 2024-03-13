@@ -9,12 +9,11 @@ import reactivefeign.spring.config.EnableReactiveFeignClients;
  * @author Jorge Medina
  *
  */
-@SpringBootApplication
 @EnableReactiveFeignClients
+@SpringBootApplication
 public class TetrisApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TetrisApplication.class, args);
 	}
-
 }

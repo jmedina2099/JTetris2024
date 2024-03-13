@@ -30,10 +30,6 @@ public class Figure implements Cloneable {
 	@JsonIgnore
 	public int rotation = 0;
 	
-	public Figure( List<Box> boxes ) {
-		this.boxes = boxes;
-	}
-	
 	public Figure( List<Box> boxes,Point center, int numRotations, int rotation ) {
 		this.boxes = boxes;
 		this.center = center;
