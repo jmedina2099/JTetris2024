@@ -17,7 +17,7 @@
 		<app.gateway.context.path>/gateway</app.gateway.context.path>
 		<app.gateway.eureka.instance.host>localhost</app.gateway.eureka.instance.host>
 		<app.gateway.log.path>/var/log/jtetris</app.gateway.log.path>
-		<app.gateway.log.name>jtetris-gateway</app.gateway.log.name>		
+		<app.gateway.log.name>jtetris-gateway</app.gateway.log.name>
 	</properties>
 	<profiles>
 		<profile>
@@ -94,6 +94,14 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
 		</dependency>
 	</dependencies>
 </project>

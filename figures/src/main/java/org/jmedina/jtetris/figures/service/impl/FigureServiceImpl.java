@@ -10,10 +10,10 @@ import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.domain.Figura;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 import org.jmedina.jtetris.figures.exception.ServiceException;
-import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
 import org.jmedina.jtetris.figures.figure.Te;
+import org.jmedina.jtetris.figures.figure.Vertical;
 import org.jmedina.jtetris.figures.repository.FigureRepository;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
@@ -59,15 +59,15 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	public void askForNextFigure() throws ServiceException {
 		this.logger.debug("==> FigureService.getNextFigure()");
 		Figure figure = null;
-		int value = this.random.nextInt(FiguraEnumeration.values().length);
+		int value = this.random.nextInt(3) + 1;
 		switch (value) {
-		case 0:
-			figure = new Caja();
-			break;
 		case 1:
-			figure = new Ele();
+			figure = new Vertical();
 			break;
 		case 2:
+			figure = new Ele();
+			break;
+		case 3:
 			figure = new Te();
 			break;
 		default:
@@ -95,7 +95,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 
 	private void loadFigureCoordinates(Figura f, int id) {
 		this.logger.debug("====> loading Figuras ({}) ==> {}", id, f);
-		FiguraEnumeration.valueOf(f.getName()).loadCoordinates(f.getBoxes());
+		FiguraEnumeration.valueOf(f.getName()).loadFigura(f);
 	}
 
 	private List<String> linesFromResource(Resource input) {

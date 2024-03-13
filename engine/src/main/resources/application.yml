@@ -44,7 +44,7 @@ management:
       enabled: true
   endpoint:
     health:
-      show-details: "ALWAYS"
+      show-details: always
   endpoints:
     web:
       exposure:

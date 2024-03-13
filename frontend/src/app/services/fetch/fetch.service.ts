@@ -7,23 +7,32 @@ import { Observable } from 'rxjs';
 })
 export class FetchService {
   //private baseUrl = 'http://localhost:9081/api';
-  private baseUrl = 'http://localhost:9083/service-api/api';
+  private baseUrl = 'http://localhost:9083/service-api/api'; // gateway
 
   constructor(private http: HttpClient) {}
 
-  start(): Observable<boolean> {
-    return this.http.get<boolean>(this.baseUrl + '/start');
+  start(): Observable<string> {
+    return this.http.get<string>(this.baseUrl + '/start');
   }
 
-  moveRight(): Observable<boolean> {
-    return this.http.get<boolean>(this.baseUrl + '/moveRight');
+  moveRight(): Observable<string> {
+    return this.http.get<string>(this.baseUrl + '/moveRight');
   }
 
-  moveLeft(): Observable<boolean> {
-    return this.http.get<boolean>(this.baseUrl + '/moveLeft');
+  moveLeft(): Observable<string> {
+    return this.http.get<string>(this.baseUrl + '/moveLeft');
   }
 
-  moveDown(): Observable<boolean> {
-    return this.http.get<boolean>(this.baseUrl + '/moveDown');
+  moveDown(): Observable<string> {
+    return this.http.get<string>(this.baseUrl + '/moveDown');
   }
+
+  rotateRight(): Observable<string> {
+    return this.http.get<string>(this.baseUrl + '/rotateRight');
+  }
+
+  rotateLeft(): Observable<string> {
+    return this.http.get<string>(this.baseUrl + '/rotateLeft');
+  }
+
 }

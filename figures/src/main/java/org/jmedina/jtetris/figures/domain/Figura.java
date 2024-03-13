@@ -23,4 +23,6 @@ public class Figura {
 	private String id;
 	private String name;
 	private String boxes;
+	private String center;
+	private int numRotations;
 }

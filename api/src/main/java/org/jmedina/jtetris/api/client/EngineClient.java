@@ -1,25 +1,34 @@
 package org.jmedina.jtetris.api.client;
 
-import org.springframework.cloud.openfeign.FeignClient;
+import org.jmedina.jtetris.api.model.Message;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import reactivefeign.spring.config.ReactiveFeignClient;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Jorge Medina
  *
  */
-@FeignClient(name = "engineClient", url = "${api.engine.base-url}", fallback = EngineFallback.class)
+@ReactiveFeignClient(value = "engineClient", url = "${api.engine.base-url}", fallback = EngineFallback.class)
 public interface EngineClient {
 
 	@GetMapping(value = "/start", produces = "application/json")
-	public Boolean start();
+	public Mono<Message> start();
 
 	@GetMapping(value = "/moveRight", produces = "application/json")
-	public Boolean moveRight();
+	public Mono<Message> moveRight();
 
 	@GetMapping(value = "/moveLeft", produces = "application/json")
-	public Boolean moveLeft();
+	public Mono<Message> moveLeft();
 
 	@GetMapping(value = "/moveDown", produces = "application/json")
-	public Boolean moveDown();
+	public Mono<Message> moveDown();
+
+	@GetMapping(value = "/rotateRight", produces = "application/json")
+	public Mono<Message> rotateRight();
+
+	@GetMapping(value = "/rotateLeft", produces = "application/json")
+	public Mono<Message> rotateLeft();
 
 }

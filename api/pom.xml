@@ -18,7 +18,7 @@
 		<app.api.context.path>/api</app.api.context.path>
 		<app.api.eureka.instance.host>localhost</app.api.eureka.instance.host>
 		<app.api.log.path>/var/log/jtetris</app.api.log.path>
-		<app.api.log.name>jtetris-api</app.api.log.name>		
+		<app.api.log.name>jtetris-api</app.api.log.name>
 	</properties>
 	<profiles>
 		<profile>
@@ -96,8 +96,18 @@
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.playtika.reactivefeign</groupId>
+			<artifactId>feign-reactor-spring-cloud-starter</artifactId>
+			<version>4.0.3</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+			<artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -112,6 +122,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

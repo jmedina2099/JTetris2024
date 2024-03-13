@@ -9,6 +9,11 @@ spring:
         wiretap: true
       httpserver:
         wiretap: true
+    discovery:
+      reactive:
+        enabled: true
+    loadbalancer:
+      enabled: true
 eureka:
   client:
     serviceUrl:
@@ -27,7 +32,7 @@ management:
       enabled: true
   endpoint:
     health:
-      show-details: "ALWAYS"
+      show-details: always
   endpoints:
     web:
       exposure:

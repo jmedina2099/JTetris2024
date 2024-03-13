@@ -15,21 +15,26 @@ export class AppComponent {
     console.log('Key = ' + key);
     switch (key) {
       case 'ArrowRight':
-        this.fetchService.moveRight().subscribe((value: boolean) => {
+        this.fetchService.moveRight().subscribe((value: string) => {
           console.log('moveRight = ' + value);
         });
         break;
       case 'ArrowLeft':
-        this.fetchService.moveLeft().subscribe((value: boolean) => {
+        this.fetchService.moveLeft().subscribe((value: string) => {
           console.log('moveLeft = ' + value);
         });
         break;
-      case 'ArrowDown':
-        this.fetchService.moveDown().subscribe((value: boolean) => {
-          console.log('moveDown = ' + value);
+      case 'ArrowUp':
+        this.fetchService.rotateRight().subscribe((value: string) => {
+          console.log('rotateRight = ' + value);
         });
         break;
-      default:
+        case 'ArrowDown':
+          this.fetchService.rotateLeft().subscribe((value: string) => {
+            console.log('rotateLeft = ' + value);
+          });
+          break;
+        default:
         break;
     }
   }

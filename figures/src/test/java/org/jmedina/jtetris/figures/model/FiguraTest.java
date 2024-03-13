@@ -39,7 +39,9 @@ class FiguraTest {
 		String id = "figCaja";
 		String name = "Caja";
 		String boxes = "(0,0)-(0,1)-(1,0)-(1,1)";
-		Figura figura = new Figura(id,name,boxes);
+		String center = "0,1";
+		int numRotaciones = 4;
+		Figura figura = new Figura(id,name,boxes,center,numRotaciones);
 		assertEquals(id, figura.getId());
 		assertEquals(name, figura.getName());
 		assertEquals(boxes, figura.getBoxes());

@@ -6,9 +6,37 @@ spring:
   webflux:
     base-path: ${app.api.context.path} # reactive
   cloud:
-    openfeign:
-      circuitbreaker:
-        enabled: true
+    loadbalancer:
+      enabled: true
+      ribbon:
+        enabled: false
+reactive:
+  feign:
+    cloud:
+      enabled: true
+    ribbon:
+      enabled: false  
+    loadbalancer:
+      enabled: true
+    client:
+      config:
+        httpBinClient:
+          options:
+            readTimeoutMillis: 2000
+            connectTimeoutMillis: 1000
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+    instances: 
+      HttpBinClient_getBinWithDelayInSeconds_int:
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 50
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 20s
 eureka:
   client:
     serviceUrl:
@@ -27,7 +55,10 @@ management:
       enabled: true
   endpoint:
     health:
-      show-details: "ALWAYS"
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
   endpoints:
     web:
       exposure:

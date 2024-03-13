@@ -36,7 +36,7 @@ export class VentanaPrincipalComponent implements OnInit {
   }
 
   nextFigure(): void {
-    this.fetchService.start().subscribe((value: boolean) => {
+    this.fetchService.start().subscribe((value: string) => {
       console.log('start = ' + value);
     });
   }
