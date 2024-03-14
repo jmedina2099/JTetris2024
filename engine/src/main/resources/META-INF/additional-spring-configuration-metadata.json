@@ -28,5 +28,10 @@
     "name": "engine.figures.askForNextFigureUri",
     "type": "java.lang.String",
     "description": "A description for 'engine.figures.askForNextFigureUri'"
+  },
+  {
+    "name": "engine.topic.board",
+    "type": "java.lang.String",
+    "description": "A description for 'engine.topic.board'"
   }
 ]}

@@ -1,13 +1,10 @@
 <div class="ventana">
   <div>
-    <input type="button" value="Next" (click)="nextFigure()" />
+    <input id="startButton" type="button" value="Start" (click)="nextFigure()" />
   </div>
+  <br/>
   <div class="panel">
-    <div
-      class="box"
-      *ngFor="let box of fallingFigure.boxes"
-      [style.top]="box.y + 'px'"
-      [style.left]="box.x + 'px'"
-      [style.visibility]="box.y<0? 'hidden': 'visible'"></div>
+    <app-figure [boxes]="fallingFigure.boxes"></app-figure>
+    <app-figure *ngFor="let figure of board" [boxes]="figure.boxes"></app-figure>
   </div>
 </div>

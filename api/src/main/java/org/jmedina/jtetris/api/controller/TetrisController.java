@@ -68,5 +68,10 @@ public class TetrisController {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
 	}
-	
+
+	@GetMapping(value = "/bottomDown")
+	public ResponseEntity<Mono<Message>> bottomDown() {
+		this.logger.debug("===> EngineController.bottomDown()");
+		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
+	}
 }

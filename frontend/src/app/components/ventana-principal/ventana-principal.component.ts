@@ -12,6 +12,7 @@ import { WebSocketService } from 'src/app/services/socket-io/web-socket.service'
 })
 export class VentanaPrincipalComponent implements OnInit {
   fallingFigure: Figure = { boxes: [] };
+  board: Figure[] = [];
   socket: Socket | undefined;
 
   constructor(
@@ -26,9 +27,13 @@ export class VentanaPrincipalComponent implements OnInit {
   initSocket(): void {
     this.socket = this.webSocketService.getSocket();
     if (this.socket) {
-      this.socket.on('message', (data: string) => {
-        console.log('on message = ' + data);
+      this.socket.on('fallingFigureMessage', (data: string) => {
+        console.log('on fallingFigureMessage = ' + data);
         this.fallingFigure = JSON.parse(data) as Figure;
+      });
+      this.socket.on('boardMessage', (data: string) => {
+        console.log('on boardMessage = ' + data);
+        this.board = JSON.parse(data) as Figure[];
       });
       this.socket.on('connect', () => {
         console.log('on connect !!!');
@@ -37,6 +42,10 @@ export class VentanaPrincipalComponent implements OnInit {
   }
 
   nextFigure(): void {
+    const startButtonElement = window.document.getElementById('startButton');
+    if( startButtonElement ) {
+      startButtonElement.blur();
+    }
     this.fetchService.start().subscribe((value: Message) => {
       console.log('start = ' + value? value.content: '');
     });

@@ -31,4 +31,6 @@ public interface EngineClient {
 	@GetMapping(value = "/rotateLeft", produces = "application/json")
 	public Mono<Message> rotateLeft();
 
+	@GetMapping(value = "/bottomDown", produces = "application/json")
+	public Mono<Message> bottomDown();
 }

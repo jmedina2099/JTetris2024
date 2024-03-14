@@ -1,0 +1,5 @@
+<div class="box"
+  *ngFor="let box of boxes"
+  [style.top]="box.y + 'px'"
+  [style.left]="box.x + 'px'"
+  [style.visibility]="box.y<0? 'hidden': 'visible'"></div>

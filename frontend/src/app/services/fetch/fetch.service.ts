@@ -36,4 +36,7 @@ export class FetchService {
     return this.http.get<Message>(this.baseUrl + '/rotateLeft');
   }
 
+  bottomDown(): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/bottomDown');
+  }
 }

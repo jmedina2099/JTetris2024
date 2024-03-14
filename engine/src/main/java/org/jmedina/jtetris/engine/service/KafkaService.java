@@ -21,9 +21,18 @@ public class KafkaService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final KafkaTemplate<String, String> kafkaTemplate;
 
-	public void sendMessage(String message) {
-		this.logger.debug("==> KafkaService.sendMessage() = {}", message);
-		CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send("figureTopic", message);
+	public void sendMessageFigure(String message) {
+		this.logger.debug("==> KafkaService.sendMessageFigure() = {}", message);
+		sendMessage(message,"figureTopic");
+	}
+
+	public void sendMessageBoard(String message) {
+		this.logger.debug("==> KafkaService.sendMessageBoard() = {}", message);
+		sendMessage(message,"boardTopic");
+	}
+
+	private void sendMessage(String message,String topic) {
+		CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);
 		future.whenComplete((result, ex) -> {
 			if (ex == null) {
 				this.logger.debug("Sent message=[{}] with offset=[{}]", message, result.getRecordMetadata().offset());
@@ -32,5 +41,4 @@ public class KafkaService {
 			}
 		});
 	}
-
 }

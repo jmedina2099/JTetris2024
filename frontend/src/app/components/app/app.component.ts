@@ -35,7 +35,12 @@ export class AppComponent {
           console.log('rotateLeft = ' + value? value.content: '');
         });
         break;
-      default:
+      case ' ':
+        this.fetchService.bottomDown().subscribe((value: Message) => {
+          console.log('bottomDown = ' + value? value.content: '');
+        });
+        break;
+        default:
         break;
     }
   }

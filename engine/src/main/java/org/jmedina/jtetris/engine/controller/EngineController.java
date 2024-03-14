@@ -37,6 +37,7 @@ public class EngineController {
 	@GetMapping(value = "/start")
 	public Mono<Message> start() {
 		this.logger.debug("===> EngineController.start()");
+		this.engine.start();
 		return this.figureService.askForNextFigure();
 	}
 
@@ -72,6 +73,13 @@ public class EngineController {
 	public Mono<Message> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		this.engine.rotateLeft();
+		return Mono.just(new Message("OK from engine!!!"));
+	}
+
+	@GetMapping(value = "/bottomDown")
+	public Mono<Message> bottomDown() {
+		this.logger.debug("===> EngineController.bottomDown()");
+		this.engine.bottomDown();
 		return Mono.just(new Message("OK from engine!!!"));
 	}
 

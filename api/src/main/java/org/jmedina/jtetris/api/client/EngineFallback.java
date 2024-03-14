@@ -42,4 +42,8 @@ public class EngineFallback implements EngineClient {
 		return Mono.just(new Message("ROTATE LEFT FALLBACK"));
 	}
 
+	@Override
+	public Mono<Message> bottomDown() {
+		return Mono.just(new Message("BOTTOM DOWN FALLBACK"));
+	}
 }

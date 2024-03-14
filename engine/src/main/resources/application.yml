@@ -89,6 +89,7 @@ engine:
   topic:
     nextFigure: nextFigureTopic
     figure: figureTopic
+    board: boardTopic
   groupId:
     message: figureMessage
   figures:

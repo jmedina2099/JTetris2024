@@ -11,15 +11,21 @@ const consumer = kafka.consumer({ groupId: 'figureMessageNode' })
 let socketConnected : Socket;
 
 await consumer.connect()
-await consumer.subscribe({ topics: ['nextFigureTopic','figureTopic'], fromBeginning: false })
+await consumer.subscribe({ topics: ['nextFigureTopic','figureTopic','boardTopic'], fromBeginning: false })
 await consumer.run({
   eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
     let json = message.value?.toString();
+    console.log( 'topic ===> '+topic )
     console.log({
       value: json,
     })
-    if( socketConnected )
-      socketConnected.emit( 'message', json );
+    if( socketConnected ) {
+      if( topic == 'nextFigureTopic' || topic == 'figureTopic' ) {
+        socketConnected.emit( 'fallingFigureMessage', json );
+      } else if( topic == 'boardTopic' ) {
+        socketConnected.emit( 'boardMessage', json );
+      }
+    }
   },
 })
 

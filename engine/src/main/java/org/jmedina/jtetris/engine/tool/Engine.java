@@ -1,7 +1,11 @@
 package org.jmedina.jtetris.engine.tool;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.service.FigureService;
 import org.jmedina.jtetris.engine.service.KafkaService;
 import org.jmedina.jtetris.engine.util.RotationUtil;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
@@ -20,82 +24,104 @@ import lombok.RequiredArgsConstructor;
 public class Engine {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final FigureService figureService;
 	private final KafkaService kafkaService;
 	private final SerializeUtil serializeUtil;
 	private Figure fallingFigure;
+	private List<Figure> falledFigures;
+
+	public void start() {
+		this.falledFigures = new ArrayList<>();
+	}
 
 	public void addFallingFigure(Figure figure) {
 		this.logger.debug("==> Engine.addFallingFigure()");
 		this.fallingFigure = figure;
 	}
 
-	public boolean moveRight() {
+	public void moveRight() {
 		this.logger.debug("==> Engine.moveRight()");
 		double max = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
 		double size = Box.SIZE;
 		if ((max + 2 * size) <= size * 10) {
 			this.fallingFigure.moveRight();
-			this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessage);
-			return true;
+			this.serializeUtil.convertFigureToString(this.fallingFigure)
+					.ifPresent(this.kafkaService::sendMessageFigure);
 		}
-		return false;
 	}
 
-	public boolean moveLeft() {
+	public void moveLeft() {
 		this.logger.debug("==> Engine.moveLeft()");
 		double min = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
 		double size = Box.SIZE;
 		if ((min - size) >= 0) {
 			this.fallingFigure.moveLeft();
-			this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessage);
-			return true;
+			this.serializeUtil.convertFigureToString(this.fallingFigure)
+					.ifPresent(this.kafkaService::sendMessageFigure);
 		}
-		return false;
 	}
 
-	public boolean moveDown() {
+	public void moveDown() {
 		this.logger.debug("==> Engine.moveDown()");
 		double max = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
 		double size = Box.SIZE;
 		if ((max + 2 * size) <= size * 20) {
 			this.fallingFigure.moveDown();
-			this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessage);
-			return true;
+			this.serializeUtil.convertFigureToString(this.fallingFigure)
+					.ifPresent(this.kafkaService::sendMessageFigure);
 		}
-		return false;
 	}
 
 	public void rotateRight() {
 		this.logger.debug("==> Engine.rotateRight()");
-		
-		if( this.fallingFigure.numRotations == 0 ) {
+
+		if (this.fallingFigure.numRotations == 0) {
 			return;
 		}
 
-		int direction = this.fallingFigure.numRotations == 2? -1: 1;
-		if( rotate(direction) ) {
-			this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessage);
+		int direction = this.fallingFigure.numRotations == 2 ? -1 : 1;
+		if (rotate(direction)) {
+			this.serializeUtil.convertFigureToString(this.fallingFigure)
+					.ifPresent(this.kafkaService::sendMessageFigure);
 		}
 	}
 
 	public void rotateLeft() {
 		this.logger.debug("==> Engine.rotateLeft()");
 
-		if( this.fallingFigure.numRotations == 0 ) {
+		if (this.fallingFigure.numRotations == 0) {
 			return;
 		}
 
 		int direction = -1;
-		if( rotate(direction) ) {
-			this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessage);
+		if (rotate(direction)) {
+			this.serializeUtil.convertFigureToString(this.fallingFigure)
+					.ifPresent(this.kafkaService::sendMessageFigure);
 		}
+	}
+
+	public void bottomDown() {
+		this.logger.debug("==> Engine.bottomDown()");
+		double max = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
+		double size = Box.SIZE;
+		while ((max + 2 * size) <= size * 20) {
+			this.fallingFigure.moveDown();
+			max = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
+		}
+		this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
+		this.falledFigures.add(this.fallingFigure);
+		this.serializeUtil.convertListOfFiguresToString(this.falledFigures)
+				.ifPresent(this.kafkaService::sendMessageBoard);
+		this.figureService.askForNextFigure().subscribe(m -> {
+			this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
+		});
 	}
 
 	private boolean rotate(int direction) {
 		this.logger.debug("==> Engine.rotate()");
-		
-		if( this.fallingFigure.numRotations == 2 ) {
-			if( this.fallingFigure.rotation == 0 ) {
+
+		if (this.fallingFigure.numRotations == 2) {
+			if (this.fallingFigure.rotation == 0) {
 				this.fallingFigure.rotation++;
 			} else {
 				direction *= -1;
@@ -105,9 +131,9 @@ public class Engine {
 			this.fallingFigure.rotation++;
 			this.fallingFigure.rotation = this.fallingFigure.rotation % this.fallingFigure.numRotations;
 		}
-		
-		this.logger.debug("==> center = {}",this.fallingFigure.getCenter());
-		
+
+		this.logger.debug("==> center = {}", this.fallingFigure.getCenter());
+
 		Figure tmpFigure = RotationUtil.rotateFigure(this.fallingFigure, direction);
 		double max = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
 		double size = Box.SIZE;
@@ -120,9 +146,10 @@ public class Engine {
 			tmpFigure.moveRight();
 			min = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
 		}
-		
+
 		this.fallingFigure.setBoxes(tmpFigure.getBoxes());
 		this.fallingFigure.setCenter(tmpFigure.getCenter());
 		return true;
 	}
+
 }

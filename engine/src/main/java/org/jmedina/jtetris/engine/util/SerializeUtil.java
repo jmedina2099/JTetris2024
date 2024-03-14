@@ -1,5 +1,6 @@
 package org.jmedina.jtetris.engine.util;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jmedina.jtetris.engine.figure.Figure;
@@ -37,4 +38,14 @@ public class SerializeUtil {
 		}
 		return Optional.empty();
 	}
+
+	public Optional<String> convertListOfFiguresToString(List<Figure> listFigures) {
+		try {
+			return Optional.of(this.mapper.writeValueAsString(listFigures));
+		} catch (JsonProcessingException e) {
+			this.logger.error("==> Error trying to convert figure to JSON!!!", e);
+		}
+		return Optional.empty();
+	}
+
 }

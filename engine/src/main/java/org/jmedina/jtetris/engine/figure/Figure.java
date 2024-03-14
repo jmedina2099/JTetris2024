@@ -38,20 +38,20 @@ public class Figure implements Cloneable {
 	}
 
 	public boolean moveRight() {
-		this.center.x += Box.SIZE;
 		this.logger.debug("==> moveRight = {}",center);
+		this.center.x += Box.SIZE;
 		return this.boxes.stream().allMatch(Box::moveRight);
 	}
 
 	public boolean moveLeft() {
+		this.logger.debug("==> moveLeft = {}",center);
 		this.center.x -= Box.SIZE;
-		this.logger.debug("==> moveRight = {}",center);
 		return this.boxes.stream().allMatch(Box::moveLeft);
 	}
 
 	public boolean moveDown() {
+		this.logger.debug("==> moveDown = {}",center);
 		this.center.y += Box.SIZE;
-		this.logger.debug("==> moveRight = {}",center);
 		return this.boxes.stream().allMatch(Box::moveDown);
 	}
 

@@ -21,10 +21,13 @@ public class KafkaTopicConfig {
 	private String bootstrapAddress;
 
 	@Value("${engine.topic.nextFigure}")
-	public String nextFigureTopic;
+	private String nextFigureTopic;
 	
 	@Value("${engine.topic.figure}")
-	public String figureTopic;
+	private String figureTopic;
+	
+	@Value("${engine.topic.board}")
+	private String boardTopic;
 	
 	@Bean
 	KafkaAdmin kafkaAdmin() {
@@ -41,5 +44,10 @@ public class KafkaTopicConfig {
 	@Bean
 	NewTopic figureTopic() {
 		return new NewTopic(this.figureTopic, 1, (short) 1);
+	}
+
+	@Bean
+	NewTopic boardTopic() {
+		return new NewTopic(this.boardTopic, 1, (short) 1);
 	}
 }
