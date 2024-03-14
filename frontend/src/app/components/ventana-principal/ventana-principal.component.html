@@ -5,6 +5,6 @@
   <br/>
   <div class="panel">
     <app-figure [boxes]="fallingFigure.boxes"></app-figure>
-    <app-figure *ngFor="let figure of board" [boxes]="figure.boxes"></app-figure>
+    <app-box *ngFor="let box of board" [box]="box"></app-box>
   </div>
 </div>

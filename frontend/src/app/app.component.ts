@@ -13,7 +13,6 @@ export class AppComponent {
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     const key = event.key;
-    console.log('Key = ' + key);
     switch (key) {
       case 'ArrowRight':
         this.fetchService.moveRight().subscribe((value: Message) => {

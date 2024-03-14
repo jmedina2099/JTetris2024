@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Socket } from 'socket.io-client';
+import { Box } from 'src/app/model/figure/box';
 import { Figure } from 'src/app/model/figure/figure';
 import { Message } from 'src/app/model/message/message';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
@@ -12,7 +13,7 @@ import { WebSocketService } from 'src/app/services/socket-io/web-socket.service'
 })
 export class VentanaPrincipalComponent implements OnInit {
   fallingFigure: Figure = { boxes: [] };
-  board: Figure[] = [];
+  board: Box[] = [];
   socket: Socket | undefined;
 
   constructor(
@@ -33,7 +34,7 @@ export class VentanaPrincipalComponent implements OnInit {
       });
       this.socket.on('boardMessage', (data: string) => {
         console.log('on boardMessage = ' + data);
-        this.board = JSON.parse(data) as Figure[];
+        this.board = JSON.parse(data) as Box[];
       });
       this.socket.on('connect', () => {
         console.log('on connect !!!');

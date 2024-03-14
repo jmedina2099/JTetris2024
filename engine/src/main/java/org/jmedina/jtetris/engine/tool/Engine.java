@@ -28,10 +28,10 @@ public class Engine {
 	private final KafkaService kafkaService;
 	private final SerializeUtil serializeUtil;
 	private Figure fallingFigure;
-	private List<Figure> falledFigures;
+	private List<Box> falledBoxes;
 
 	public void start() {
-		this.falledFigures = new ArrayList<>();
+		this.falledBoxes = new ArrayList<>();
 	}
 
 	public void addFallingFigure(Figure figure) {
@@ -63,13 +63,18 @@ public class Engine {
 
 	public void moveDown() {
 		this.logger.debug("==> Engine.moveDown()");
-		double max = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
+		double yMax = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
 		double size = Box.SIZE;
-		if ((max + 2 * size) <= size * 20) {
+		if ((yMax + size) < size * 20 && canMoveDown(this.fallingFigure.getBoxes())) {
 			this.fallingFigure.moveDown();
 			this.serializeUtil.convertFigureToString(this.fallingFigure)
 					.ifPresent(this.kafkaService::sendMessageFigure);
 		}
+	}
+
+	private boolean canMoveDown(List<Box> listBoxes) {
+		return listBoxes.stream().allMatch(
+				b -> this.falledBoxes.stream().allMatch(f -> f.getX() != b.getX() || f.getY() > b.getY() + Box.SIZE) );
 	}
 
 	public void rotateRight() {
@@ -102,16 +107,15 @@ public class Engine {
 
 	public void bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
-		double max = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
+		double yMax = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
 		double size = Box.SIZE;
-		while ((max + 2 * size) <= size * 20) {
+		while ((yMax + size) < size * 20 && canMoveDown(this.fallingFigure.getBoxes())) {
 			this.fallingFigure.moveDown();
-			max = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
+			yMax = this.fallingFigure.getBoxes().stream().mapToDouble(b -> b.getY()).max().getAsDouble();
 		}
 		this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
-		this.falledFigures.add(this.fallingFigure);
-		this.serializeUtil.convertListOfFiguresToString(this.falledFigures)
-				.ifPresent(this.kafkaService::sendMessageBoard);
+		this.falledBoxes.addAll(this.fallingFigure.getBoxes());
+		this.serializeUtil.convertListOfBoxesToString(this.falledBoxes).ifPresent(this.kafkaService::sendMessageBoard);
 		this.figureService.askForNextFigure().subscribe(m -> {
 			this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
 		});
