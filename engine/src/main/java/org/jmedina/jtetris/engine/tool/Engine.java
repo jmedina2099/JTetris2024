@@ -74,7 +74,7 @@ public class Engine {
 
 	private boolean canMoveDown(List<Box> listBoxes) {
 		return listBoxes.stream().allMatch(
-				b -> this.falledBoxes.stream().allMatch(f -> f.getX() != b.getX() || f.getY() > b.getY() + Box.SIZE) );
+				b -> this.falledBoxes.stream().allMatch(f -> f.getX() != b.getX() || f.getY() != b.getY() + Box.SIZE) );
 	}
 
 	public void rotateRight() {
