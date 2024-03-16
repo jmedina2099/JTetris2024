@@ -1,9 +1,13 @@
 package org.jmedina.jtetris.engine.tool;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jmedina.jtetris.engine.figure.Box;
@@ -35,71 +39,76 @@ public class Engine {
 
 	private static final int WIDTH = 10;
 	private static final int HEIGHT = 20;
-	private Map<Integer, int[]> gridBoxes = new HashMap<>();
+	private Map<Integer, Integer[]> gridBoxes = new HashMap<>();
 
 	public void start() {
 		this.logger.debug("==> Engine.start()");
 		this.falledBoxes = new ArrayList<>();
 		Stream.iterate(0, x -> x + 1).limit(HEIGHT).forEach(i -> {
-			this.gridBoxes.put(i, new int[WIDTH]);
+			Integer[] array = new Integer[WIDTH];
+			Arrays.fill(array, 0);
+			this.gridBoxes.put(i, array);
 		});
 	}
 
 	public void addFallingFigure(Figure figure) {
 		this.logger.debug("==> Engine.addFallingFigure()");
 		this.fallingFigure = figure;
-		addToGrid();
+		addToGrid(figure);
 	}
 
-	private void addToGrid() {
-		this.fallingFigure.getBoxes().stream().forEach(b -> {
+	private void addToGrid(Figure figure) {
+		figure.getBoxes().stream().forEach(b -> {
 			int x = (int) Math.round(b.getX() / Box.SIZE);
 			int y = (int) Math.round(b.getY() / Box.SIZE);
-			int[] cells = this.gridBoxes.get(y);
+			Integer[] cells = this.gridBoxes.get(y);
 			cells[x] = 1;
 		});
 	}
 
-	private void removeFromGrid() {
-		this.fallingFigure.getBoxes().stream().forEach(b -> {
+	private void removeFromGrid(Figure figure) {
+		figure.getBoxes().stream().forEach(b -> {
 			int x = (int) Math.round(b.getX() / Box.SIZE);
 			int y = (int) Math.round(b.getY() / Box.SIZE);
-			int[] cells = this.gridBoxes.get(y);
+			Integer[] cells = this.gridBoxes.get(y);
 			cells[x] = 0;
 		});
 	}
 
 	public void moveRight() {
 		this.logger.debug("==> Engine.moveRight()");
-		removeFromGrid();
-		if (canMoveRight(this.fallingFigure) && noHit(this.fallingFigure, 1, 0)) {
-			this.fallingFigure.moveRight();
-			this.serializeUtil.convertFigureToString(this.fallingFigure)
-					.ifPresent(this.kafkaService::sendMessageFigure);
+		Figure figureTmp = this.fallingFigure.clone();
+		removeFromGrid(figureTmp);
+		if (canMoveRight(figureTmp) && noHit(figureTmp, 1, 0)) {
+			figureTmp.moveRight();
+			this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+			this.fallingFigure = figureTmp;
 		}
-		addToGrid();
+		addToGrid(this.fallingFigure);
 	}
 
 	public void moveLeft() {
 		this.logger.debug("==> Engine.moveLeft()");
-		removeFromGrid();
-		if (canMoveLeft(this.fallingFigure) && noHit(this.fallingFigure, -1, 0)) {
-			this.fallingFigure.moveLeft();
-			this.serializeUtil.convertFigureToString(this.fallingFigure)
-					.ifPresent(this.kafkaService::sendMessageFigure);
+		Figure figureTmp = this.fallingFigure.clone();
+		removeFromGrid(figureTmp);
+		if (canMoveLeft(figureTmp) && noHit(figureTmp, -1, 0)) {
+			figureTmp.moveLeft();
+			this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+			this.fallingFigure = figureTmp;
 		}
-		addToGrid();
+		addToGrid(this.fallingFigure);
 	}
 
 	public void moveDown() {
 		this.logger.debug("==> Engine.moveDown()");
-		removeFromGrid();
-		if (canMoveDown(this.fallingFigure) && noHit(this.fallingFigure, 0, 1)) {
-			this.fallingFigure.moveDown();
-			this.serializeUtil.convertFigureToString(this.fallingFigure)
-					.ifPresent(this.kafkaService::sendMessageFigure);
+		Figure figureTmp = this.fallingFigure.clone();
+		removeFromGrid(figureTmp);
+		if (canMoveDown(figureTmp) && noHit(figureTmp, 0, 1)) {
+			figureTmp.moveDown();
+			this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+			this.fallingFigure = figureTmp;
 		}
-		addToGrid();
+		addToGrid(this.fallingFigure);
 	}
 
 	private boolean canMoveRight(Figure figure) {
@@ -127,7 +136,7 @@ public class Engine {
 		return figure.getBoxes().stream().allMatch(b -> {
 			int x = (int) Math.round(b.getX() / Box.SIZE);
 			int y = (int) Math.round(b.getY() / Box.SIZE);
-			int[] cells = this.gridBoxes.get(y + offsetY);
+			Integer[] cells = this.gridBoxes.get(y + offsetY);
 			return cells[x + offsetX] == 0;
 		});
 	}
@@ -139,11 +148,15 @@ public class Engine {
 			return;
 		}
 
-		int direction = this.fallingFigure.numRotations == 2 ? -1 : 1;
-		if (rotate(direction)) {
-			this.serializeUtil.convertFigureToString(this.fallingFigure)
-					.ifPresent(this.kafkaService::sendMessageFigure);
+		Figure figureTmp = this.fallingFigure.clone();
+		removeFromGrid(figureTmp);
+
+		int direction = figureTmp.numRotations == 2 ? -1 : 1;
+		if (rotate(figureTmp, direction)) {
+			this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+			this.fallingFigure = figureTmp;
 		}
+		addToGrid(this.fallingFigure);
 	}
 
 	public void rotateLeft() {
@@ -153,67 +166,123 @@ public class Engine {
 			return;
 		}
 
+		Figure figureTmp = this.fallingFigure.clone();
+		removeFromGrid(figureTmp);
+
 		int direction = -1;
-		if (rotate(direction)) {
-			this.serializeUtil.convertFigureToString(this.fallingFigure)
-					.ifPresent(this.kafkaService::sendMessageFigure);
+		if (rotate(figureTmp, direction)) {
+			this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+			this.fallingFigure = figureTmp;
 		}
+		addToGrid(this.fallingFigure);
 	}
 
 	public void bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
-		removeFromGrid();
-		while (canMoveDown(this.fallingFigure) && noHit(this.fallingFigure, 0, 1)) {
-			this.fallingFigure.moveDown();
+
+		Figure figureTmp = this.fallingFigure.clone();
+		removeFromGrid(figureTmp);
+		while (canMoveDown(figureTmp) && noHit(figureTmp, 0, 1)) {
+			figureTmp.moveDown();
 		}
-		addToGrid();
-		this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
-		this.falledBoxes.addAll(this.fallingFigure.getBoxes());
+		addToGrid(figureTmp);
+		this.falledBoxes.addAll(figureTmp.getBoxes());
 		this.serializeUtil.convertListOfBoxesToString(this.falledBoxes).ifPresent(this.kafkaService::sendMessageBoard);
+
+		this.fallingFigure = new Figure();
+		this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
+
+		if (checkMakeLines(figureTmp) > 0) {
+			this.serializeUtil.convertListOfBoxesToString(this.falledBoxes)
+					.ifPresent(this.kafkaService::sendMessageBoard);
+		}
+
 		this.figureService.askForNextFigure().subscribe(m -> {
 			this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
 		});
 	}
 
-	private boolean rotate(int direction) {
+	private int checkMakeLines(Figure figure) {
+		int minY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / Box.SIZE)).min().orElse(0);
+		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / Box.SIZE)).max().orElse(0);
+
+		int[] numLinesCompleted = new int[] { 0 };
+
+		AtomicReference<Integer[]> cells = new AtomicReference<Integer[]>();
+		AtomicReference<Boolean> isLineCompleted = new AtomicReference<Boolean>();
+		AtomicReference<List<Box>> boxesOnLine = new AtomicReference<List<Box>>();
+
+		int[] indexY = new int[] { maxY };
+		Stream.iterate(0, x -> x + 1).limit(maxY - minY + 1).forEach(i -> {
+			cells.set(this.gridBoxes.get(indexY[0]));
+			isLineCompleted.set(Arrays.asList(cells.get()).stream().allMatch(c -> c == 1));
+			if (isLineCompleted.get()) {
+				numLinesCompleted[0]++;
+				boxesOnLine.set(this.falledBoxes.stream()
+						.filter(b -> (int) Math.round(b.getY() / Box.SIZE) == indexY[0]).collect(Collectors.toList()));
+				this.falledBoxes.removeAll(boxesOnLine.get());
+				this.gridBoxes.remove(indexY[0]);
+				moveDownFalledBoxes(indexY[0]);
+			} else {
+				indexY[0]--;
+			}
+		});
+		return numLinesCompleted[0];
+	}
+
+	private void moveDownFalledBoxes(int indexY) {
+		this.logger.debug("==> Engine.rotate() indexY={}", indexY);
+		this.falledBoxes.stream().forEach(b -> {
+			if ((int) Math.round(b.getY() / Box.SIZE) < indexY) {
+				b.moveDown();
+			}
+		});
+		List<Integer> keys = this.gridBoxes.keySet().stream().filter(y -> y < indexY).collect(Collectors.toList());
+		Collections.sort(keys, Collections.reverseOrder());
+		keys.stream().forEach(y -> {
+			this.gridBoxes.put(y + 1, this.gridBoxes.get(y));
+		});
+		Integer[] array = new Integer[WIDTH];
+		Arrays.fill(array, 0);
+		this.gridBoxes.put(0, array);
+	}
+
+	private boolean rotate(Figure figure, int direction) {
 		this.logger.debug("==> Engine.rotate()");
 
 		int rotation = 0;
-
-		if (this.fallingFigure.numRotations == 2) {
-			if (this.fallingFigure.rotation == 0) {
-				rotation = this.fallingFigure.rotation + 1;
+		if (figure.numRotations == 2) {
+			if (figure.rotation == 0) {
+				rotation = figure.rotation + 1;
 			} else {
 				direction *= -1;
 				rotation = 0;
 			}
 		} else {
-			rotation = this.fallingFigure.rotation + 1;
-			rotation = rotation % this.fallingFigure.numRotations;
+			rotation = figure.rotation + 1;
+			rotation = rotation % figure.numRotations;
 		}
 
-		this.logger.debug("==> center = {}", this.fallingFigure.getCenter());
+		this.logger.debug("==> center = {}", figure.getCenter());
 
-		Figure tmpFigure = RotationUtil.rotateFigure(this.fallingFigure, direction);
-		double max = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
+		RotationUtil.rotateFigure(figure, direction);
+		double max = figure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
 		double size = Box.SIZE;
 		while ((max + size) > size * 10) {
-			tmpFigure.moveLeft();
-			max = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
+			figure.moveLeft();
+			max = figure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
 		}
-		double min = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
+		double min = figure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
 		while (min < 0) {
-			tmpFigure.moveRight();
-			min = tmpFigure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
+			figure.moveRight();
+			min = figure.getBoxes().stream().mapToDouble(b -> b.getX()).min().getAsDouble();
 		}
-		removeFromGrid();
-		if (noHit(tmpFigure, 0, 0)) {
-			this.fallingFigure.rotation = rotation;
-			this.fallingFigure.setBoxes(tmpFigure.getBoxes());
-			this.fallingFigure.setCenter(tmpFigure.getCenter());
+		if (noHit(figure, 0, 0)) {
+			figure.rotation = rotation;
+			return true;
 		}
-		addToGrid();
-		return true;
+
+		return false;
 	}
 
 }

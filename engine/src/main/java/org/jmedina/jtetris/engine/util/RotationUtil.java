@@ -15,9 +15,8 @@ import org.jmedina.jtetris.engine.figure.Figure;
  */
 public class RotationUtil {
 
-	public static Figure rotateFigure(Figure figure,int direction) {
-		Figure tmpFigure = figure.clone();
-		List<Box> boxes = tmpFigure.getBoxes();
+	public static void rotateFigure(Figure figure,int direction) {
+		List<Box> boxes = figure.getBoxes();
 		
 		List<Point2D.Double> listCoords = boxes.stream().map(box -> new Point2D.Double(box.getX(), box.getY()))
 				.collect(Collectors.toList());
@@ -27,8 +26,8 @@ public class RotationUtil {
 		
 		List<Point2D.Double> coordsRotated = Arrays.asList( srcPts );
 		List<Box> boxesRotated = coordsRotated.stream().map( c -> new Box(c.getX(),c.getY()) ).collect( Collectors.toList() );
-
-		return new Figure(boxesRotated,figure.getCenter(),tmpFigure.getNumRotations(),tmpFigure.getRotation());
+		
+		figure.setBoxes(boxesRotated);
 	}
 
 	private static void rotateCoords(Point2D.Double[] srcPts, Point2D.Double center, int direction) {
