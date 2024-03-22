@@ -54,7 +54,7 @@ mvn clean spring-boot:run -DskipTests -Ptomcat
 mvn clean package -DskipTests -Pjboss
 
 # For deployment in Wildfly v30.0.0.Final
-mvn clean wildfly:deploy-only -DskipTests -Pjboss
+mvn wildfly:deploy-only -DskipTests -Pjboss
 
 # For generating a docker image
 docker image build -t jtetris .
