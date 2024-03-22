@@ -4,7 +4,7 @@
 #########################################################
 # 1) Pre-requisites
 # Having installed:
-# - Java: v7.0.6
+# - Java: v17.0.6
 # - Maven: v3.9.6
 # - Node: v18.16.0
 # - Npm: v9.5.1
@@ -50,11 +50,11 @@ mvn clean package -DskipTests -Ptomcat
 # For running with spring-boot
 mvn clean spring-boot:run -DskipTests -Ptomcat
 
-# For generating wars for Wildfly Preview v26.1.3.Final
+# For generating wars for Wildfly v30.0.0.Final
 mvn clean package -DskipTests -Pjboss
 
-# For deployment in Wildfly Preview v26.1.3.Final
-mvn clean wildfly:deploy -DskipTests -Pjboss
+# For deployment in Wildfly v30.0.0.Final
+mvn clean wildfly:deploy-only -DskipTests -Pjboss
 
 # For generating a docker image
 docker image build -t jtetris .

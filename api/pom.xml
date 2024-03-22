@@ -23,6 +23,9 @@
 	<profiles>
 		<profile>
 			<id>jboss</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<properties>
 				<app.eureka.server>http://localhost:8080/eurekaserver/eureka</app.eureka.server>
 			</properties>
@@ -41,17 +44,10 @@
 						</exclusion>
 					</exclusions>
 				</dependency>
-				<dependency>
-					<groupId>org.glassfish.jersey.core</groupId>
-					<artifactId>jersey-server</artifactId>
-				</dependency>
 			</dependencies>
 		</profile>
 		<profile>
 			<id>tomcat</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<properties>
 				<app.eureka.server>http://localhost:9080/eurekaserver/eureka</app.eureka.server>
 			</properties>
@@ -97,9 +93,18 @@
 		</dependency>
 		<dependency>
 			<groupId>com.playtika.reactivefeign</groupId>
-			<artifactId>feign-reactor-spring-cloud-starter</artifactId>
+			<artifactId>feign-reactor-cloud</artifactId>
 			<version>4.0.3</version>
-			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>com.playtika.reactivefeign</groupId>
+			<artifactId>feign-reactor-webclient</artifactId>
+			<version>4.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jmedina.jtetris</groupId>
+			<artifactId>feign-reactor-spring-configuration</artifactId>
+			<version>4.0.3-FIX</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -122,6 +127,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.servlet</groupId>

@@ -2,10 +2,11 @@
 	<deployment>
 		<dependencies>
 			<!-- for spring reactive webapp -->
-			<module name="org.jboss.xnio" services="import"/>
+			<module name="org.jboss.xnio" services="import" />
 		</dependencies>
 		<exclude-subsystems>
 			<subsystem name="logging" />
+			<subsystem name="jaxrs" />
 		</exclude-subsystems>
 	</deployment>
 </jboss-deployment-structure>

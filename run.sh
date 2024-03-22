@@ -12,4 +12,4 @@ source /root/.bashrc
 cd /root/installation/node-server
 ./run.sh &
 
-/root/installation/wildfly-preview-26.1.3.Final/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0
+/root/installation/wildfly-30.0.0.Final/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0

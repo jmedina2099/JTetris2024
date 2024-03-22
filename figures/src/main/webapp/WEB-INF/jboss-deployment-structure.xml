@@ -6,6 +6,7 @@
 		</dependencies>
 		<exclude-subsystems>
 			<subsystem name="logging" />
+			<subsystem name="jaxrs" />
 		</exclude-subsystems>
 	</deployment>
 </jboss-deployment-structure>

@@ -1,5 +1,6 @@
 .project
 .settings/*
+feign/target/*
 eureka/target/*
 gateway/target/*
 api/target/*

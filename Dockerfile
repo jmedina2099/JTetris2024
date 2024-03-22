@@ -27,9 +27,11 @@ RUN aptitude install -y mysql-server
 RUN wget https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz
 RUN tar zxf kafka_2.13-3.7.0.tgz
 
-RUN wget https://github.com/wildfly/wildfly/releases/download/26.1.3.Final/wildfly-preview-26.1.3.Final.tar.gz 
-RUN tar zxf wildfly-preview-26.1.3.Final.tar.gz
-RUN /root/installation/wildfly-preview-26.1.3.Final/bin/add-user.sh -u 'wildfly' -p 'wi1df1y!' 
+#RUN wget https://github.com/wildfly/wildfly/releases/download/26.1.3.Final/wildfly-preview-26.1.3.Final.tar.gz
+#RUN tar zxf wildfly-preview-26.1.3.Final.tar.gz
+RUN wget https://github.com/wildfly/wildfly/releases/download/30.0.0.Final/wildfly-30.0.0.Final.tar.gz
+RUN tar zxf wildfly-30.0.0.Final.tar.gz
+RUN /root/installation/wildfly-30.0.0.Final/bin/add-user.sh -u 'wildfly' -p 'wi1df1y!' 
 
 SHELL ["/bin/bash", "--login", "-c"]
 RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -60,4 +62,4 @@ ENTRYPOINT ["/root/installation/run.sh"]
 
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
 #ENTRYPOINT ["mysqld", "--user=root"]
-#ENTRYPOINT ["./wildfly-preview-26.1.3.Final/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+#ENTRYPOINT ["./wildfly-30.0.0.Final/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
