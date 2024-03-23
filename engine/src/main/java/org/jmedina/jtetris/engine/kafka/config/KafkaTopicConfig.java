@@ -32,6 +32,7 @@ public class KafkaTopicConfig {
 	@Bean
 	KafkaAdmin kafkaAdmin() {
 		Map<String, Object> configs = new HashMap<>();
+		configs.put(AdminClientConfig.CLIENT_ID_CONFIG, "adminClient");
 		configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		return new KafkaAdmin(configs);
 	}

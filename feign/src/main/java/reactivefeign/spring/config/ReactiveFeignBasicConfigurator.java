@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
+@SuppressWarnings( value = {"rawtypes","unchecked"})
 public class ReactiveFeignBasicConfigurator extends AbstractReactiveFeignConfigurator{
 
 

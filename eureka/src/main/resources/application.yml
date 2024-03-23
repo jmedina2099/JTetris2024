@@ -30,3 +30,7 @@ management:
     web:
       exposure:
         include: health,info,beans,env
+logging:
+  level:
+    # don't warn that there are no replica nodes
+    com.netflix.eureka.cluster.PeerEurekaNodes: 'ERROR'

@@ -12,6 +12,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyMap;
 
+@SuppressWarnings( value = {"rawtypes","unchecked"})
 public class ReactiveFeignNamedContext {
 
     private final ApplicationContext applicationContext;

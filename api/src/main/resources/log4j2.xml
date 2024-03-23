@@ -30,6 +30,10 @@
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker" additivity="false" level="error" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Root level="info" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />

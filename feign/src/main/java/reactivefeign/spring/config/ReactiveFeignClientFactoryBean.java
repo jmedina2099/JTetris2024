@@ -37,6 +37,7 @@ import java.util.Objects;
  *
  *  Patterned after org.springframework.cloud.openfeign.FeignClientFactoryBean
  */
+@SuppressWarnings( value = {"rawtypes","unchecked"})
 class ReactiveFeignClientFactoryBean implements FactoryBean<Object>, InitializingBean,
 		ApplicationContextAware {
 	/***********************************

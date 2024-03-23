@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import static reactivefeign.spring.config.ReactiveFeignBasicConfigurator.configureRetryPolicyFromProperties;
 
+@SuppressWarnings( value = {"rawtypes","unchecked"})
 public class ReactiveFeignLoadBalancerConfigurator extends AbstractReactiveFeignConfigurator{
 
 	protected ReactiveFeignLoadBalancerConfigurator() {

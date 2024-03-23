@@ -54,8 +54,10 @@ import java.util.List;
  * patterned after org.springframework.cloud.netflix.feign.FeignClientsConfiguration
  */
 @Configuration
+@SuppressWarnings( value = {"rawtypes","unchecked"})
 public class ReactiveFeignClientsConfiguration {
 
+	@SuppressWarnings("unused")
 	@Autowired(required = false)
 	private List<AnnotatedParameterProcessor> parameterProcessors = new ArrayList<>();
 

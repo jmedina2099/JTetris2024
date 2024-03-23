@@ -25,6 +25,7 @@ import reactivefeign.cloud2.ReactiveFeignCircuitBreakerFactory;
 
 import java.util.function.Consumer;
 
+@SuppressWarnings( value = {"rawtypes","unchecked"})
 public class ReactiveFeignCircuitBreakerConfigurator extends AbstractReactiveFeignConfigurator{
 
 	protected ReactiveFeignCircuitBreakerConfigurator() {

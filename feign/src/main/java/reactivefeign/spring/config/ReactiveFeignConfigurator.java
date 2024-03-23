@@ -19,6 +19,7 @@ package reactivefeign.spring.config;
 
 import reactivefeign.ReactiveFeignBuilder;
 
+@SuppressWarnings( value = {"rawtypes"})
 interface ReactiveFeignConfigurator extends Comparable<ReactiveFeignConfigurator>{
 
 	ReactiveFeignBuilder configure(

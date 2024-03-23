@@ -58,6 +58,7 @@ import static reactivefeign.utils.StringUtils.cutTail;
 /**
  * patterned after org.springframework.cloud.openfeign.FeignClientsRegistrar
  */
+@SuppressWarnings( value = {"rawtypes"})
 class ReactiveFeignClientsRegistrar implements ImportBeanDefinitionRegistrar,
 		ResourceLoaderAware, EnvironmentAware {
 

@@ -45,7 +45,6 @@ public class ReactiveFeignAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        @ConfigurationProperties("reactive.feign.client")
         public ReactiveFeignClientsProperties<WebReactiveOptions.Builder> webClientReactiveFeignClientProperties() {
             return new ReactiveFeignClientsProperties<>();
         }
@@ -71,7 +70,6 @@ public class ReactiveFeignAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        @ConfigurationProperties("reactive.feign.client")
         public ReactiveFeignClientsProperties<JettyReactiveOptions.Builder> jettyReactiveFeignClientProperties() {
             return new ReactiveFeignClientsProperties<>();
         }
