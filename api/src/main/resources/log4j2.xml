@@ -30,6 +30,10 @@
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver" additivity="false" level="warn" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.springframework" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
