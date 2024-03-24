@@ -49,60 +49,42 @@ public class EngineController {
 	public Flux<Box> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
 		Optional<Box[]> optional = this.engine.moveRight();
-		if (optional.isPresent()) {
-			return Flux.fromArray(optional.get());
-		}
-		return Flux.empty();
+		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/moveLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
 		Optional<Box[]> optional = this.engine.moveLeft();
-		if (optional.isPresent()) {
-			return Flux.fromArray(optional.get());
-		}
-		return Flux.empty();
+		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/moveDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> moveDown() {
 		this.logger.debug("===> EngineController.moveDown()");
 		Optional<Box[]> optional = this.engine.moveDown();
-		if (optional.isPresent()) {
-			return Flux.fromArray(optional.get());
-		}
-		return Flux.empty();
+		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/rotateRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		Optional<Box[]> optional = this.engine.rotateRight();
-		if (optional.isPresent()) {
-			return Flux.fromArray(optional.get());
-		}
-		return Flux.empty();
+		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/rotateLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		Optional<Box[]> optional = this.engine.rotateLeft();
-		if (optional.isPresent()) {
-			return Flux.fromArray(optional.get());
-		}
-		return Flux.empty();
+		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		Optional<Box[]> optional = this.engine.bottomDown();
-		if (optional.isPresent()) {
-			return Flux.fromArray(optional.get());
-		}
-		return Flux.empty();
+		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 }

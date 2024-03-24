@@ -4,10 +4,9 @@ import { Box } from 'src/app/model/figure/box';
 @Component({
   selector: 'app-box',
   templateUrl: './box.component.html',
-  styleUrls: ['./box.component.css']
+  styleUrls: ['./box.component.css'],
 })
 export class BoxComponent {
-
   @Input()
-  box : Box = {x:0,y:0};
+  box: Box = { x: 0, y: 0 };
 }

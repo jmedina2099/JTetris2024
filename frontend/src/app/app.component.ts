@@ -1,7 +1,5 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { Message } from 'src/app/model/message/message';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
-import { Figure } from './model/figure/figure';
 import { VentanaPrincipalComponent } from './components/ventana-principal/ventana-principal.component';
 import { Box } from './model/figure/box';
 
@@ -11,76 +9,53 @@ import { Box } from './model/figure/box';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-
   constructor(private fetchService: FetchService) {}
 
   @ViewChild(VentanaPrincipalComponent) ventana!: VentanaPrincipalComponent;
 
   @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
+  handleKeyboardEvent(event: KeyboardEvent): void {
     const key = event.key;
+    const firstBoxRight: boolean[] = [false];
+    const firstBoxLeft: boolean[] = [false];
+    const firstBoxRotateRight: boolean[] = [false];
+    const firstBoxRotateLeft: boolean[] = [false];
     switch (key) {
       case 'ArrowRight':
-        let firstBoxRight = false;
-        this.fetchService.moveRight().subscribe({ 
-          next: value => {
-            if( this.ventana ) {
-              if( !firstBoxRight ) {
-                this.ventana.fallingBoxes = [];
-                firstBoxRight = true;
-              }
-              this.ventana.fallingBoxes.push(value);
-            }
-          }
+        this.fetchService.moveRight().subscribe({
+          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRight),
         });
         break;
       case 'ArrowLeft':
-        let firstBoxLeft = false;
-        this.fetchService.moveLeft().subscribe({ 
-          next: value => {
-            if( this.ventana ) {
-              if( !firstBoxLeft ) {
-                this.ventana.fallingBoxes = [];
-                firstBoxLeft = true;
-              }
-              this.ventana.fallingBoxes.push(value);
-            }
-          }
+        this.fetchService.moveLeft().subscribe({
+          next: (box: Box) => this.fillFallingBoxes(box, firstBoxLeft),
         });
         break;
       case 'ArrowUp':
-        let firstBoxRotateRight = false;
-        this.fetchService.rotateRight().subscribe({ 
-          next: value => {
-            if( this.ventana ) {
-              if( !firstBoxRotateRight ) {
-                this.ventana.fallingBoxes = [];
-                firstBoxRotateRight = true;
-              }
-              this.ventana.fallingBoxes.push(value);
-            }
-          }
+        this.fetchService.rotateRight().subscribe({
+          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateRight),
         });
         break;
       case 'ArrowDown':
-        let firstBoxRotateLeft = false;
-        this.fetchService.rotateLeft().subscribe({ 
-          next: value => {
-            if( this.ventana ) {
-              if( !firstBoxRotateLeft ) {
-                this.ventana.fallingBoxes = [];
-                firstBoxRotateLeft = true;
-              }
-              this.ventana.fallingBoxes.push(value);
-            }
-          }
+        this.fetchService.rotateLeft().subscribe({
+          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateLeft),
         });
         break;
       case ' ':
         this.fetchService.bottomDown().subscribe();
         break;
-        default:
+      default:
         break;
+    }
+  }
+
+  fillFallingBoxes(box: Box, firstBox: boolean[]): void {
+    if (this.ventana) {
+      if (!firstBox[0]) {
+        this.ventana.fallingBoxes = [];
+        firstBox[0] = true;
+      }
+      this.ventana.fallingBoxes.push(box);
     }
   }
 }

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Socket } from 'socket.io-client';
 import { Box } from 'src/app/model/figure/box';
 import { Figure } from 'src/app/model/figure/figure';
-import { Message } from 'src/app/model/message/message';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { WebSocketService } from 'src/app/services/socket-io/web-socket.service';
 
@@ -31,7 +30,7 @@ export class VentanaPrincipalComponent implements OnInit {
     if (this.socket) {
       this.socket.on('fallingFigureMessage', (data: string) => {
         console.log('on fallingFigureMessage = ' + data);
-        let figure = JSON.parse(data) as Figure;
+        const figure = JSON.parse(data) as Figure;
         this.fallingBoxes = figure.boxes;
       });
       this.socket.on('boardMessage', (data: string) => {
@@ -46,11 +45,9 @@ export class VentanaPrincipalComponent implements OnInit {
 
   nextFigure(): void {
     const startButtonElement = window.document.getElementById('startButton');
-    if( startButtonElement ) {
+    if (startButtonElement) {
       startButtonElement.blur();
     }
-    this.fetchService.start().subscribe((value: Message) => {
-      //console.log('start = ' + value? value.content: '');
-    });
+    this.fetchService.start().subscribe();
   }
 }

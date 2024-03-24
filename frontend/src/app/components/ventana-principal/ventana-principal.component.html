@@ -1,8 +1,12 @@
 <div class="ventana">
   <div>
-    <input id="startButton" type="button" value="Start" (click)="nextFigure()" />
+    <input
+      id="startButton"
+      type="button"
+      value="Start"
+      (click)="nextFigure()" />
   </div>
-  <br/>
+  <br />
   <div class="panel">
     <app-box *ngFor="let box of fallingBoxes" [box]="box"></app-box>
     <app-box *ngFor="let box of board" [box]="box"></app-box>

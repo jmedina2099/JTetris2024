@@ -1,21 +1,26 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { Box } from 'src/app/model/figure/box';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EventSourceService {
-
-  constructor() { }
-
   observeMessages(url: string): Observable<Box> {
-    return new Observable<Box>(obs => {
-      const es = new EventSource(url);
-      es.addEventListener('message', (evt: MessageEvent) => {
-        obs.next(evt.data != null ? JSON.parse(evt.data): '');
+    return new Observable<Box>((observer: Subscriber<Box>) => {
+      const eventSource = new EventSource(url);
+      eventSource.addEventListener(
+        'message',
+        (messageEvent: MessageEvent<string>) => {
+          if (messageEvent.data != undefined) {
+            observer.next(JSON.parse(messageEvent.data) as Box);
+          }
+        }
+      );
+      eventSource.addEventListener('error', () => {
+        observer.complete();
       });
-      return () => es.close();
+      return () => eventSource.close();
     });
   }
 }

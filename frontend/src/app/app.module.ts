@@ -9,7 +9,12 @@ import { FigureComponent } from './components/figure/figure.component';
 import { VentanaPrincipalComponent } from './components/ventana-principal/ventana-principal.component';
 
 @NgModule({
-  declarations: [AppComponent, VentanaPrincipalComponent, FigureComponent, BoxComponent],
+  declarations: [
+    AppComponent,
+    VentanaPrincipalComponent,
+    FigureComponent,
+    BoxComponent,
+  ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],

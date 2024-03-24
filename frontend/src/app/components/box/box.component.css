@@ -1,7 +1,7 @@
 .box {
-    position: absolute;
-    width: 19px;
-    height: 19px;
-    background-color: blue;
-    border: 1px solid white;
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  background-color: blue;
+  border: 1px solid white;
 }
