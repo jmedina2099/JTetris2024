@@ -37,10 +37,6 @@
 					<exclusions>
 						<exclusion>
 							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-starter-logging</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.springframework.boot</groupId>
 							<artifactId>spring-boot-starter-tomcat</artifactId>
 						</exclusion>
 					</exclusions>
@@ -56,12 +52,6 @@
 				<dependency>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-webflux</artifactId>
-					<exclusions>
-						<exclusion>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-starter-logging</artifactId>
-						</exclusion>
-					</exclusions>
 				</dependency>
 			</dependencies>
 			<build>
@@ -95,17 +85,17 @@
 		<dependency>
 			<groupId>com.playtika.reactivefeign</groupId>
 			<artifactId>feign-reactor-cloud</artifactId>
-			<version>4.0.3</version>
+			<version>${feign-reactive.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.playtika.reactivefeign</groupId>
 			<artifactId>feign-reactor-webclient</artifactId>
-			<version>4.0.3</version>
+			<version>${feign-reactive.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jmedina.jtetris</groupId>
 			<artifactId>feign-reactor-spring-configuration</artifactId>
-			<version>4.0.3-FIX</version>
+			<version>${feign-reactive-spring-configuration.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -118,12 +108,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.github.ben-manes.caffeine</groupId>
@@ -132,22 +116,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.servlet</groupId>

@@ -13,15 +13,23 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
+		<java.version>17</java.version>
+		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+		<spring-boot.version>3.2.4</spring-boot.version>
+		<spring-cloud.version>2023.0.1-SNAPSHOT</spring-cloud.version>
+		<feign-reactive.version>4.0.3</feign-reactive.version>
+		<feign-reactive-spring-configuration.version>4.0.3-FIX</feign-reactive-spring-configuration.version>
+		<embedded-mongo.version>4.12.2</embedded-mongo.version>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.language>java</sonar.language>
 		<sonar.login>admin</sonar.login>
 		<sonar.password>sonar</sonar.password>
-		<maven.compiler.target>17</maven.compiler.target>
-		<maven.compiler.source>17</maven.compiler.source>
-		<java.version>17</java.version>
-		<spring-cloud.version>2023.0.1-SNAPSHOT</spring-cloud.version>
+		<wildfly.hostname>localhost</wildfly.hostname>
+		<wildfly.port>9990</wildfly.port>
+		<wildfly.username>wildfly</wildfly.username>
+		<wildfly.password>wi1df1y!</wildfly.password>
 	</properties>
 	<modules>
 		<module>node-server</module>
@@ -35,6 +43,17 @@
 	</modules>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter</artifactId>
+				<version>${spring-boot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
@@ -150,10 +169,10 @@
 				<artifactId>wildfly-maven-plugin</artifactId>
 				<version>4.2.2.Final</version>
 				<configuration>
-					<hostname>localhost</hostname>
-					<port>9990</port>
-					<username>wildfly</username>
-					<password>wi1df1y!</password>
+					<hostname>${wildfly.hostname}</hostname>
+					<port>${wildfly.port}</port>
+					<username>${wildfly.username}</username>
+					<password>${wildfly.password}</password>
 				</configuration>
 			</plugin>
 		</plugins>
