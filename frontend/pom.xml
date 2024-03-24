@@ -76,7 +76,7 @@
 							</includes>
 						</fileset>
 						<fileset>
-							<directory>dist</directory>
+							<directory>../api/frontend/dist</directory>
 							<includes>
 								<include>**</include>
 							</includes>

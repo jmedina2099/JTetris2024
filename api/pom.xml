@@ -11,7 +11,8 @@
 	<artifactId>api</artifactId>
 	<packaging>war</packaging>
 	<properties>
-		<frontend.dist.directory>${project.parent.basedir}/frontend/dist/</frontend.dist.directory>
+		<frontend.dist.directory>${project.basedir}/frontend/dist/</frontend.dist.directory>
+		<resources.target.directory>${project.basedir}/target/classes/resources</resources.target.directory>
 		<start-class>org.jmedina.jtetris.api.TetrisApplication</start-class>
 		<app.api.name>api</app.api.name>
 		<app.api.port>9081</app.api.port>
@@ -166,8 +167,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>
-								${project.basedir}/target/classes/resources</outputDirectory>
+							<outputDirectory>${resources.target.directory}</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${frontend.dist.directory}</directory>
