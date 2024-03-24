@@ -43,6 +43,7 @@ export class AppComponent {
         break;
       case ' ':
         this.fetchService.bottomDown().subscribe();
+        this.ventana.fallingBoxes = [];
         break;
       default:
         break;

@@ -193,7 +193,7 @@ public class Engine {
 		return Optional.empty();
 	}
 
-	public Optional<Box[]> bottomDown() {
+	public void bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
 
 		Figure figureTmp = this.fallingFigure.clone();
@@ -216,7 +216,6 @@ public class Engine {
 		this.figureService.askForNextFigure().subscribe(m -> {
 			this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
 		});
-		return Optional.of(figureTmp.getBoxes().toArray(new Box[0]));
 	}
 
 	private int checkMakeLines(Figure figure) {

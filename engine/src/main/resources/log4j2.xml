@@ -50,6 +50,10 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="org.springframework.kafka.listener.KafkaMessageListenerContainer" additivity="false" level="warn" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.jmedina.jtetris.engine" additivity="false" level="debug" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
