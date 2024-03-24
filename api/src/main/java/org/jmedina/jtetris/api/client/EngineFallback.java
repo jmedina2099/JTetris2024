@@ -1,8 +1,10 @@
 package org.jmedina.jtetris.api.client;
 
+import org.jmedina.jtetris.api.model.Box;
 import org.jmedina.jtetris.api.model.Message;
 import org.springframework.stereotype.Component;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -18,32 +20,32 @@ public class EngineFallback implements EngineClient {
 	}
 
 	@Override
-	public Mono<Message> moveRight() {
-		return Mono.just(new Message("MOVE RIGHT FALLBACK"));
+	public Flux<Box> moveRight() {
+		return Flux.empty();
 	}
 
 	@Override
-	public Mono<Message> moveLeft() {
-		return Mono.just(new Message("MOVE LEFT FALLBACK"));
+	public Flux<Box> moveLeft() {
+		return Flux.empty();
 	}
 
 	@Override
-	public Mono<Message> moveDown() {
-		return Mono.just(new Message("MOVE DOWN FALLBACK"));
+	public Flux<Box> moveDown() {
+		return Flux.empty();
 	}
 
 	@Override
-	public Mono<Message> rotateRight() {
-		return Mono.just(new Message("ROTATE RIGHT FALLBACK"));
+	public Flux<Box> rotateRight() {
+		return Flux.empty();
 	}
 
 	@Override
-	public Mono<Message> rotateLeft() {
-		return Mono.just(new Message("ROTATE LEFT FALLBACK"));
+	public Flux<Box> rotateLeft() {
+		return Flux.empty();
 	}
 
 	@Override
-	public Mono<Message> bottomDown() {
-		return Mono.just(new Message("BOTTOM DOWN FALLBACK"));
+	public Flux<Box> bottomDown() {
+		return Flux.empty();
 	}
 }

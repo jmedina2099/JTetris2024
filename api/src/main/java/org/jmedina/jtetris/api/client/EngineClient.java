@@ -1,9 +1,12 @@
 package org.jmedina.jtetris.api.client;
 
+import org.jmedina.jtetris.api.model.Box;
 import org.jmedina.jtetris.api.model.Message;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import reactivefeign.spring.config.ReactiveFeignClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -16,21 +19,21 @@ public interface EngineClient {
 	@GetMapping(value = "/start", produces = "application/json")
 	public Mono<Message> start();
 
-	@GetMapping(value = "/moveRight", produces = "application/json")
-	public Mono<Message> moveRight();
+	@GetMapping(value = "/moveRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> moveRight();
 
-	@GetMapping(value = "/moveLeft", produces = "application/json")
-	public Mono<Message> moveLeft();
+	@GetMapping(value = "/moveLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> moveLeft();
 
-	@GetMapping(value = "/moveDown", produces = "application/json")
-	public Mono<Message> moveDown();
+	@GetMapping(value = "/moveDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> moveDown();
 
-	@GetMapping(value = "/rotateRight", produces = "application/json")
-	public Mono<Message> rotateRight();
+	@GetMapping(value = "/rotateRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> rotateRight();
 
-	@GetMapping(value = "/rotateLeft", produces = "application/json")
-	public Mono<Message> rotateLeft();
+	@GetMapping(value = "/rotateLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> rotateLeft();
 
-	@GetMapping(value = "/bottomDown", produces = "application/json")
-	public Mono<Message> bottomDown();
+	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> bottomDown();
 }

@@ -1,6 +1,7 @@
 package org.jmedina.jtetris.api.controller;
 
 import org.jmedina.jtetris.api.client.EngineClient;
+import org.jmedina.jtetris.api.model.Box;
 import org.jmedina.jtetris.api.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -39,38 +41,38 @@ public class TetrisController {
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start());
 	}
 
-	@GetMapping("/moveRight")
-	public ResponseEntity<Mono<Message>> moveRight() {
+	@GetMapping(value = "/moveRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> moveRight() {
 		this.logger.debug("===> TetrisController.moveRight()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveRight());
 	}
 
-	@GetMapping("/moveLeft")
-	public ResponseEntity<Mono<Message>> moveLeft() {
+	@GetMapping(value = "/moveLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> moveLeft() {
 		this.logger.debug("===> TetrisController.moveLeft()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveLeft());
 	}
 
-	@GetMapping("/moveDown")
-	public ResponseEntity<Mono<Message>> moveDown() {
+	@GetMapping(value = "/moveDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> moveDown() {
 		this.logger.debug("===> TetrisController.moveDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveDown());
 	}
 	
-	@GetMapping(value = "/rotateRight")
-	public ResponseEntity<Mono<Message>> rotateRight() {
+	@GetMapping(value = "/rotateRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateRight());
 	}
 
-	@GetMapping(value = "/rotateLeft")
-	public ResponseEntity<Mono<Message>> rotateLeft() {
+	@GetMapping(value = "/rotateLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
 	}
 
-	@GetMapping(value = "/bottomDown")
-	public ResponseEntity<Mono<Message>> bottomDown() {
+	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
 	}

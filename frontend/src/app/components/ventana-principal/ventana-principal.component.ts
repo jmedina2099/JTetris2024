@@ -12,7 +12,8 @@ import { WebSocketService } from 'src/app/services/socket-io/web-socket.service'
   styleUrls: ['./ventana-principal.component.css'],
 })
 export class VentanaPrincipalComponent implements OnInit {
-  fallingFigure: Figure = { boxes: [] };
+  //fallingFigure: Figure = { boxes: [] };
+  fallingBoxes: Box[] = [];
   board: Box[] = [];
   socket: Socket | undefined;
 
@@ -29,8 +30,9 @@ export class VentanaPrincipalComponent implements OnInit {
     this.socket = this.webSocketService.getSocket();
     if (this.socket) {
       this.socket.on('fallingFigureMessage', (data: string) => {
-        //console.log('on fallingFigureMessage = ' + data);
-        this.fallingFigure = JSON.parse(data) as Figure;
+        console.log('on fallingFigureMessage = ' + data);
+        let figure = JSON.parse(data) as Figure;
+        this.fallingBoxes = figure.boxes;
       });
       this.socket.on('boardMessage', (data: string) => {
         //console.log('on boardMessage = ' + data);

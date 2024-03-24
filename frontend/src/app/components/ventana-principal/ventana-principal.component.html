@@ -4,7 +4,7 @@
   </div>
   <br/>
   <div class="panel">
-    <app-figure [boxes]="fallingFigure.boxes"></app-figure>
+    <app-box *ngFor="let box of fallingBoxes" [box]="box"></app-box>
     <app-box *ngFor="let box of board" [box]="box"></app-box>
   </div>
 </div>
