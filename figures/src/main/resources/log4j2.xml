@@ -7,7 +7,7 @@
 			   status="WARN">
     <Properties>
         <Property name="LOG_PATTERN_COLORS">%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{${LOG_LEVEL_PATTERN:-%5p}}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=green, TRACE=green} %style{${sys:PID}}{magenta} --- [%15.15t] %style{%-60.60c}{cyan} :%L: %m%n%ex</Property>
-        <Property name="LOG_PATTERN_FILE">%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${sys:PID} --- [%15.15t] %-60.60c :%L: %m%n%ex</Property>
+        <Property name="LOG_PATTERN_FILE">%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${sys:PID} --- [%15.15t] %-90.90c :%L: %m%n%ex</Property>
         <Property name="APP_LOG_ROOT">${app.figures.log.path}</Property>
     </Properties>
     <Appenders>
@@ -26,7 +26,27 @@
     </Appenders>
 
     <Loggers>
-    	<Logger name="org.springframework.kafka" additivity="false" level="info" includeLocation="true">
+        <Logger name="org.mongodb.driver" additivity="false" level="warn" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.apache.kafka" additivity="false" level="warn" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="com.netflix.discovery" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.cloud.netflix" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker" additivity="false" level="error" includeLocation="true">
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>
@@ -34,7 +54,11 @@
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker" additivity="false" level="error" includeLocation="true">
+        <Logger name="org.jmedina.jtetris.figures.controller" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.jmedina.jtetris.figures.service" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>

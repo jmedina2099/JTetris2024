@@ -29,11 +29,11 @@ export class VentanaPrincipalComponent implements OnInit {
     this.socket = this.webSocketService.getSocket();
     if (this.socket) {
       this.socket.on('fallingFigureMessage', (data: string) => {
-        console.log('on fallingFigureMessage = ' + data);
+        //console.log('on fallingFigureMessage = ' + data);
         this.fallingFigure = JSON.parse(data) as Figure;
       });
       this.socket.on('boardMessage', (data: string) => {
-        console.log('on boardMessage = ' + data);
+        //console.log('on boardMessage = ' + data);
         this.board = JSON.parse(data) as Box[];
       });
       this.socket.on('connect', () => {
@@ -48,7 +48,7 @@ export class VentanaPrincipalComponent implements OnInit {
       startButtonElement.blur();
     }
     this.fetchService.start().subscribe((value: Message) => {
-      console.log('start = ' + value? value.content: '');
+      //console.log('start = ' + value? value.content: '');
     });
   }
 }

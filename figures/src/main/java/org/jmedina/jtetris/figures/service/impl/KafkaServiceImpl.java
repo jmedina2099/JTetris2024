@@ -1,16 +1,9 @@
 package org.jmedina.jtetris.figures.service.impl;
 
-import java.util.Collection;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 
-import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.DescribeClusterResult;
-import org.apache.kafka.common.Node;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.exception.ServiceException;
@@ -38,6 +31,9 @@ public class KafkaServiceImpl implements KafkaService, ApplicationListener<Conte
 
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapAddress;
+	
+	@Value("${figures.topic.nextFigure}")
+	private String nextFigureTopic;
 
 	@Getter
 	private CountDownLatch latchForTesting = new CountDownLatch(1);
@@ -66,20 +62,6 @@ public class KafkaServiceImpl implements KafkaService, ApplicationListener<Conte
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		this.logger.debug("==> KafkaService.onApplicationEvent()");
-		Properties props = new Properties();
-		props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapAddress);
-
-		AdminClient adminClient = AdminClient.create(props);
-		DescribeClusterResult describeClusterResult = adminClient.describeCluster();
-		try {
-			Collection<Node> clusterDetails = describeClusterResult.nodes().get();
-			clusterDetails.stream().forEach(n -> {
-				this.logger.debug("==> kafka node = {}", n);
-			});
-		} catch (InterruptedException e) {
-			this.logger.error("=*=> ERROR initializing kafka", e);
-		} catch (ExecutionException e) {
-			this.logger.error("=*=> ERROR initializing kafka", e);
-		}
+		sendMessage("{}", this.nextFigureTopic);
 	}
 }

@@ -5,6 +5,9 @@ server:
 spring:
   application:
     name: ${app.eureka.name}
+  mvc:
+    servlet:
+      load-on-startup: 1
 eureka:
   client:
     registerWithEureka: false

@@ -28,12 +28,12 @@ public class ReactiveFeignAutoConfiguration {
     private List<ReactiveFeignClientSpecification> configurations = new ArrayList<>();
 
     @Bean
-    public HasFeatures reactiveFeignFeature() {
+    HasFeatures reactiveFeignFeature() {
         return HasFeatures.namedFeature("ReactiveFeign", ReactiveFeign.class);
     }
 
     @Bean
-    public ReactiveFeignNamedContextFactory reactiveFeignContext() {
+    ReactiveFeignNamedContextFactory reactiveFeignContext() {
         ReactiveFeignNamedContextFactory context = new ReactiveFeignNamedContextFactory();
         context.setConfigurations(this.configurations);
         return context;
@@ -45,7 +45,7 @@ public class ReactiveFeignAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public ReactiveFeignClientsProperties<WebReactiveOptions.Builder> webClientReactiveFeignClientProperties() {
+        ReactiveFeignClientsProperties<WebReactiveOptions.Builder> webClientReactiveFeignClientProperties() {
             return new ReactiveFeignClientsProperties<>();
         }
 
@@ -58,7 +58,7 @@ public class ReactiveFeignAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean
         @ConfigurationProperties("reactive.feign.client")
-        public ReactiveFeignClientsProperties<Java11ReactiveOptions.Builder> java11ReactiveFeignClientProperties() {
+        ReactiveFeignClientsProperties<Java11ReactiveOptions.Builder> java11ReactiveFeignClientProperties() {
             return new ReactiveFeignClientsProperties<>();
         }
 
@@ -70,7 +70,7 @@ public class ReactiveFeignAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public ReactiveFeignClientsProperties<JettyReactiveOptions.Builder> jettyReactiveFeignClientProperties() {
+        ReactiveFeignClientsProperties<JettyReactiveOptions.Builder> jettyReactiveFeignClientProperties() {
             return new ReactiveFeignClientsProperties<>();
         }
 

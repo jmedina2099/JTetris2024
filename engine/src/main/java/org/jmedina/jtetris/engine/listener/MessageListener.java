@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +30,9 @@ public class MessageListener {
 		this.logger.debug("==> MessageListener.listenGroupFigureMessage() = {} ", message);
 		Optional<Figure> optional = this.serializeUtil.convertStringToFigure(message);
 		if (optional.isPresent()) {
-			this.engine.addFallingFigure(optional.get());
+			if( !ObjectUtils.isEmpty(optional.get().getBoxes()) ) {
+				this.engine.addFallingFigure(optional.get());
+			}
 		}
 	}
 }

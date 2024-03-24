@@ -66,7 +66,7 @@ public class ReactiveFeignClientsConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public Contract reactiveFeignContract(
+	Contract reactiveFeignContract(
 			List<AnnotatedParameterProcessor> parameterProcessors, FormattingConversionService feignConversionService) {
 		return new SpringMvcContract(parameterProcessors, feignConversionService);
 	}
@@ -75,20 +75,20 @@ public class ReactiveFeignClientsConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnClass(name = "io.micrometer.core.instrument.MeterRegistry")
 	@ConditionalOnProperty(name = "reactive.feign.metrics.enabled", havingValue = "true")
-	public MicrometerReactiveLogger metricsReactiveLogger() {
+	MicrometerReactiveLogger metricsReactiveLogger() {
 		return MicrometerReactiveLogger.basicTimer();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(ignoredType = "reactivefeign.client.metrics.MicrometerReactiveLogger")
 	@ConditionalOnProperty(name = "reactive.feign.logger.enabled", havingValue = "true")
-	public ReactiveLoggerListener reactiveLogger() {
+	ReactiveLoggerListener reactiveLogger() {
 		return new DefaultReactiveLogger(Clock.systemUTC());
 	}
 
 	@Bean
 	@Primary
-	public FormattingConversionService feignConversionService() {
+	FormattingConversionService feignConversionService() {
 		FormattingConversionService conversionService = new DefaultFormattingConversionService();
 		for (FeignFormatterRegistrar feignFormatterRegistrar : feignFormatterRegistrars) {
 			feignFormatterRegistrar.registerFormatters(conversionService);
@@ -105,7 +105,7 @@ public class ReactiveFeignClientsConfiguration {
 
 			@Bean
 			@Scope("prototype")
-			public ReactiveFeignBuilder reactiveFeignBuilder(
+			ReactiveFeignBuilder reactiveFeignBuilder(
 					JettyHttpClientFactory jettyHttpClientFactory) {
 				return JettyReactiveFeign.builder(jettyHttpClientFactory);
 			}
@@ -118,7 +118,7 @@ public class ReactiveFeignClientsConfiguration {
 
 			@Bean
 			@Scope("prototype")
-			public ReactiveFeignBuilder reactiveFeignBuilder(
+			ReactiveFeignBuilder reactiveFeignBuilder(
 					@Autowired(required = false) HttpClientFeignCustomizer httpClientCustomizer) {
 				return httpClientCustomizer != null
 						? Java11ReactiveFeign.builder(httpClientCustomizer)
@@ -133,7 +133,7 @@ public class ReactiveFeignClientsConfiguration {
 
 			@Bean
 			@Scope("prototype")
-			public ReactiveFeignBuilder reactiveFeignBuilder(
+			ReactiveFeignBuilder reactiveFeignBuilder(
 					WebClient.Builder builder,
 					@Autowired(required = false) WebClientFeignCustomizer webClientCustomizer) {
 				return webClientCustomizer != null
@@ -144,7 +144,7 @@ public class ReactiveFeignClientsConfiguration {
 
 		@Bean
 		@Scope("prototype")
-		public ReactiveFeignConfigurator reactiveFeignBasicConfigurator(){
+		ReactiveFeignConfigurator reactiveFeignBasicConfigurator(){
 			return new ReactiveFeignBasicConfigurator();
 		}
 	}
@@ -159,14 +159,14 @@ public class ReactiveFeignClientsConfiguration {
 		@Bean
 		@Scope("prototype")
 		@ConditionalOnProperty(name = "reactive.feign.circuit.breaker.enabled", havingValue = "true", matchIfMissing = true)
-		public ReactiveFeignConfigurator reactiveFeignResilience4jConfigurator(){
+		ReactiveFeignConfigurator reactiveFeignResilience4jConfigurator(){
 			return new ReactiveFeignCircuitBreakerConfigurator();
 		}
 
 		@Bean
 		@Scope("prototype")
 		@ConditionalOnProperty(name = "reactive.feign.loadbalancer.enabled", havingValue = "true", matchIfMissing = true)
-		public ReactiveFeignConfigurator reactiveFeignLoadBalancerConfigurator(){
+		ReactiveFeignConfigurator reactiveFeignLoadBalancerConfigurator(){
 			return new ReactiveFeignLoadBalancerConfigurator();
 		}
 
@@ -174,7 +174,7 @@ public class ReactiveFeignClientsConfiguration {
 		@Primary
 		@Scope("prototype")
 		@ConditionalOnMissingBean
-		public reactivefeign.cloud2.CloudReactiveFeign.Builder reactiveFeignCloudBuilder(
+		reactivefeign.cloud2.CloudReactiveFeign.Builder reactiveFeignCloudBuilder(
 				ReactiveFeignBuilder reactiveFeignBuilder) {
 			return reactivefeign.cloud2.CloudReactiveFeign.builder(reactiveFeignBuilder);
 		}

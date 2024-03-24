@@ -16,27 +16,27 @@ export class AppComponent {
     switch (key) {
       case 'ArrowRight':
         this.fetchService.moveRight().subscribe((value: Message) => {
-          console.log('moveRight = ' + value? value.content: '' );
+          //console.log('moveRight = ' + value? value.content: '' );
         });
         break;
       case 'ArrowLeft':
         this.fetchService.moveLeft().subscribe((value: Message) => {
-          console.log('moveLeft = ' + value? value.content: '');
+          //console.log('moveLeft = ' + value? value.content: '');
         });
         break;
       case 'ArrowUp':
         this.fetchService.rotateRight().subscribe((value: Message) => {
-          console.log('rotateRight = ' + value? value.content: '');
+          //console.log('rotateRight = ' + value? value.content: '');
         });
         break;
       case 'ArrowDown':
         this.fetchService.rotateLeft().subscribe((value: Message) => {
-          console.log('rotateLeft = ' + value? value.content: '');
+          //console.log('rotateLeft = ' + value? value.content: '');
         });
         break;
       case ' ':
         this.fetchService.bottomDown().subscribe((value: Message) => {
-          console.log('bottomDown = ' + value? value.content: '');
+          //console.log('bottomDown = ' + value? value.content: '');
         });
         break;
         default:

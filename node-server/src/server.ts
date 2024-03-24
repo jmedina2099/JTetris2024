@@ -15,10 +15,8 @@ await consumer.subscribe({ topics: ['nextFigureTopic','figureTopic','boardTopic'
 await consumer.run({
   eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
     let json = message.value?.toString();
-    console.log( 'topic ===> '+topic )
-    console.log({
-      value: json,
-    })
+    //console.log( 'topic ===> '+topic )
+    //console.log({value: json,})
     if( socketConnected ) {
       if( topic == 'nextFigureTopic' || topic == 'figureTopic' ) {
         socketConnected.emit( 'fallingFigureMessage', json );
