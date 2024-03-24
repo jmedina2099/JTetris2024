@@ -38,6 +38,10 @@
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration" additivity="false" level="warn" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.springframework.cloud.netflix" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
