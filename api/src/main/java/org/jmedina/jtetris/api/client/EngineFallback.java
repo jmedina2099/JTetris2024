@@ -45,7 +45,7 @@ public class EngineFallback implements EngineClient {
 	}
 
 	@Override
-	public Flux<Void> bottomDown() {
+	public Flux<Box> bottomDown() {
 		return Flux.empty();
 	}
 }

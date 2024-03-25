@@ -20,6 +20,7 @@ export class AppComponent {
     const firstBoxLeft: boolean[] = [false];
     const firstBoxRotateRight: boolean[] = [false];
     const firstBoxRotateLeft: boolean[] = [false];
+    const firstBoxBottomDown: boolean[] = [false];
     switch (key) {
       case 'ArrowRight':
         this.fetchService.moveRight().subscribe({
@@ -42,8 +43,9 @@ export class AppComponent {
         });
         break;
       case ' ':
-        this.fetchService.bottomDown().subscribe();
-        this.ventana.fallingBoxes = [];
+        this.fetchService.bottomDown().subscribe({
+          next: (box: Box) => this.fillFallingBoxes(box, firstBoxBottomDown),
+        });
         break;
       default:
         break;

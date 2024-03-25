@@ -72,7 +72,7 @@ public class TetrisController {
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<Void>> bottomDown() {
+	public ResponseEntity<Flux<Box>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
 	}
