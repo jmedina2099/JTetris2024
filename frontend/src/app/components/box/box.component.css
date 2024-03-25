@@ -1,4 +1,5 @@
 .box {
+  box-sizing: unset !important;
   position: absolute;
   width: 19px;
   height: 19px;

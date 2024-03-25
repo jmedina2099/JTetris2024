@@ -8,7 +8,7 @@
   </div>
   <br />
   <div class="panel">
-    <app-box *ngFor="let box of fallingBoxes" [box]="box"></app-box>
+    <app-box *ngFor="let box of getFallingBoxes()" [box]="box"></app-box>
     <app-box *ngFor="let box of board" [box]="box"></app-box>
   </div>
 </div>

@@ -63,6 +63,9 @@ management:
     web:
       exposure:
         include: health,info,beans,env
+logging:
+  level:
+    org.springframework.security: INFO
 # Api App
 api:
   engine:

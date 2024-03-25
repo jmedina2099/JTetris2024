@@ -9,6 +9,16 @@ spring:
         wiretap: true
       httpserver:
         wiretap: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:8080,http://localhost:9081,http://localhost:4200"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allow-credentials: true
     discovery:
       reactive:
         enabled: true

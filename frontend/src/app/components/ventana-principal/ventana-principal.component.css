@@ -1,8 +1,10 @@
 .ventana {
+  box-sizing: unset !important;
   width: 100%;
 }
 
 .panel {
+  box-sizing: unset !important;
   width: 201px;
   height: 401px;
   background-color: black;

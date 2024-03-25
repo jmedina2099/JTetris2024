@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Message } from 'src/app/model/message/message';
 import { Box } from 'src/app/model/figure/box';
 import { EventSourceService } from './event-source.service';
 import { take } from 'rxjs/operators';
+import { Credentials } from 'src/app/components/login/login.component';
 
 @Injectable({
   providedIn: 'root',
@@ -18,19 +19,25 @@ export class FetchService {
     private http: HttpClient
   ) {}
 
-  start(): Observable<Message> {
-    return this.http.get<Message>(this.baseUrl + '/start');
+  createHeaders(credentials: Credentials) {
+    return new HttpHeaders(credentials ? {
+      authorization: 'Basic ' + btoa(credentials.username + ':' + credentials.password)
+    } : {});
   }
 
-  moveRight(): Observable<Box> {
+  start(credentials: Credentials): Observable<Message> {
+    return this.http.get<Message>(this.baseUrl + '/start', { headers: this.createHeaders(credentials) });
+  }
+
+  moveRight(credentials: Credentials): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/moveRight')
+      .observeMessages(this.baseUrl + '/moveRight',credentials)
       .pipe(take(4));
   }
 
-  moveLeft(): Observable<Box> {
+  moveLeft(credentials: Credentials): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/moveLeft')
+      .observeMessages(this.baseUrl + '/moveLeft',credentials)
       .pipe(take(4));
   }
 
@@ -38,21 +45,21 @@ export class FetchService {
     return this.http.get<Message>(this.baseUrl + '/moveDown');
   }
 
-  rotateRight(): Observable<Box> {
+  rotateRight(credentials: Credentials): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/rotateRight')
+      .observeMessages(this.baseUrl + '/rotateRight',credentials)
       .pipe(take(4));
   }
 
-  rotateLeft(): Observable<Box> {
+  rotateLeft(credentials: Credentials): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/rotateLeft')
+      .observeMessages(this.baseUrl + '/rotateLeft',credentials)
       .pipe(take(4));
   }
 
-  bottomDown(): Observable<Box> {
+  bottomDown(credentials: Credentials): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/bottomDown')
+      .observeMessages(this.baseUrl + '/bottomDown',credentials)
       .pipe(take(4));
   }
 }
