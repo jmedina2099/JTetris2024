@@ -59,13 +59,6 @@ public class EngineController {
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
-	@GetMapping(value = "/moveDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<Box> moveDown() {
-		this.logger.debug("===> EngineController.moveDown()");
-		Optional<Box[]> optional = this.engine.moveDown();
-		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
-	}
-
 	@GetMapping(value = "/rotateRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
@@ -81,10 +74,10 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<Box> bottomDown() {
+	public Flux<Void> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
-		Optional<Box[]> optional = this.engine.bottomDown();
-		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
+		this.engine.bottomDown();
+		return Flux.empty();
 	}
 
 }

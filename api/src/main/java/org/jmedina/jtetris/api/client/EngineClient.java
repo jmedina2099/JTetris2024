@@ -35,5 +35,5 @@ public interface EngineClient {
 	public Flux<Box> rotateLeft();
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<Box> bottomDown();
+	public Flux<Void> bottomDown();
 }

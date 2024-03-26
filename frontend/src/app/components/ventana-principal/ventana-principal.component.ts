@@ -34,9 +34,14 @@ export class VentanaPrincipalComponent implements OnInit {
     if (this.socket) {
       this.socket.on('fallingFigureMessage', (data: string) => {
         //console.log('on fallingFigureMessage = ' + data);
-        this.route.snapshot.data['fallingBoxes'] = (
-          JSON.parse(data) as Figure
-        ).boxes;
+        const figure: Figure = JSON.parse(data) as Figure;
+        const currentTimeStamp: number = this.route.snapshot.data[
+          'timeStamp'
+        ] as number;
+        if (currentTimeStamp <= figure.timeStamp) {
+          this.route.snapshot.data['timeStamp'] = figure.timeStamp;
+          this.route.snapshot.data['fallingBoxes'] = figure.boxes;
+        }
       });
       this.socket.on('boardMessage', (data: string) => {
         //console.log('on boardMessage = ' + data);

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,6 +39,7 @@ public class Engine {
 	private final SerializeUtil serializeUtil;
 	private Figure fallingFigure;
 	private List<Box> falledBoxes;
+	private ReentrantLock lock = new ReentrantLock();	
 
 	private static final int WIDTH = 10;
 	private static final int HEIGHT = 20;
@@ -45,6 +47,7 @@ public class Engine {
 
 	public void start() {
 		this.logger.debug("==> Engine.start()");
+		this.fallingFigure = null;
 		this.falledBoxes = new ArrayList<>();
 		Stream.iterate(0, x -> x + 1).limit(HEIGHT).forEach(i -> {
 			Integer[] array = new Integer[WIDTH];
@@ -56,7 +59,7 @@ public class Engine {
 	public void addFallingFigure(Figure figure) {
 		this.logger.debug("==> Engine.addFallingFigure()");
 		this.fallingFigure = figure;
-		addToGrid(figure);
+		addToGrid(this.fallingFigure);
 	}
 
 	private void addToGrid(Figure figure) {
@@ -82,16 +85,20 @@ public class Engine {
 		if( Objects.isNull(this.fallingFigure) ) {
 			return Optional.empty();
 		}
-		Figure figureTmp = this.fallingFigure.clone();
-		removeFromGrid(figureTmp);
-		if (canMoveRight(figureTmp) && noHit(figureTmp, 1, 0)) {
-			figureTmp.moveRight();
-			// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
-			this.fallingFigure = figureTmp;
-			addToGrid(figureTmp);
-			return Optional.of(figureTmp.getBoxes().toArray(new Box[0]));
+		boolean isLockAcquired = lock.tryLock();
+		if( isLockAcquired ) {
+			try {
+				removeFromGrid(this.fallingFigure);
+				if (canMoveRight(this.fallingFigure) && noHit(this.fallingFigure, 1, 0)) {
+					this.fallingFigure.moveRight();
+					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
+				}
+			} finally {
+				addToGrid(this.fallingFigure);
+	            lock.unlock();
+	        }
 		}
-		addToGrid(this.fallingFigure);
 		return Optional.empty();
 	}
 
@@ -100,34 +107,20 @@ public class Engine {
 		if( Objects.isNull(this.fallingFigure) ) {
 			return Optional.empty();
 		}
-		Figure figureTmp = this.fallingFigure.clone();
-		removeFromGrid(figureTmp);
-		if (canMoveLeft(figureTmp) && noHit(figureTmp, -1, 0)) {
-			figureTmp.moveLeft();
-			// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
-			this.fallingFigure = figureTmp;
-			addToGrid(figureTmp);
-			return Optional.of(figureTmp.getBoxes().toArray(new Box[0]));
+		boolean isLockAcquired = lock.tryLock();
+		if( isLockAcquired ) {
+			try {
+				removeFromGrid(this.fallingFigure);
+				if (canMoveLeft(this.fallingFigure) && noHit(this.fallingFigure, -1, 0)) {
+					this.fallingFigure.moveLeft();
+					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
+				}
+			} finally {
+				addToGrid(this.fallingFigure);
+	            lock.unlock();
+	        }
 		}
-		addToGrid(this.fallingFigure);
-		return Optional.empty();
-	}
-
-	public Optional<Box[]> moveDown() {
-		this.logger.debug("==> Engine.moveDown()");
-		if( Objects.isNull(this.fallingFigure) ) {
-			return Optional.empty();
-		}
-		Figure figureTmp = this.fallingFigure.clone();
-		removeFromGrid(figureTmp);
-		if (canMoveDown(figureTmp) && noHit(figureTmp, 0, 1)) {
-			figureTmp.moveDown();
-			// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
-			this.fallingFigure = figureTmp;
-			addToGrid(figureTmp);
-			return Optional.of(figureTmp.getBoxes().toArray(new Box[0]));
-		}
-		addToGrid(this.fallingFigure);
 		return Optional.empty();
 	}
 
@@ -170,17 +163,22 @@ public class Engine {
 			return Optional.empty();
 		}
 
-		Figure figureTmp = this.fallingFigure.clone();
-		removeFromGrid(figureTmp);
-
-		int direction = figureTmp.numRotations == 2 ? -1 : 1;
-		if (rotate(figureTmp, direction)) {
-			// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
-			this.fallingFigure = figureTmp;
-			addToGrid(figureTmp);
-			return Optional.of(figureTmp.getBoxes().toArray(new Box[0]));
+		boolean isLockAcquired = lock.tryLock();
+		if( isLockAcquired ) {
+			try {
+				removeFromGrid(this.fallingFigure);
+				Figure figureTmp = this.fallingFigure.clone();
+				int direction = figureTmp.numRotations == 2 ? -1 : 1;
+				if (rotate(figureTmp, direction)) {
+					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					this.fallingFigure = figureTmp;
+					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
+				}
+			} finally {
+				addToGrid(this.fallingFigure);
+	            lock.unlock();
+	        }
 		}
-		addToGrid(this.fallingFigure);
 		return Optional.empty();
 	}
 
@@ -193,55 +191,55 @@ public class Engine {
 			return Optional.empty();
 		}
 
-		Figure figureTmp = this.fallingFigure.clone();
-		removeFromGrid(figureTmp);
-
-		int direction = -1;
-		if (rotate(figureTmp, direction)) {
-			// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
-			this.fallingFigure = figureTmp;
-			addToGrid(figureTmp);
-			return Optional.of(figureTmp.getBoxes().toArray(new Box[0]));
+		boolean isLockAcquired = lock.tryLock();
+		if( isLockAcquired ) {
+			try {
+				removeFromGrid(this.fallingFigure);
+				Figure figureTmp = this.fallingFigure.clone();
+				int direction = -1;
+				if (rotate(figureTmp, direction)) {
+					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					this.fallingFigure = figureTmp;
+					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
+				}
+			} finally {
+				addToGrid(this.fallingFigure);
+	            lock.unlock();
+	        }
 		}
-		addToGrid(this.fallingFigure);
 		return Optional.empty();
 	}
 
-	public Optional<Box[]> bottomDown() {
+	public void bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
 		if( Objects.isNull(this.fallingFigure) ) {
-			return Optional.empty();
+			return;
 		}
-		Figure figureTmp = this.fallingFigure.clone();
-		removeFromGrid(figureTmp);
-		while (canMoveDown(figureTmp) && noHit(figureTmp, 0, 1)) {
-			figureTmp.moveDown();
-			this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
-		}
-		addToGrid(figureTmp);
-		this.falledBoxes.addAll(figureTmp.getBoxes());
-		this.serializeUtil.convertListOfBoxesToString(this.falledBoxes).ifPresent(this.kafkaService::sendMessageBoard);
-
-		this.fallingFigure = null;
-		// this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
-
-		runInThread(figureTmp);
-
-		return Optional.empty();
-	}
-
-	private void runInThread(Figure figureTmp) {
-		Runnable runnable = () -> {
-			if (checkMakeLines(figureTmp) > 0) {
-				this.serializeUtil.convertListOfBoxesToString(this.falledBoxes)
-						.ifPresent(this.kafkaService::sendMessageBoard);
-			}
-			this.figureService.askForNextFigure().subscribe(m -> {
-				this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
-			});
-		};
-		Thread thread = new Thread(runnable);
-		thread.start();
+		boolean isLockAcquired = lock.tryLock();
+		if( isLockAcquired ) {
+			try {
+				removeFromGrid(this.fallingFigure);
+				while (canMoveDown(this.fallingFigure) && noHit(this.fallingFigure, 0, 1)) {
+					this.fallingFigure.moveDown();
+					this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
+				}
+				addToGrid(this.fallingFigure);
+				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
+				this.serializeUtil.convertListOfBoxesToString(this.falledBoxes).ifPresent(this.kafkaService::sendMessageBoard);
+		
+				if (checkMakeLines(this.fallingFigure) > 0) {
+					this.serializeUtil.convertListOfBoxesToString(this.falledBoxes)
+							.ifPresent(this.kafkaService::sendMessageBoard);
+				}
+				this.fallingFigure = null;
+				this.figureService.askForNextFigure().subscribe(m -> {
+					this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
+				});
+			} finally {
+	            lock.unlock();
+	        }
+		}				
+		return;
 	}
 
 	private int checkMakeLines(Figure figure) {
