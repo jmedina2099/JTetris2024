@@ -1,12 +1,8 @@
-import { Component, HostListener, ViewChild } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
-import { VentanaPrincipalComponent } from './components/ventana-principal/ventana-principal.component';
 import { Box } from './model/figure/box';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AppService } from './services/app/app.service';
-import { Credentials } from 'src/app/components/login/login.component';
-import { finalize } from 'rxjs/operators'
 
 @Component({
   selector: 'app-root',
@@ -14,18 +10,19 @@ import { finalize } from 'rxjs/operators'
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-
-  constructor(private app: AppService, private http: HttpClient, private router: Router, private fetchService: FetchService, private route: ActivatedRoute) {
-  }
+  constructor(
+    private app: AppService,
+    private fetchService: FetchService,
+    private route: ActivatedRoute
+  ) {}
 
   logout() {
-    this.http.post('logout', {}).pipe( finalize(() => {
-        this.app.authenticated = false;
-        this.router.navigateByUrl('/login');
-    })).subscribe();
+    this.app.logout();
   }
 
-  authenticated() { return this.app.authenticated; }
+  authenticated() {
+    return this.app.authenticated;
+  }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
@@ -34,34 +31,29 @@ export class AppComponent {
     const firstBoxLeft: boolean[] = [false];
     const firstBoxRotateRight: boolean[] = [false];
     const firstBoxRotateLeft: boolean[] = [false];
-    const firstBoxBottomDown: boolean[] = [false];
     switch (key) {
       case 'ArrowRight':
-        this.fetchService.moveRight(this.app.credentials).subscribe({
-          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRight)
+        this.fetchService.moveRight().subscribe({
+          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRight),
         });
         break;
       case 'ArrowLeft':
-        this.fetchService.moveLeft(this.app.credentials).subscribe({
+        this.fetchService.moveLeft().subscribe({
           next: (box: Box) => this.fillFallingBoxes(box, firstBoxLeft),
         });
         break;
       case 'ArrowUp':
-        this.fetchService.rotateRight(this.app.credentials).subscribe({
+        this.fetchService.rotateRight().subscribe({
           next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateRight),
         });
         break;
       case 'ArrowDown':
-        this.fetchService.rotateLeft(this.app.credentials).subscribe({
+        this.fetchService.rotateLeft().subscribe({
           next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateLeft),
         });
         break;
       case ' ':
-        let child = this.route.snapshot.firstChild;
-        if( child ) {
-          child.data['fallingBoxes'] = [];
-        }
-        this.fetchService.bottomDown(this.app.credentials).subscribe();
+        this.fetchService.bottomDown().subscribe();
         break;
       default:
         break;
@@ -69,8 +61,8 @@ export class AppComponent {
   }
 
   fillFallingBoxes(box: Box, firstBox: boolean[]): void {
-    let child = this.route.snapshot.firstChild;
-    if( child ) {
+    const child = this.route.snapshot.firstChild;
+    if (child) {
       if (!firstBox[0]) {
         child.data['fallingBoxes'] = [];
         firstBox[0] = true;

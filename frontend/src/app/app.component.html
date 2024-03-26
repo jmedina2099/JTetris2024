@@ -2,8 +2,10 @@
   <ul class="nav nav-pills">
     <li><a routerLinkActive="active" routerLink="/home">Home</a></li>
     <li><a routerLinkActive="active" routerLink="/login">Login</a></li>
-    <li *ngIf="authenticated()"><a routerLinkActive="active" routerLink="/jtetris">Tetris</a></li>
-    <li><a (click)="logout()">Logout</a></li>
+    <li *ngIf="authenticated()">
+      <a routerLinkActive="active" routerLink="/jtetris">Tetris</a>
+    </li>
+    <li><button (click)="logout()">Logout</button></li>
   </ul>
 </div>
 <div class="container">

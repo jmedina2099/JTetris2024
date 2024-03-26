@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { Socket } from 'socket.io-client';
 import { Box } from 'src/app/model/figure/box';
 import { Figure } from 'src/app/model/figure/figure';
-import { AppService } from 'src/app/services/app/app.service';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { WebSocketService } from 'src/app/services/socket-io/web-socket.service';
 
@@ -13,13 +12,10 @@ import { WebSocketService } from 'src/app/services/socket-io/web-socket.service'
   styleUrls: ['./ventana-principal.component.css'],
 })
 export class VentanaPrincipalComponent implements OnInit {
-  //fallingFigure: Figure = { boxes: [] };
-  //fallingBoxes: Box[] = [];
   board: Box[] = [];
   socket: Socket | undefined;
 
   constructor(
-    private app: AppService,
     private fetchService: FetchService,
     private webSocketService: WebSocketService,
     private route: ActivatedRoute
@@ -37,9 +33,10 @@ export class VentanaPrincipalComponent implements OnInit {
     this.socket = this.webSocketService.getSocket();
     if (this.socket) {
       this.socket.on('fallingFigureMessage', (data: string) => {
-        console.log('on fallingFigureMessage = ' + data);
-        const figure = JSON.parse(data) as Figure;
-        this.route.snapshot.data['fallingBoxes'] = figure.boxes;
+        //console.log('on fallingFigureMessage = ' + data);
+        this.route.snapshot.data['fallingBoxes'] = (
+          JSON.parse(data) as Figure
+        ).boxes;
       });
       this.socket.on('boardMessage', (data: string) => {
         //console.log('on boardMessage = ' + data);
@@ -56,6 +53,6 @@ export class VentanaPrincipalComponent implements OnInit {
     if (startButtonElement) {
       startButtonElement.blur();
     }
-    this.fetchService.start(this.app.credentials).subscribe();
+    this.fetchService.start().subscribe();
   }
 }

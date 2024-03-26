@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -78,6 +79,9 @@ public class Engine {
 
 	public Optional<Box[]> moveRight() {
 		this.logger.debug("==> Engine.moveRight()");
+		if( Objects.isNull(this.fallingFigure) ) {
+			return Optional.empty();
+		}
 		Figure figureTmp = this.fallingFigure.clone();
 		removeFromGrid(figureTmp);
 		if (canMoveRight(figureTmp) && noHit(figureTmp, 1, 0)) {
@@ -93,6 +97,9 @@ public class Engine {
 
 	public Optional<Box[]> moveLeft() {
 		this.logger.debug("==> Engine.moveLeft()");
+		if( Objects.isNull(this.fallingFigure) ) {
+			return Optional.empty();
+		}
 		Figure figureTmp = this.fallingFigure.clone();
 		removeFromGrid(figureTmp);
 		if (canMoveLeft(figureTmp) && noHit(figureTmp, -1, 0)) {
@@ -108,6 +115,9 @@ public class Engine {
 
 	public Optional<Box[]> moveDown() {
 		this.logger.debug("==> Engine.moveDown()");
+		if( Objects.isNull(this.fallingFigure) ) {
+			return Optional.empty();
+		}
 		Figure figureTmp = this.fallingFigure.clone();
 		removeFromGrid(figureTmp);
 		if (canMoveDown(figureTmp) && noHit(figureTmp, 0, 1)) {
@@ -153,7 +163,9 @@ public class Engine {
 
 	public Optional<Box[]> rotateRight() {
 		this.logger.debug("==> Engine.rotateRight()");
-
+		if( Objects.isNull(this.fallingFigure) ) {
+			return Optional.empty();
+		}
 		if (this.fallingFigure.numRotations == 0) {
 			return Optional.empty();
 		}
@@ -174,7 +186,9 @@ public class Engine {
 
 	public Optional<Box[]> rotateLeft() {
 		this.logger.debug("==> Engine.rotateLeft()");
-
+		if( Objects.isNull(this.fallingFigure) ) {
+			return Optional.empty();
+		}
 		if (this.fallingFigure.numRotations == 0) {
 			return Optional.empty();
 		}
@@ -195,22 +209,25 @@ public class Engine {
 
 	public Optional<Box[]> bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
-
+		if( Objects.isNull(this.fallingFigure) ) {
+			return Optional.empty();
+		}
 		Figure figureTmp = this.fallingFigure.clone();
 		removeFromGrid(figureTmp);
 		while (canMoveDown(figureTmp) && noHit(figureTmp, 0, 1)) {
 			figureTmp.moveDown();
+			this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
 		}
 		addToGrid(figureTmp);
 		this.falledBoxes.addAll(figureTmp.getBoxes());
 		this.serializeUtil.convertListOfBoxesToString(this.falledBoxes).ifPresent(this.kafkaService::sendMessageBoard);
 
-		this.fallingFigure = new Figure();
+		this.fallingFigure = null;
 		// this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
 
 		runInThread(figureTmp);
 
-		return Optional.of(figureTmp.getBoxes().toArray(new Box[0]));
+		return Optional.empty();
 	}
 
 	private void runInThread(Figure figureTmp) {

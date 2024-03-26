@@ -13,9 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": [
-              "event-source-polyfill"
-            ],
+            "allowedCommonJsDependencies": ["event-source-polyfill"],
             "outputPath": "../api/frontend/dist",
             "index": "src/index.html",
             "main": "src/main.ts",
