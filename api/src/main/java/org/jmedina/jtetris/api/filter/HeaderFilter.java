@@ -1,6 +1,8 @@
 package org.jmedina.jtetris.api.filter;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,6 @@ public class HeaderFilter implements WebFilter {
 				Arrays.asList(exchange.getRequest().getHeaders().get("Origin")).toString(),
 				Arrays.asList(corsOrigin).toString());
 		final ServerHttpResponse response = exchange.getResponse();
-		/** GATEWAY PUT THE HEADER
 		List<String> listOrigins = exchange.getRequest().getHeaders().get("Origin");
 		if (Objects.nonNull(listOrigins)) {
 			String origin = listOrigins.get(0);
@@ -41,7 +42,6 @@ public class HeaderFilter implements WebFilter {
 				}
 			});
 		}
-		*/
 		response.getHeaders().add("Access-Control-Allow-Methods", "HEAD, GET, PUT, POST, DELETE, PATCH, OPTIONS");
 		response.getHeaders().add("Access-Control-Max-Age", "3600");
 		response.getHeaders().add("Access-Control-Allow-Headers", "*");
