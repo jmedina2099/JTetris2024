@@ -39,7 +39,7 @@ public class Engine {
 	private final SerializeUtil serializeUtil;
 	private Figure fallingFigure;
 	private List<Box> falledBoxes;
-	private ReentrantLock lock = new ReentrantLock();	
+	private ReentrantLock lock = new ReentrantLock();
 
 	private static final int WIDTH = 10;
 	private static final int HEIGHT = 20;
@@ -82,11 +82,11 @@ public class Engine {
 
 	public Optional<Box[]> moveRight() {
 		this.logger.debug("==> Engine.moveRight()");
-		if( Objects.isNull(this.fallingFigure) ) {
+		if (Objects.isNull(this.fallingFigure)) {
 			return Optional.empty();
 		}
 		boolean isLockAcquired = lock.tryLock();
-		if( isLockAcquired ) {
+		if (isLockAcquired) {
 			try {
 				removeFromGrid(this.fallingFigure);
 				if (canMoveRight(this.fallingFigure) && noHit(this.fallingFigure, 1, 0)) {
@@ -96,19 +96,19 @@ public class Engine {
 				}
 			} finally {
 				addToGrid(this.fallingFigure);
-	            lock.unlock();
-	        }
+				lock.unlock();
+			}
 		}
 		return Optional.empty();
 	}
 
 	public Optional<Box[]> moveLeft() {
 		this.logger.debug("==> Engine.moveLeft()");
-		if( Objects.isNull(this.fallingFigure) ) {
+		if (Objects.isNull(this.fallingFigure)) {
 			return Optional.empty();
 		}
 		boolean isLockAcquired = lock.tryLock();
-		if( isLockAcquired ) {
+		if (isLockAcquired) {
 			try {
 				removeFromGrid(this.fallingFigure);
 				if (canMoveLeft(this.fallingFigure) && noHit(this.fallingFigure, -1, 0)) {
@@ -118,8 +118,8 @@ public class Engine {
 				}
 			} finally {
 				addToGrid(this.fallingFigure);
-	            lock.unlock();
-	        }
+				lock.unlock();
+			}
 		}
 		return Optional.empty();
 	}
@@ -156,7 +156,7 @@ public class Engine {
 
 	public Optional<Box[]> rotateRight() {
 		this.logger.debug("==> Engine.rotateRight()");
-		if( Objects.isNull(this.fallingFigure) ) {
+		if (Objects.isNull(this.fallingFigure)) {
 			return Optional.empty();
 		}
 		if (this.fallingFigure.numRotations == 0) {
@@ -164,7 +164,7 @@ public class Engine {
 		}
 
 		boolean isLockAcquired = lock.tryLock();
-		if( isLockAcquired ) {
+		if (isLockAcquired) {
 			try {
 				removeFromGrid(this.fallingFigure);
 				Figure figureTmp = this.fallingFigure.clone();
@@ -176,15 +176,15 @@ public class Engine {
 				}
 			} finally {
 				addToGrid(this.fallingFigure);
-	            lock.unlock();
-	        }
+				lock.unlock();
+			}
 		}
 		return Optional.empty();
 	}
 
 	public Optional<Box[]> rotateLeft() {
 		this.logger.debug("==> Engine.rotateLeft()");
-		if( Objects.isNull(this.fallingFigure) ) {
+		if (Objects.isNull(this.fallingFigure)) {
 			return Optional.empty();
 		}
 		if (this.fallingFigure.numRotations == 0) {
@@ -192,7 +192,7 @@ public class Engine {
 		}
 
 		boolean isLockAcquired = lock.tryLock();
-		if( isLockAcquired ) {
+		if (isLockAcquired) {
 			try {
 				removeFromGrid(this.fallingFigure);
 				Figure figureTmp = this.fallingFigure.clone();
@@ -204,29 +204,31 @@ public class Engine {
 				}
 			} finally {
 				addToGrid(this.fallingFigure);
-	            lock.unlock();
-	        }
+				lock.unlock();
+			}
 		}
 		return Optional.empty();
 	}
 
 	public void bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
-		if( Objects.isNull(this.fallingFigure) ) {
+		if (Objects.isNull(this.fallingFigure)) {
 			return;
 		}
 		boolean isLockAcquired = lock.tryLock();
-		if( isLockAcquired ) {
+		if (isLockAcquired) {
 			try {
 				removeFromGrid(this.fallingFigure);
 				while (canMoveDown(this.fallingFigure) && noHit(this.fallingFigure, 0, 1)) {
 					this.fallingFigure.moveDown();
-					this.serializeUtil.convertFigureToString(this.fallingFigure).ifPresent(this.kafkaService::sendMessageFigure);
+					this.serializeUtil.convertFigureToString(this.fallingFigure)
+							.ifPresent(this.kafkaService::sendMessageFigure);
 				}
 				addToGrid(this.fallingFigure);
 				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-				this.serializeUtil.convertListOfBoxesToString(this.falledBoxes).ifPresent(this.kafkaService::sendMessageBoard);
-		
+				this.serializeUtil.convertListOfBoxesToString(this.falledBoxes)
+						.ifPresent(this.kafkaService::sendMessageBoard);
+
 				if (checkMakeLines(this.fallingFigure) > 0) {
 					this.serializeUtil.convertListOfBoxesToString(this.falledBoxes)
 							.ifPresent(this.kafkaService::sendMessageBoard);
@@ -236,9 +238,9 @@ public class Engine {
 					this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
 				});
 			} finally {
-	            lock.unlock();
-	        }
-		}				
+				lock.unlock();
+			}
+		}
 		return;
 	}
 
