@@ -10,6 +10,8 @@ import { AppService } from './services/app/app.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
+  private lastCallTime = 0;
+
   constructor(
     private app: AppService,
     private fetchService: FetchService,
@@ -38,32 +40,40 @@ export class AppComponent implements OnInit {
     const firstBoxLeft: boolean[] = [false];
     const firstBoxRotateRight: boolean[] = [false];
     const firstBoxRotateLeft: boolean[] = [false];
-    switch (key) {
-      case 'ArrowRight':
-        this.fetchService.moveRight().subscribe({
-          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRight),
-        });
-        break;
-      case 'ArrowLeft':
-        this.fetchService.moveLeft().subscribe({
-          next: (box: Box) => this.fillFallingBoxes(box, firstBoxLeft),
-        });
-        break;
-      case 'ArrowUp':
-        this.fetchService.rotateRight().subscribe({
-          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateRight),
-        });
-        break;
-      case 'ArrowDown':
-        this.fetchService.rotateLeft().subscribe({
-          next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateLeft),
-        });
-        break;
-      case ' ':
-        this.fetchService.bottomDown().subscribe();
-        break;
-      default:
-        break;
+    const elapsedTime = Date.now() - this.lastCallTime;
+    if (elapsedTime > 50) {
+      switch (key) {
+        case 'ArrowRight':
+          this.lastCallTime = Date.now();
+          this.fetchService.moveRight().subscribe({
+            next: (box: Box) => this.fillFallingBoxes(box, firstBoxRight),
+          });
+          break;
+        case 'ArrowLeft':
+          this.lastCallTime = Date.now();
+          this.fetchService.moveLeft().subscribe({
+            next: (box: Box) => this.fillFallingBoxes(box, firstBoxLeft),
+          });
+          break;
+        case 'ArrowUp':
+          this.lastCallTime = Date.now();
+          this.fetchService.rotateRight().subscribe({
+            next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateRight),
+          });
+          break;
+        case 'ArrowDown':
+          this.lastCallTime = Date.now();
+          this.fetchService.rotateLeft().subscribe({
+            next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateLeft),
+          });
+          break;
+        case ' ':
+          this.lastCallTime = Date.now();
+          this.fetchService.bottomDown().subscribe();
+          break;
+        default:
+          break;
+      }
     }
   }
 
