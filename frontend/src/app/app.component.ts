@@ -1,7 +1,7 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { Box } from './model/figure/box';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from './services/app/app.service';
 
 @Component({
@@ -9,12 +9,19 @@ import { AppService } from './services/app/app.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(
     private app: AppService,
     private fetchService: FetchService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
+
+  ngOnInit(): void {
+    if (this.authenticated()) {
+      this.router.navigate(['/jtetris']);
+    }
+  }
 
   logout() {
     this.app.logout();

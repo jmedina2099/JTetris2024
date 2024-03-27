@@ -17,11 +17,7 @@ interface Principal {
 export class AppService {
   private fetchUrl = environment.baseUrl + environment.userUri;
 
-  authenticated = false;
-  credentials: Credentials = {
-    username: '',
-    password: '',
-  };
+  authenticated = sessionStorage.getItem('authorization') !== null;
 
   constructor(
     private http: HttpClient,
@@ -37,12 +33,12 @@ export class AppService {
     callbackSuccess: () => void,
     callbackFailure: () => void
   ) {
+    const auth =
+      'Basic ' + btoa(credentials.username + ':' + credentials.password);
     const headers = new HttpHeaders(
       credentials
         ? {
-            authorization:
-              'Basic ' +
-              btoa(credentials.username + ':' + credentials.password),
+            authorization: auth,
           }
         : {}
     );
@@ -52,13 +48,10 @@ export class AppService {
         next: (response: Principal) => {
           if (response.name) {
             this.authenticated = true;
-            this.credentials = credentials;
+            sessionStorage.setItem('authorization', auth);
           } else {
             this.authenticated = false;
-            this.credentials = {
-              username: '',
-              password: '',
-            };
+            sessionStorage.removeItem('authorization');
           }
           return callbackSuccess && callbackSuccess();
         },
@@ -69,6 +62,7 @@ export class AppService {
   }
 
   logout() {
+    sessionStorage.removeItem('authorization');
     this.http
       .post(environment.baseUrl + '/logout', {})
       .pipe(

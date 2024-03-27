@@ -3,7 +3,7 @@ import { AppService } from 'src/app/services/app/app.service';
 
 export interface Greeting {
   id: string;
-  content: string;
+  username: string;
 }
 
 @Component({
@@ -13,7 +13,7 @@ export interface Greeting {
 })
 export class HomeComponent {
   title = 'Demo';
-  greeting: Greeting = { id: '', content: '' };
+  greeting: Greeting = { id: '', username: '' };
 
   constructor(private app: AppService) {
     this.app.getResource().subscribe((data: Greeting) => {

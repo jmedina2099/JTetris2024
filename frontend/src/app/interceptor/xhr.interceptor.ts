@@ -18,20 +18,10 @@ export class XhrInterceptor implements HttpInterceptor {
     req: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
-    if (
-      this.app.credentials.username !== '' &&
-      this.app.credentials.password !== ''
-    ) {
+    const auth = sessionStorage.getItem('authorization');
+    if (auth !== null) {
       const xhr = req.clone({
-        headers: req.headers.set(
-          'Authorization',
-          'Basic ' +
-            btoa(
-              this.app.credentials.username +
-                ':' +
-                this.app.credentials.password
-            )
-        ),
+        headers: req.headers.set('Authorization', auth),
       });
       return next.handle(xhr);
     }

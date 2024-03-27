@@ -36,11 +36,11 @@ public class UserController {
 
     @GetMapping(value = "/resource", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> home() {
+    public Map<String, Object> home(Principal user) {
     	this.logger.debug("===> UserController.home()" );
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("id", UUID.randomUUID().toString());
-        model.put("content", "Hello World");
+        model.put("username", (Objects.nonNull(user)? user.getName(): ""));
         return model;
     }
 }
