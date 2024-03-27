@@ -73,7 +73,7 @@ export class AppComponent implements OnInit {
       const initialTimeStamp: number = child.data['initialTimeStamp'] as number;
       const currentTimeStamp: number = child.data['timeStamp'] as number;
       if (
-        initialTimeStamp === box.initialTimeStamp &&
+        initialTimeStamp <= box.initialTimeStamp &&
         currentTimeStamp <= box.timeStamp
       ) {
         if (!firstBox[0]) {

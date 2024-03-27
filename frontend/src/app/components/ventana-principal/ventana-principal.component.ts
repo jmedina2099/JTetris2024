@@ -38,7 +38,7 @@ export class VentanaPrincipalComponent implements OnInit {
         const initialTimeStamp: number = this.route.snapshot.data[
           'initialTimeStamp'
         ] as number;
-        if (initialTimeStamp < figure.initialTimeStamp) {
+        if (initialTimeStamp <= figure.initialTimeStamp) {
           this.route.snapshot.data['initialTimeStamp'] =
             figure.initialTimeStamp;
           this.route.snapshot.data['timeStamp'] = figure.timeStamp;
@@ -55,7 +55,7 @@ export class VentanaPrincipalComponent implements OnInit {
           'timeStamp'
         ] as number;
         if (
-          initialTimeStamp == figure.initialTimeStamp &&
+          initialTimeStamp <= figure.initialTimeStamp &&
           currentTimeStamp < figure.timeStamp
         ) {
           this.route.snapshot.data['timeStamp'] = figure.timeStamp;
