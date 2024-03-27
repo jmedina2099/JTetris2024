@@ -22,7 +22,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class StaticResourcesRoute {
 
 	@Bean
-	RouterFunction<ServerResponse> htmlRouter(@Value("classpath:/resources/index.html") Resource html) {
+	RouterFunction<ServerResponse> htmlRouter1(@Value("classpath:/resources/index.html") Resource html) {
+		return route(GET(""), request -> ok().contentType(MediaType.TEXT_HTML).bodyValue(html));
+	}
+
+	@Bean
+	RouterFunction<ServerResponse> htmlRouter2(@Value("classpath:/resources/index.html") Resource html) {
 		return route(GET("/"), request -> ok().contentType(MediaType.TEXT_HTML).bodyValue(html));
 	}
 	

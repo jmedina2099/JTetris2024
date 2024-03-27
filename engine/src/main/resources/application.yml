@@ -1,5 +1,6 @@
 server:
   port: ${app.engine.port}
+  shutdown: graceful
 spring:
   application:
     name: ${app.engine.name}
@@ -8,6 +9,8 @@ spring:
       enabled: true
       ribbon:
         enabled: false
+    refresh:
+      enabled: false        
   jpa:
     hibernate:
       ddl-auto: update

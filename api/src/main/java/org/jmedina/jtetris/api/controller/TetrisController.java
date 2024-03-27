@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +22,7 @@ import reactor.core.publisher.Mono;
  *
  */
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/game")
 public class TetrisController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -29,13 +30,13 @@ public class TetrisController {
 	@Autowired
 	private EngineClient engineClient;
 
-	@GetMapping("/hello")
+	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Message>> hello() {
 		this.logger.debug("===> TetrisController.hello()");
 		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("Hello from api reactive!!!")));
 	}
 
-	@GetMapping("/start")
+	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Message>> start() {
 		this.logger.debug("===> TetrisController.start()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start());
@@ -71,7 +72,7 @@ public class TetrisController {
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
 	}
 
-	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Flux<Void>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());

@@ -1,8 +1,16 @@
 server:
   port: ${app.figures.port}
+  shutdown: graceful
 spring:
   application:
     name: ${app.figures.name}
+  cloud:
+    loadbalancer:
+      enabled: true
+      ribbon:
+        enabled: false
+    refresh:
+      enabled: false
   data:
     mongodb:
       uri: mongodb://${app.mongo.sever}/${figures.mongodb.name}

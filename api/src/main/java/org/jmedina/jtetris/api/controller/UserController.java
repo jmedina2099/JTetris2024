@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,18 +19,22 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
+@RequestMapping("/user")
 public class UserController {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/credentials", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Principal user(Principal user) {
+    public Object user(Principal user) {
     	this.logger.debug("===> UserController.user() = " + (Objects.nonNull(user)? user.getName(): user) );
-        return user;
+        return new Object() {
+        	@SuppressWarnings("unused")
+			public String name = (Objects.nonNull(user)? user.getName(): "");
+        };
     }
 
-    @GetMapping("/resource")
+    @GetMapping(value = "/resource", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> home() {
     	this.logger.debug("===> UserController.home()" );

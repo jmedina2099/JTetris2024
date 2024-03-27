@@ -50,7 +50,7 @@ public class SecurityConfig {
 	@Value("${api.cors.origin}")
 	private String[] corsOrigin;
 
-	private String[] securePages = new String[] { "/api/", "/api/index.html", "/api/resource" };
+	private String[] securePages = new String[] { "/api", "/api/", "/api/index.html", "/api/user/resource" };
 	private String[] secureTypes = new String[] { ".js", ".css", ".ico" };
 
 	private List<String> securePagesList = Arrays.asList(securePages);
@@ -104,7 +104,7 @@ public class SecurityConfig {
 		@Override
 		public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
 			ServerHttpResponse response = exchange.getResponse();
-			response.setStatusCode(HttpStatus.FORBIDDEN);
+			response.setStatusCode(HttpStatus.UNAUTHORIZED);
 			return new AuthFailureHandler().formatResponse(response);
 		}
 	}
@@ -116,7 +116,7 @@ public class SecurityConfig {
 	                .add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 	        ObjectMapper mapper = new ObjectMapper();
 	        ApiResponse apiResponse = new ApiResponse(response.getStatusCode()
-	                .value(), "Access Denied");
+	                .value(), "Access Denied !!!");
 	        StringBuilder json = new StringBuilder();
 	        try {
 	            json.append(mapper.writeValueAsString(apiResponse));

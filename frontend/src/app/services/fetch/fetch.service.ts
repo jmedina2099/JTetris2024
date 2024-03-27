@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class FetchService {
-  private baseUrl = environment.baseUrl;
+  private fetchUrl = environment.baseUrl + environment.gameUri;
 
   constructor(
     private sseService: EventSourceService,
@@ -19,36 +19,34 @@ export class FetchService {
   ) {}
 
   start(): Observable<Message> {
-    return this.http.get<Message>(this.baseUrl + '/start');
+    return this.http.post<Message>(this.fetchUrl + '/start', null);
   }
 
   moveRight(): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/moveRight')
+      .observeMessages(this.fetchUrl + '/moveRight')
       .pipe(take(4));
   }
 
   moveLeft(): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/moveLeft')
+      .observeMessages(this.fetchUrl + '/moveLeft')
       .pipe(take(4));
   }
 
   rotateRight(): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/rotateRight')
+      .observeMessages(this.fetchUrl + '/rotateRight')
       .pipe(take(4));
   }
 
   rotateLeft(): Observable<Box> {
     return this.sseService
-      .observeMessages(this.baseUrl + '/rotateLeft')
+      .observeMessages(this.fetchUrl + '/rotateLeft')
       .pipe(take(4));
   }
 
-  bottomDown(): Observable<Box> {
-    return this.sseService
-      .observeMessages(this.baseUrl + '/bottomDown')
-      .pipe(take(4));
+  bottomDown(): Observable<void> {
+    return this.http.post<void>(this.fetchUrl + '/bottomDown', null);
   }
 }

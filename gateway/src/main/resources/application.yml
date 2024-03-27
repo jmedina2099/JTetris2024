@@ -1,5 +1,6 @@
 server:
   port: ${app.gateway.port}
+  shutdown: graceful
 spring:
   application:
     name: ${app.gateway.name}
@@ -22,6 +23,8 @@ spring:
         enabled: true
     loadbalancer:
       enabled: true
+    refresh:
+      enabled: false      
 eureka:
   client:
     serviceUrl:

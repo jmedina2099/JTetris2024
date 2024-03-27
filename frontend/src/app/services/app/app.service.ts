@@ -15,7 +15,7 @@ interface Principal {
   providedIn: 'root',
 })
 export class AppService {
-  private baseUrl = environment.baseUrl;
+  private fetchUrl = environment.baseUrl + environment.userUri;
 
   authenticated = false;
   credentials: Credentials = {
@@ -29,7 +29,7 @@ export class AppService {
   ) {}
 
   getResource(): Observable<Greeting> {
-    return this.http.get<Greeting>(this.baseUrl + '/resource');
+    return this.http.get<Greeting>(this.fetchUrl + '/resource');
   }
 
   authenticate(
@@ -47,7 +47,7 @@ export class AppService {
         : {}
     );
     this.http
-      .get<Principal>(this.baseUrl + '/user', { headers: headers })
+      .get<Principal>(this.fetchUrl + '/credentials', { headers: headers })
       .subscribe({
         next: (response: Principal) => {
           if (response.name) {
@@ -70,7 +70,7 @@ export class AppService {
 
   logout() {
     this.http
-      .post(this.baseUrl + '/logout', {})
+      .post(environment.baseUrl + '/logout', {})
       .pipe(
         finalize(() => {
           this.authenticated = false;

@@ -25,6 +25,7 @@ export class EventSourceService {
                 ':' +
                 this.app.credentials.password
             ),
+          'Content-Type': 'text/event-stream',
         },
       });
       eventSource.addEventListener('message', messageEvent => {
