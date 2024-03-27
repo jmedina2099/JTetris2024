@@ -11,7 +11,7 @@ const routes: Routes = [
   {
     path: 'jtetris',
     component: VentanaPrincipalComponent,
-    data: { fallingBoxes: [], timeStamp: 0 },
+    data: { fallingBoxes: [], initialTimeStamp: 0, timeStamp: 0 },
   },
 ];
 

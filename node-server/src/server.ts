@@ -18,7 +18,9 @@ await consumer.run({
     //console.log( 'topic ===> '+topic )
     //console.log({value: json,})
     if( socketConnected ) {
-      if( topic == 'nextFigureTopic' || topic == 'figureTopic' ) {
+      if( topic == 'nextFigureTopic' ) {
+        socketConnected.emit( 'nextFigureMessage', json );
+      } else if( topic == 'figureTopic' ) {
         socketConnected.emit( 'fallingFigureMessage', json );
       } else if( topic == 'boardTopic' ) {
         socketConnected.emit( 'boardMessage', json );

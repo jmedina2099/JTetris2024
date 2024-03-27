@@ -70,11 +70,19 @@ export class AppComponent implements OnInit {
   fillFallingBoxes(box: Box, firstBox: boolean[]): void {
     const child = this.route.snapshot.firstChild;
     if (child) {
-      if (!firstBox[0]) {
-        child.data['fallingBoxes'] = [];
-        firstBox[0] = true;
+      const initialTimeStamp: number = child.data['initialTimeStamp'] as number;
+      const currentTimeStamp: number = child.data['timeStamp'] as number;
+      if (
+        initialTimeStamp === box.initialTimeStamp &&
+        currentTimeStamp <= box.timeStamp
+      ) {
+        if (!firstBox[0]) {
+          child.data['fallingBoxes'] = [];
+          child.data['timeStamp'] = box.timeStamp;
+          firstBox[0] = true;
+        }
+        child.data['fallingBoxes'].push(box);
       }
-      child.data['fallingBoxes'].push(box);
     }
   }
 }

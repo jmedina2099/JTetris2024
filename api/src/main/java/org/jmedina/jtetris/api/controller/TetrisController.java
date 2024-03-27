@@ -73,7 +73,7 @@ public class TetrisController {
 	}
 
 	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Flux<Void>> bottomDown() {
+	public ResponseEntity<Mono<Void>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
 	}

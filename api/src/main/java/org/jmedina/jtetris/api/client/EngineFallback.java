@@ -45,7 +45,7 @@ public class EngineFallback implements EngineClient {
 	}
 
 	@Override
-	public Flux<Void> bottomDown() {
-		return Flux.empty();
+	public Mono<Void> bottomDown() {
+		return Mono.empty();
 	}
 }

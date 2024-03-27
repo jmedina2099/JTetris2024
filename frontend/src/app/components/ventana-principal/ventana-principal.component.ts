@@ -32,13 +32,32 @@ export class VentanaPrincipalComponent implements OnInit {
   initSocket(): void {
     this.socket = this.webSocketService.getSocket();
     if (this.socket) {
+      this.socket.on('nextFigureMessage', (data: string) => {
+        //console.log('on nextFigureMessage = ' + data);
+        const figure: Figure = JSON.parse(data) as Figure;
+        const initialTimeStamp: number = this.route.snapshot.data[
+          'initialTimeStamp'
+        ] as number;
+        if (initialTimeStamp < figure.initialTimeStamp) {
+          this.route.snapshot.data['initialTimeStamp'] =
+            figure.initialTimeStamp;
+          this.route.snapshot.data['timeStamp'] = figure.timeStamp;
+          this.route.snapshot.data['fallingBoxes'] = figure.boxes;
+        }
+      });
       this.socket.on('fallingFigureMessage', (data: string) => {
         //console.log('on fallingFigureMessage = ' + data);
         const figure: Figure = JSON.parse(data) as Figure;
+        const initialTimeStamp: number = this.route.snapshot.data[
+          'initialTimeStamp'
+        ] as number;
         const currentTimeStamp: number = this.route.snapshot.data[
           'timeStamp'
         ] as number;
-        if (currentTimeStamp <= figure.timeStamp) {
+        if (
+          initialTimeStamp == figure.initialTimeStamp &&
+          currentTimeStamp < figure.timeStamp
+        ) {
           this.route.snapshot.data['timeStamp'] = figure.timeStamp;
           this.route.snapshot.data['fallingBoxes'] = figure.boxes;
         }
@@ -58,6 +77,10 @@ export class VentanaPrincipalComponent implements OnInit {
     if (startButtonElement) {
       startButtonElement.blur();
     }
+    this.board = [];
+    this.route.snapshot.data['initialTimeStamp'] = 0;
+    this.route.snapshot.data['timeStamp'] = 0;
+    this.route.snapshot.data['fallingBoxes'] = [];
     this.fetchService.start().subscribe();
   }
 }

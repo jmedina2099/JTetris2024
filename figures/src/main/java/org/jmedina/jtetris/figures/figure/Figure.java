@@ -1,7 +1,6 @@
 package org.jmedina.jtetris.figures.figure;
 
 import java.awt.geom.Point2D;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,14 +31,18 @@ public abstract class Figure {
 	protected List<Box> boxes;
 	protected Point2D.Double center = new Point2D.Double();
 	public int numRotations;
+	private long initialTimeStamp;
 	private long timeStamp;
 
 	protected void init(FiguraEnumeration type) {
 		this.type = type;
 		this.id = type.getId();
-		this.boxes = new ArrayList<>(this.type.getTuplas().stream().map(Box::new).collect(Collectors.toList()));
-		this.center = type.getCenter();
 		this.numRotations = type.getNumRotations();
-		this.timeStamp = Instant.now().toEpochMilli();
+		this.initialTimeStamp = System.nanoTime();
+		this.timeStamp = this.initialTimeStamp;
+		this.boxes = new ArrayList<>(this.type.getTuplas().stream().map(t -> {
+			return new Box(t, this.initialTimeStamp, this.timeStamp);
+		}).collect(Collectors.toList()));
+		this.center = type.getCenter();
 	}
 }

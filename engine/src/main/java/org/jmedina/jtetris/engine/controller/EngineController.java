@@ -74,10 +74,10 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<Void> bottomDown() {
+	public Mono<Void> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		this.engine.bottomDown();
-		return Flux.empty();
+		return Mono.empty();
 	}
 
 }

@@ -91,6 +91,8 @@ public class Engine {
 				removeFromGrid(this.fallingFigure);
 				if (canMoveRight(this.fallingFigure) && noHit(this.fallingFigure, 1, 0)) {
 					this.fallingFigure.moveRight();
+					this.fallingFigure.timeStamp = System.nanoTime();
+					this.fallingFigure.getBoxes().stream().forEach( b -> b.timeStamp = this.fallingFigure.timeStamp );
 					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
 					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
 				}
@@ -113,6 +115,8 @@ public class Engine {
 				removeFromGrid(this.fallingFigure);
 				if (canMoveLeft(this.fallingFigure) && noHit(this.fallingFigure, -1, 0)) {
 					this.fallingFigure.moveLeft();
+					this.fallingFigure.timeStamp = System.nanoTime();
+					this.fallingFigure.getBoxes().stream().forEach( b -> b.timeStamp = this.fallingFigure.timeStamp );
 					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
 					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
 				}
@@ -172,6 +176,8 @@ public class Engine {
 				if (rotate(figureTmp, direction)) {
 					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
 					this.fallingFigure = figureTmp;
+					this.fallingFigure.timeStamp = System.nanoTime();
+					this.fallingFigure.getBoxes().stream().forEach( b -> b.timeStamp = this.fallingFigure.timeStamp );
 					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
 				}
 			} finally {
@@ -200,6 +206,8 @@ public class Engine {
 				if (rotate(figureTmp, direction)) {
 					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
 					this.fallingFigure = figureTmp;
+					this.fallingFigure.timeStamp = System.nanoTime();
+					this.fallingFigure.getBoxes().stream().forEach( b -> b.timeStamp = this.fallingFigure.timeStamp );
 					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
 				}
 			} finally {
@@ -221,6 +229,8 @@ public class Engine {
 				removeFromGrid(this.fallingFigure);
 				while (canMoveDown(this.fallingFigure) && noHit(this.fallingFigure, 0, 1)) {
 					this.fallingFigure.moveDown();
+					this.fallingFigure.timeStamp = System.nanoTime();
+					this.fallingFigure.getBoxes().stream().forEach( b -> b.timeStamp = this.fallingFigure.timeStamp );
 					this.serializeUtil.convertFigureToString(this.fallingFigure)
 							.ifPresent(this.kafkaService::sendMessageFigure);
 				}

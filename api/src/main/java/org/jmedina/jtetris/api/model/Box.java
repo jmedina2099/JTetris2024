@@ -13,9 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@JsonPropertyOrder({ "x", "y" })
+@JsonPropertyOrder({ "x", "y", "initialTimeStamp", "timeStamp" })
 public class Box {
 
 	private double x;
 	private double y;
+	private long initialTimeStamp;
+	private long timeStamp;
 }

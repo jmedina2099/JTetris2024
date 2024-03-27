@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  *
  */
 @NoArgsConstructor
-@JsonPropertyOrder({ "x", "y" })
+@JsonPropertyOrder({ "x", "y", "initialTimeStamp", "timeStamp" })
 @EqualsAndHashCode
 public class Box {
 
@@ -24,9 +24,14 @@ public class Box {
 	@EqualsAndHashCode.Exclude
 	private final Rectangle2D.Double rectangle = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
 
-	public Box(Pair<Integer, Integer> tupla) {
+	public long initialTimeStamp;
+	public long timeStamp;
+
+	public Box(Pair<Integer, Integer> tupla, long initialTimeStamp, long timeStamp) {
 		this.rectangle.x = tupla.getLeft() * WIDTH;
 		this.rectangle.y = tupla.getRight() * HEIGHT;
+		this.initialTimeStamp = initialTimeStamp;
+		this.timeStamp = timeStamp;
 	}
 
 	@EqualsAndHashCode.Include

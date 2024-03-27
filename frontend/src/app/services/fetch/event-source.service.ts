@@ -14,7 +14,7 @@ export class EventSourceService {
 
   observeMessages(url: string): Observable<Box> {
     const auth = sessionStorage.getItem('authorization');
-    console.log('===> auth = ' + auth);
+    //console.log('===> auth = ' + auth);
     if (auth === null) {
       return EMPTY;
     }

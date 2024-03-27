@@ -11,16 +11,20 @@ import lombok.NoArgsConstructor;
  *
  */
 @NoArgsConstructor
-@JsonPropertyOrder({ "x", "y" })
+@JsonPropertyOrder({ "x", "y", "initialTimeStamp", "timeStamp" })
 public class Box implements Cloneable {
 
 	public static final double SIZE = 20d;
 
 	private final Rectangle2D.Double rectangle = new Rectangle2D.Double();
+	public long initialTimeStamp;
+	public long timeStamp;
 	
-	public Box(double x, double y) {
+	public Box(double x, double y, long initialTimeStamp, long timeStamp) {
 		this.rectangle.x = x;
 		this.rectangle.y = y;
+		this.initialTimeStamp = initialTimeStamp;
+		this.timeStamp = timeStamp;
 	}
 
 	public boolean moveRight() {
@@ -58,7 +62,7 @@ public class Box implements Cloneable {
 
 	@Override
 	protected Box clone() {
-		return new Box(getX(),getY());
+		return new Box(this.rectangle.x,this.rectangle.y,this.initialTimeStamp,this.timeStamp);
 	}
 
 	@Override
