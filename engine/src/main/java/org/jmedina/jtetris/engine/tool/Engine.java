@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.Board;
 import org.jmedina.jtetris.engine.service.FigureService;
 import org.jmedina.jtetris.engine.service.KafkaService;
 import org.jmedina.jtetris.engine.util.RotationUtil;
@@ -236,11 +237,13 @@ public class Engine {
 				}
 				addToGrid(this.fallingFigure);
 				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-				this.serializeUtil.convertListOfBoxesToString(this.falledBoxes)
+				Board board = new Board(this.falledBoxes,System.nanoTime());
+				this.serializeUtil.convertBoardToString(board)
 						.ifPresent(this.kafkaService::sendMessageBoard);
 
 				if (checkMakeLines(this.fallingFigure) > 0) {
-					this.serializeUtil.convertListOfBoxesToString(this.falledBoxes)
+					board = new Board(this.falledBoxes,System.nanoTime());
+					this.serializeUtil.convertBoardToString(board)
 							.ifPresent(this.kafkaService::sendMessageBoard);
 				}
 				this.fallingFigure = null;

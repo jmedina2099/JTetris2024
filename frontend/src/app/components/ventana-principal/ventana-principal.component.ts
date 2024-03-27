@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Socket } from 'socket.io-client';
-import { Box } from 'src/app/model/figure/box';
+import { Board } from 'src/app/model/board/board';
 import { Figure } from 'src/app/model/figure/figure';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { WebSocketService } from 'src/app/services/socket-io/web-socket.service';
@@ -12,7 +12,7 @@ import { WebSocketService } from 'src/app/services/socket-io/web-socket.service'
   styleUrls: ['./ventana-principal.component.css'],
 })
 export class VentanaPrincipalComponent implements OnInit {
-  board: Box[] = [];
+  board: Board = { boxes: [], timeStamp: 0 };
   socket: Socket | undefined;
 
   constructor(
@@ -64,7 +64,10 @@ export class VentanaPrincipalComponent implements OnInit {
       });
       this.socket.on('boardMessage', (data: string) => {
         //console.log('on boardMessage = ' + data);
-        this.board = JSON.parse(data) as Box[];
+        const board = JSON.parse(data) as Board;
+        if (this.board.timeStamp < board.timeStamp) {
+          this.board = board;
+        }
       });
       this.socket.on('connect', () => {
         console.log('on connect !!!');
@@ -77,7 +80,8 @@ export class VentanaPrincipalComponent implements OnInit {
     if (startButtonElement) {
       startButtonElement.blur();
     }
-    this.board = [];
+    this.board.boxes = [];
+    this.board.timeStamp = 0;
     this.route.snapshot.data['initialTimeStamp'] = 0;
     this.route.snapshot.data['timeStamp'] = 0;
     this.route.snapshot.data['fallingBoxes'] = [];

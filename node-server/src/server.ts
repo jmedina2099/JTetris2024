@@ -14,16 +14,19 @@ await consumer.connect()
 await consumer.subscribe({ topics: ['nextFigureTopic','figureTopic','boardTopic'], fromBeginning: false })
 await consumer.run({
   eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
-    let json = message.value?.toString();
     //console.log( 'topic ===> '+topic )
-    //console.log({value: json,})
-    if( socketConnected ) {
-      if( topic == 'nextFigureTopic' ) {
-        socketConnected.emit( 'nextFigureMessage', json );
-      } else if( topic == 'figureTopic' ) {
-        socketConnected.emit( 'fallingFigureMessage', json );
-      } else if( topic == 'boardTopic' ) {
-        socketConnected.emit( 'boardMessage', json );
+    if( message.value !== null ) {
+      let json = message.value.toString();
+      //console.log(JSON.stringify(JSON.parse(json),null,2));
+      //console.log({value: json});
+      if( socketConnected ) {
+        if( topic == 'nextFigureTopic' ) {
+          socketConnected.emit( 'nextFigureMessage', json );
+        } else if( topic == 'figureTopic' ) {
+          socketConnected.emit( 'fallingFigureMessage', json );
+        } else if( topic == 'boardTopic' ) {
+          socketConnected.emit( 'boardMessage', json );
+        }
       }
     }
   },
