@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Message } from 'src/app/model/message/message';
 import { Box } from 'src/app/model/figure/box';
 import { EventSourceService } from './event-source.service';
 import { take } from 'rxjs/operators';
@@ -18,8 +17,11 @@ export class FetchService {
     private http: HttpClient
   ) {}
 
-  start(): Observable<Message> {
-    return this.http.post<Message>(this.fetchUrl + '/start', null);
+  start(): Observable<Box> {
+    return this.sseService
+      .observeMessages(this.fetchUrl + '/start')
+      .pipe(take(4));
+    //return this.http.post<Message>(this.fetchUrl + '/start', null);
   }
 
   moveRight(): Observable<Box> {
@@ -46,7 +48,8 @@ export class FetchService {
       .pipe(take(4));
   }
 
-  bottomDown(): Observable<void> {
-    return this.http.post<void>(this.fetchUrl + '/bottomDown', null);
+  bottomDown(): Observable<Box> {
+    return this.sseService.observeMessages(this.fetchUrl + '/bottomDown');
+    //return this.http.post<void>(this.fetchUrl + '/bottomDown', null);
   }
 }

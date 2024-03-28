@@ -1,13 +1,11 @@
 package org.jmedina.jtetris.api.client;
 
 import org.jmedina.jtetris.api.model.Box;
-import org.jmedina.jtetris.api.model.Message;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import reactivefeign.spring.config.ReactiveFeignClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Jorge Medina
@@ -16,8 +14,8 @@ import reactor.core.publisher.Mono;
 @ReactiveFeignClient(value = "engineClient", url = "${api.engine.base-url}", fallback = EngineFallback.class)
 public interface EngineClient {
 
-	@GetMapping(value = "/start", produces = "application/json")
-	public Mono<Message> start();
+	@GetMapping(value = "/start", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> start();
 
 	@GetMapping(value = "/moveRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> moveRight();
@@ -35,5 +33,5 @@ public interface EngineClient {
 	public Flux<Box> rotateLeft();
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Mono<Void> bottomDown();
+	public Flux<Box> bottomDown();
 }

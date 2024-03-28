@@ -36,40 +36,48 @@ export class AppComponent implements OnInit {
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     const key = event.key;
-    const firstBoxRight: boolean[] = [false];
-    const firstBoxLeft: boolean[] = [false];
-    const firstBoxRotateRight: boolean[] = [false];
-    const firstBoxRotateLeft: boolean[] = [false];
+    const timeStamp: number[] = [0];
     const elapsedTime = Date.now() - this.lastCallTime;
+    const child = this.route.snapshot.firstChild;
     if (elapsedTime > 50) {
       switch (key) {
         case 'ArrowRight':
           this.lastCallTime = Date.now();
           this.fetchService.moveRight().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, firstBoxRight),
+            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
+            complete: () => this.endFillFallingBoxes(timeStamp),
           });
           break;
         case 'ArrowLeft':
           this.lastCallTime = Date.now();
           this.fetchService.moveLeft().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, firstBoxLeft),
+            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
+            complete: () => this.endFillFallingBoxes(timeStamp),
           });
           break;
         case 'ArrowUp':
           this.lastCallTime = Date.now();
           this.fetchService.rotateRight().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateRight),
+            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
+            complete: () => this.endFillFallingBoxes(timeStamp),
           });
           break;
         case 'ArrowDown':
           this.lastCallTime = Date.now();
           this.fetchService.rotateLeft().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, firstBoxRotateLeft),
+            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
+            complete: () => this.endFillFallingBoxes(timeStamp),
           });
           break;
         case ' ':
+          if (child) {
+            child.data['fallingBoxes'] = [];
+          }
           this.lastCallTime = Date.now();
-          this.fetchService.bottomDown().subscribe();
+          this.fetchService.bottomDown().subscribe({
+            next: (box: Box) => this.fillBoardBoxes(box, timeStamp),
+            complete: () => this.endFillBoardBoxes(timeStamp),
+          });
           break;
         default:
           break;
@@ -77,22 +85,57 @@ export class AppComponent implements OnInit {
     }
   }
 
-  fillFallingBoxes(box: Box, firstBox: boolean[]): void {
+  fillFallingBoxes(box: Box, timeStamp: number[]): void {
     const child = this.route.snapshot.firstChild;
     if (child) {
       const initialTimeStamp: number = child.data['initialTimeStamp'] as number;
       const currentTimeStamp: number = child.data['timeStamp'] as number;
       if (
         initialTimeStamp <= box.initialTimeStamp &&
-        currentTimeStamp <= box.timeStamp
+        currentTimeStamp < box.timeStamp
       ) {
-        if (!firstBox[0]) {
+        if (timeStamp[0] == 0) {
           child.data['fallingBoxes'] = [];
-          child.data['timeStamp'] = box.timeStamp;
-          firstBox[0] = true;
+          timeStamp[0] = box.timeStamp;
         }
         child.data['fallingBoxes'].push(box);
       }
     }
+  }
+
+  fillBoardBoxes(box: Box, timeStamp: number[]): void {
+    const child = this.route.snapshot.firstChild;
+    if (child) {
+      const currentTimeStamp: number = child.data['board'].timeStamp as number;
+      if (currentTimeStamp < box.timeStamp) {
+        if (timeStamp[0] == 0) {
+          child.data['board'].boxes = [];
+          timeStamp[0] = box.timeStamp;
+        }
+        child.data['board'].boxes.push(box);
+      }
+    }
+  }
+
+  endFillFallingBoxes(timeStamp: number[]): void {
+    const child = this.route.snapshot.firstChild;
+    if (child) {
+      if (timeStamp[0] != 0) {
+        //console.log( '--> endFillFallingBoxes (reactive) = '+timeStamp[0] );
+        child.data['timeStamp'] = timeStamp[0];
+      }
+    }
+  }
+
+  endFillBoardBoxes(timeStamp: number[]) {
+    const child = this.route.snapshot.firstChild;
+    if (child) {
+      if (timeStamp[0] != 0) {
+        //console.log( '--> endFillBoardBoxes (reactive) = '+timeStamp[0] );
+        child.data['board'].timeStamp = timeStamp[0];
+      }
+    }
+    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+    this.handleKeyboardEvent(event);
   }
 }

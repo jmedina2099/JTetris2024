@@ -3,6 +3,7 @@ package org.jmedina.jtetris.engine.controller;
 import java.util.Optional;
 
 import org.jmedina.jtetris.engine.figure.Box;
+import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.FigureService;
@@ -38,11 +39,16 @@ public class EngineController {
 		return Mono.just(new Message("Hello from engine reactive!!!"));
 	}
 
-	@GetMapping(value = "/start")
-	public Mono<Message> start() {
+	@GetMapping(value = "/start", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<Box> start() {
 		this.logger.debug("===> EngineController.start()");
 		this.engineService.start();
-		return this.figureService.askForNextFigure();
+		Mono<Figure> mono = this.figureService.askForNextFigure();
+		return mono.flatMapMany( f -> {
+			this.logger.debug("===> EngineController.start.addFallingFigure()");
+			this.engineService.addFallingFigure(f);
+			return Flux.fromArray(f.getBoxes().toArray(new Box[0])); 
+		});
 	}
 
 	@GetMapping(value = "/moveRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -74,10 +80,10 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Mono<Void> bottomDown() {
+	public Flux<Box> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
-		this.engineService.bottomDown();
-		return Mono.empty();
+		Optional<Box[]> optional = this.engineService.bottomDown();
+		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 }

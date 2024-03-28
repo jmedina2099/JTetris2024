@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.engine.service;
 
-import org.jmedina.jtetris.engine.model.Message;
+import org.jmedina.jtetris.engine.figure.Figure;
 
 import reactor.core.publisher.Mono;
 
@@ -10,5 +10,5 @@ import reactor.core.publisher.Mono;
  */
 public interface FigureService {
 
-	public Mono<Message> askForNextFigure();
+	public Mono<Figure> askForNextFigure();
 }

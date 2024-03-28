@@ -57,7 +57,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	}
 
 	@Override
-	public void askForNextFigure() throws ServiceException {
+	public Figure askForNextFigure() throws ServiceException {
 		this.logger.debug("==> FigureService.getNextFigure()");
 		Figure figure = null;
 		int value = this.random.nextInt(FiguraEnumeration.values().length);
@@ -78,6 +78,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 		}
 		this.kafkaService.sendMessage(this.serializeUtil.convertFigureToString(figure), this.nextFigureTopic);
+		return figure;
 	}
 
 	@Override

@@ -1,11 +1,9 @@
 package org.jmedina.jtetris.api.client;
 
 import org.jmedina.jtetris.api.model.Box;
-import org.jmedina.jtetris.api.model.Message;
 import org.springframework.stereotype.Component;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Jorge Medina
@@ -15,8 +13,8 @@ import reactor.core.publisher.Mono;
 public class EngineFallback implements EngineClient {
 
 	@Override
-	public Mono<Message> start() {
-		return Mono.just(new Message("START FALLBACK"));
+	public Flux<Box> start() {
+		return Flux.empty();
 	}
 
 	@Override
@@ -45,7 +43,7 @@ public class EngineFallback implements EngineClient {
 	}
 
 	@Override
-	public Mono<Void> bottomDown() {
-		return Mono.empty();
+	public Flux<Box> bottomDown() {
+		return Flux.empty();
 	}
 }

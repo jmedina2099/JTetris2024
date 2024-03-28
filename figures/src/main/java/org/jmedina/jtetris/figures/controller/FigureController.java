@@ -2,8 +2,10 @@ package org.jmedina.jtetris.figures.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.figures.figure.Figure;
 import org.jmedina.jtetris.figures.model.Message;
 import org.jmedina.jtetris.figures.service.FigureService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +31,10 @@ public class FigureController {
 		return Mono.just(new Message("Hello from figures reactive!!!"));
 	}
 
-	@GetMapping("/askForNextFigure")
-	public Mono<Message> askForNextFigure() {
+	@GetMapping(value = "/askForNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Figure> askForNextFigure() {
 		this.logger.debug("===> FigureController.askForNextFigure()");
-		this.figureService.askForNextFigure();
-		return Mono.just(new Message("OK from figures!!!"));
+		return Mono.just(this.figureService.askForNextFigure());
 	}
 
 }

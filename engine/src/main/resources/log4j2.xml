@@ -70,10 +70,6 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.jmedina.jtetris.engine.tool" additivity="false" level="info" includeLocation="true">
-            <AppenderRef ref="appLogEngine" />
-            <AppenderRef ref="Console" />
-        </Logger>
         <Logger name="org.jmedina.jtetris.engine.listener" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />

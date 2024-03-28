@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Socket } from 'socket.io-client';
-import { Board } from 'src/app/model/board/board';
+import { Box } from 'src/app/model/figure/box';
 import { Figure } from 'src/app/model/figure/figure';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { WebSocketService } from 'src/app/services/socket-io/web-socket.service';
@@ -12,7 +12,6 @@ import { WebSocketService } from 'src/app/services/socket-io/web-socket.service'
   styleUrls: ['./ventana-principal.component.css'],
 })
 export class VentanaPrincipalComponent implements OnInit {
-  board: Board = { boxes: [], timeStamp: 0 };
   socket: Socket | undefined;
 
   constructor(
@@ -29,6 +28,10 @@ export class VentanaPrincipalComponent implements OnInit {
     return this.route.snapshot.data['fallingBoxes'];
   }
 
+  getBoard() {
+    return this.route.snapshot.data['board'];
+  }
+
   initSocket(): void {
     this.socket = this.webSocketService.getSocket();
     if (this.socket) {
@@ -38,7 +41,8 @@ export class VentanaPrincipalComponent implements OnInit {
         const initialTimeStamp: number = this.route.snapshot.data[
           'initialTimeStamp'
         ] as number;
-        if (initialTimeStamp <= figure.initialTimeStamp) {
+        if (initialTimeStamp < figure.initialTimeStamp) {
+          //console.log( '--> nextFigureMessage (kafka) = '+figure.timeStamp );
           this.route.snapshot.data['initialTimeStamp'] =
             figure.initialTimeStamp;
           this.route.snapshot.data['timeStamp'] = figure.timeStamp;
@@ -58,15 +62,23 @@ export class VentanaPrincipalComponent implements OnInit {
           initialTimeStamp <= figure.initialTimeStamp &&
           currentTimeStamp < figure.timeStamp
         ) {
+          //console.log( '--> fallingFigureMessage (kafka) = '+figure.timeStamp );
           this.route.snapshot.data['timeStamp'] = figure.timeStamp;
           this.route.snapshot.data['fallingBoxes'] = figure.boxes;
         }
       });
       this.socket.on('boardMessage', (data: string) => {
-        //console.log('on boardMessage = ' + data);
-        const board = JSON.parse(data) as Board;
-        if (this.board.timeStamp < board.timeStamp) {
-          this.board = board;
+        //console.log('on boardMessage (kafka) = ' + data);
+        const boxes = JSON.parse(data) as Box[] | undefined;
+        if (boxes && boxes.length > 0) {
+          const doPaint: boolean = boxes.every(
+            b => this.route.snapshot.data['board'].timeStamp < b.timeStamp
+          );
+          if (doPaint) {
+            //console.log( '--> boardMessage (kafka) = '+boxes[0].timeStamp );
+            this.route.snapshot.data['board'].timeStamp = boxes[0].timeStamp;
+            this.route.snapshot.data['board'].boxes = boxes;
+          }
         }
       });
       this.socket.on('connect', () => {
@@ -80,11 +92,36 @@ export class VentanaPrincipalComponent implements OnInit {
     if (startButtonElement) {
       startButtonElement.blur();
     }
-    this.board.boxes = [];
-    this.board.timeStamp = 0;
+    this.route.snapshot.data['board'].boxes = [];
+    this.route.snapshot.data['board'].timeStamp = 0;
     this.route.snapshot.data['initialTimeStamp'] = 0;
     this.route.snapshot.data['timeStamp'] = 0;
     this.route.snapshot.data['fallingBoxes'] = [];
-    this.fetchService.start().subscribe();
+    const timeStamp: number[] = [0];
+    this.fetchService.start().subscribe({
+      next: (box: Box) => this.fillNextFigure(box, timeStamp),
+      complete: () => this.endFillNextFigure(timeStamp),
+    });
+  }
+
+  fillNextFigure(box: Box, timeStamp: number[]): void {
+    const initialTimeStamp: number = this.route.snapshot.data[
+      'initialTimeStamp'
+    ] as number;
+    if (initialTimeStamp < box.initialTimeStamp) {
+      if (timeStamp[0] == 0) {
+        this.route.snapshot.data['fallingBoxes'] = [];
+        timeStamp[0] = box.timeStamp;
+      }
+      this.route.snapshot.data['fallingBoxes'].push(box);
+    }
+  }
+
+  endFillNextFigure(timeStamp: number[]): void {
+    if (timeStamp[0] != 0) {
+      //console.log( '--> endFillNextFigure (reactive) = '+timeStamp[0] );
+      this.route.snapshot.data['initialTimeStamp'] = timeStamp[0];
+      this.route.snapshot.data['timeStamp'] = timeStamp[0];
+    }
   }
 }

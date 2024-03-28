@@ -23,5 +23,5 @@ public interface EngineService {
 
 	public Optional<Box[]> rotateLeft();
 
-	public void bottomDown();
+	public Optional<Box[]> bottomDown();
 }

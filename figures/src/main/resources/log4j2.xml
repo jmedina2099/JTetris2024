@@ -66,6 +66,10 @@
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="org.jmedina.jtetris.figures.figure" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogFigures" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Root level="info" includeLocation="true">
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />

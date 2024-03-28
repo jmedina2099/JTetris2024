@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
-import org.jmedina.jtetris.engine.model.Board;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.FigureService;
 import org.jmedina.jtetris.engine.service.GridSupportService;
@@ -58,8 +57,11 @@ public class EngineServiceImpl implements EngineService {
 	@Override
 	public void addFallingFigure(Figure figure) {
 		this.logger.debug("==> Engine.addFallingFigure()");
-		this.fallingFigure = figure;
-		this.gridSupport.addToGrid(this.fallingFigure);
+		if (this.fallingFigure == null || this.fallingFigure.getInitialTimeStamp() < figure.getInitialTimeStamp()) {
+			this.logger.debug("==> Engine.addFallingFigure.adding.. " + figure.getInitialTimeStamp());
+			this.fallingFigure = figure;
+			this.gridSupport.addToGrid(this.fallingFigure);
+		}
 	}
 
 	@Override
@@ -89,10 +91,10 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	@Override
-	public void bottomDown() {
+	public Optional<Box[]> bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
 		if (Objects.isNull(this.fallingFigure)) {
-			return;
+			return Optional.empty();
 		}
 		boolean isLockAcquired = lock.tryLock();
 		if (isLockAcquired) {
@@ -106,22 +108,29 @@ public class EngineServiceImpl implements EngineService {
 				}
 				this.gridSupport.addToGrid(this.fallingFigure);
 				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-				Board board = new Board(this.falledBoxes, System.nanoTime());
-				this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
+
+				AtomicReference<Long> timeStamp = new AtomicReference<Long>();
+				timeStamp.set(System.nanoTime());
+				this.falledBoxes.stream().forEach(b -> b.timeStamp = timeStamp.get());
+				this.serializeUtil.convertBoxesToString(this.falledBoxes)
+						.ifPresent(this.kafkaService::sendMessageBoard);
 
 				if (checkMakeLines(this.fallingFigure) > 0) {
-					board = new Board(this.falledBoxes, System.nanoTime());
-					this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
+					timeStamp.set(System.nanoTime());
+					this.falledBoxes.stream().forEach(b -> b.timeStamp = timeStamp.get());
+					this.serializeUtil.convertBoxesToString(this.falledBoxes)
+							.ifPresent(this.kafkaService::sendMessageBoard);
 				}
 				this.fallingFigure = null;
-				this.figureService.askForNextFigure().subscribe(m -> {
-					this.logger.debug("==> askForNextFigure.subscribe = " + m.getContent());
+				this.figureService.askForNextFigure().subscribe(f -> {
+					this.logger.debug("==> askForNextFigure.subscribe = " + f);
+					addFallingFigure(f);
 				});
 			} finally {
 				lock.unlock();
 			}
 		}
-		return;
+		return Optional.of(this.falledBoxes.toArray(new Box[0]));
 	}
 
 	private Optional<Box[]> moveFigure(MoveDirectionEnumeration direction) {
@@ -142,7 +151,8 @@ public class EngineServiceImpl implements EngineService {
 						this.fallingFigure.moveRight();
 					}
 					this.fallingFigure.setTimeStampPropagate(System.nanoTime());
-					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					this.serializeUtil.convertFigureToString(this.fallingFigure)
+							.ifPresent(this.kafkaService::sendMessageFigure);
 					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
 				}
 			}
@@ -191,7 +201,7 @@ public class EngineServiceImpl implements EngineService {
 				this.gridSupport.removeFromGrid(this.fallingFigure);
 				Figure figureTmp = this.fallingFigure.clone();
 				if (rotateHelper(figureTmp, direction)) {
-					// this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
 					this.fallingFigure = figureTmp;
 					this.fallingFigure.setTimeStampPropagate(System.nanoTime());
 					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));

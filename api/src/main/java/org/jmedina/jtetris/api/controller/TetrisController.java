@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +25,7 @@ import reactor.core.publisher.Mono;
 public class TetrisController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private EngineClient engineClient;
 
@@ -36,8 +35,8 @@ public class TetrisController {
 		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("Hello from api reactive!!!")));
 	}
 
-	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Mono<Message>> start() {
+	@GetMapping(value = "/start", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> start() {
 		this.logger.debug("===> TetrisController.start()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start());
 	}
@@ -59,7 +58,7 @@ public class TetrisController {
 		this.logger.debug("===> TetrisController.moveDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveDown());
 	}
-	
+
 	@GetMapping(value = "/rotateRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public ResponseEntity<Flux<Box>> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
@@ -72,8 +71,8 @@ public class TetrisController {
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
 	}
 
-	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Mono<Void>> bottomDown() {
+	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Box>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
 	}
