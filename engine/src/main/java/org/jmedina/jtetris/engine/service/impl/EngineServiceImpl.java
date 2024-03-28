@@ -38,6 +38,7 @@ public class EngineServiceImpl implements EngineService {
 	private final FigureService figureService;
 	private final KafkaService kafkaService;
 	private final GridSupportService gridSupport;
+	private final RotationUtil rotationUtil;
 	private final SerializeUtil serializeUtil;
 	private Figure fallingFigure;
 	private List<Box> falledBoxes;
@@ -223,7 +224,7 @@ public class EngineServiceImpl implements EngineService {
 
 		this.logger.debug("==> center = {}", figure.getCenter());
 
-		RotationUtil.rotateFigure(figure, direction);
+		this.rotationUtil.rotateFigure(figure, direction);
 		tryToFit(figure);
 		if (this.gridSupport.noHit(figure, 0, 0)) {
 			figure.rotation = rotation;

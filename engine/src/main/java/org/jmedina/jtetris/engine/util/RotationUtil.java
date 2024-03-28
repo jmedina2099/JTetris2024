@@ -8,14 +8,16 @@ import java.util.stream.Collectors;
 
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Jorge Medina
  *
  */
+@Service
 public class RotationUtil {
 
-	public static void rotateFigure(Figure figure, int direction) {
+	public void rotateFigure(Figure figure, int direction) {
 		List<Box> boxes = figure.getBoxes();
 
 		List<Point2D.Double> listCoords = boxes.stream().map(box -> new Point2D.Double(box.getX(), box.getY()))
@@ -32,7 +34,7 @@ public class RotationUtil {
 		figure.setBoxes(boxesRotated);
 	}
 
-	private static void rotateCoords(Point2D.Double[] srcPts, Point2D.Double center, int direction) {
+	private void rotateCoords(Point2D.Double[] srcPts, Point2D.Double center, int direction) {
 
 		AffineTransform translate1 = AffineTransform.getTranslateInstance(-center.getX(), -center.getY());
 		AffineTransform rotate = AffineTransform.getRotateInstance(direction * Math.toRadians(90d));
