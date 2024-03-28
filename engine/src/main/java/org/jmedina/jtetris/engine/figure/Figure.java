@@ -27,12 +27,13 @@ public class Figure implements Cloneable {
 	public Point center;
 	public int numRotations;
 	private long initialTimeStamp;
-	public long timeStamp;
+	private long timeStamp;
 
 	@JsonIgnore
 	public int rotation = 0;
 
-	public Figure(List<Box> boxes, Point center, int numRotations, int rotation, long initialTimeStamp, long timeStamp) {
+	public Figure(List<Box> boxes, Point center, int numRotations, int rotation, long initialTimeStamp,
+			long timeStamp) {
 		this.boxes = boxes;
 		this.center = center;
 		this.numRotations = numRotations;
@@ -63,7 +64,7 @@ public class Figure implements Cloneable {
 	public Figure clone() {
 		List<Box> list = this.boxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 		Point center = new Point(this.center.x, this.center.y);
-		return new Figure(list, center, numRotations, rotation,this.initialTimeStamp,this.timeStamp);
+		return new Figure(list, center, numRotations, rotation, this.initialTimeStamp, this.timeStamp);
 	}
 
 	@Override
@@ -71,6 +72,12 @@ public class Figure implements Cloneable {
 		StringBuilder sb = new StringBuilder();
 		this.boxes.stream().forEach(b -> sb.append(b.toString()));
 		return sb.toString();
+	}
+
+	public void setTimeStampPropagate(long nanoTime) {
+		this.timeStamp = nanoTime;
+		this.boxes.stream().forEach(b -> b.timeStamp = nanoTime);
+
 	}
 
 }
