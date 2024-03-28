@@ -3,7 +3,7 @@ package org.jmedina.jtetris.engine.listener;
 import java.util.Optional;
 
 import org.jmedina.jtetris.engine.figure.Figure;
-import org.jmedina.jtetris.engine.tool.Engine;
+import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class MessageListener {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final SerializeUtil serializeUtil;
-	private final Engine engine;
+	private final EngineService engineService;
 
 	@KafkaListener(topics = "${engine.topic.nextFigure}", groupId = "${engine.groupId.message}")
 	public void listenGroupFigureMessage(String message) {
@@ -31,7 +31,7 @@ public class MessageListener {
 		Optional<Figure> optional = this.serializeUtil.convertStringToFigure(message);
 		if (optional.isPresent()) {
 			if( !ObjectUtils.isEmpty(optional.get().getBoxes()) ) {
-				this.engine.addFallingFigure(optional.get());
+				this.engineService.addFallingFigure(optional.get());
 			}
 		}
 	}

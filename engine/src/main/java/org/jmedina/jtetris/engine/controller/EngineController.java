@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.model.Message;
+import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.FigureService;
-import org.jmedina.jtetris.engine.tool.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -30,7 +30,7 @@ public class EngineController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FigureService figureService;
-	private final Engine engine;
+	private final EngineService engineService;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -41,42 +41,42 @@ public class EngineController {
 	@GetMapping(value = "/start")
 	public Mono<Message> start() {
 		this.logger.debug("===> EngineController.start()");
-		this.engine.start();
+		this.engineService.start();
 		return this.figureService.askForNextFigure();
 	}
 
 	@GetMapping(value = "/moveRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
-		Optional<Box[]> optional = this.engine.moveRight();
+		Optional<Box[]> optional = this.engineService.moveRight();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/moveLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
-		Optional<Box[]> optional = this.engine.moveLeft();
+		Optional<Box[]> optional = this.engineService.moveLeft();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/rotateRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
-		Optional<Box[]> optional = this.engine.rotateRight();
+		Optional<Box[]> optional = this.engineService.rotateRight();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/rotateLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<Box> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
-		Optional<Box[]> optional = this.engine.rotateLeft();
+		Optional<Box[]> optional = this.engineService.rotateLeft();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Mono<Void> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
-		this.engine.bottomDown();
+		this.engineService.bottomDown();
 		return Mono.empty();
 	}
 
