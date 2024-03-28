@@ -48,6 +48,7 @@ public class Engine {
 		this.logger.debug("==> Engine.start()");
 		this.fallingFigure = null;
 		this.falledBoxes = new ArrayList<>();
+		this.gridSupport.initializeGrid();
 	}
 
 	public void addFallingFigure(Figure figure) {

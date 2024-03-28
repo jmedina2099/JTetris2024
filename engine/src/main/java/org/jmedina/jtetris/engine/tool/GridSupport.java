@@ -21,8 +21,10 @@ public class GridSupport {
 
 	private Map<Integer, boolean[]> gridBoxes = new HashMap<>();
 
-	public GridSupport() {
-		initializeGrid();
+	public void initializeGrid() {
+		Stream.iterate(0, x -> x + 1).limit(Engine.HEIGHT).forEach(i -> {
+			this.gridBoxes.put(i, new boolean[Engine.WIDTH]);
+		});
 	}
 
 	public Stream<Boolean> getStreamRow(int indexY) {
@@ -64,12 +66,6 @@ public class GridSupport {
 			int x = (int) Math.round(b.getX() / Box.SIZE);
 			int y = (int) Math.round(b.getY() / Box.SIZE);
 			this.gridBoxes.get(y)[x] = false;
-		});
-	}
-
-	private void initializeGrid() {
-		Stream.iterate(0, x -> x + 1).limit(Engine.HEIGHT).forEach(i -> {
-			this.gridBoxes.put(i, new boolean[Engine.WIDTH]);
 		});
 	}
 
