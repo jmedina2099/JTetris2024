@@ -32,7 +32,7 @@ public class EngineController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final EngineService engineService;
-	private final EnginePublisher figurePublisher;
+	private final EnginePublisher enginePublisher;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -44,7 +44,7 @@ public class EngineController {
 	public Flux<Figure> start() {
 		this.logger.debug("===> EngineController.start()");
 		this.engineService.start();
-		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
+		return Flux.from(this.enginePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
 			this.logger.debug("===> ENGINE - NEXT = " + figure);
 			this.engineService.addFallingFigure(figure);
 		}).doOnComplete(() -> {
