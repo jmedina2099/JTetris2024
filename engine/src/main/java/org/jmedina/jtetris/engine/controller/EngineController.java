@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.Message;
-import org.jmedina.jtetris.engine.publisher.FigurePublisher;
+import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class EngineController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final EngineService engineService;
-	private final FigurePublisher figurePublisher;
+	private final EnginePublisher figurePublisher;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -40,7 +40,7 @@ public class EngineController {
 		return Mono.just(new Message("Hello from engine reactive!!!"));
 	}
 
-	@GetMapping(value = "/start", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<Figure> start() {
 		this.logger.debug("===> EngineController.start()");
 		this.engineService.start();

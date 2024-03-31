@@ -2,6 +2,7 @@ package org.jmedina.jtetris.engine.service;
 
 import org.jmedina.jtetris.engine.figure.Figure;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -10,5 +11,7 @@ import reactor.core.publisher.Mono;
  */
 public interface FigureService {
 
-	public Mono<Figure> askForNextFigure();
+	public Flux<Figure> start();
+
+	public Mono<Void> askForNextFigure();
 }

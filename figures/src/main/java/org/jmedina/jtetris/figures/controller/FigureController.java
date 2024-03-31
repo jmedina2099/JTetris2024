@@ -6,13 +6,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.figure.Figure;
 import org.jmedina.jtetris.figures.model.Message;
-import org.jmedina.jtetris.figures.service.FigureService;
+import org.jmedina.jtetris.figures.publisher.FiguresPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -25,7 +26,7 @@ import reactor.core.publisher.Mono;
 public class FigureController {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
-	private final FigureService figureService;
+	private final FiguresPublisher figurePublisher;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -33,10 +34,10 @@ public class FigureController {
 		return Mono.just(new Message("Hello from figures reactive!!!"));
 	}
 
-	@GetMapping(value = "/askForNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Figure> askForNextFigure() {
+	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<Figure> start() {
 		this.logger.debug("===> FigureController.askForNextFigure()");
-		return Mono.just(this.figureService.askForNextFigure()).timeout(Duration.ofHours(1)).doOnNext(figure -> {
+		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
 			this.logger.debug("===> FIGURES - NEXT = " + figure);
 		}).doOnCancel(() -> {
 			this.logger.debug("===> FIGURES - CANCEL!");
@@ -47,4 +48,10 @@ public class FigureController {
 		});
 	}
 
+	@GetMapping(value = "/askForNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Void> askAndSendNextFigure() {
+		this.logger.debug("===> FigureController.askAndSendNextFigure()");
+		this.figurePublisher.askAndSendNextFigure();
+		return Mono.empty();
+	}
 }

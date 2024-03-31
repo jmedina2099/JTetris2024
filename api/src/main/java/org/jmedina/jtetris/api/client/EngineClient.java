@@ -5,7 +5,6 @@ import org.jmedina.jtetris.api.model.Figure;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import feign.Headers;
 import reactivefeign.spring.config.ReactiveFeignClient;
 import reactor.core.publisher.Flux;
 
@@ -14,10 +13,9 @@ import reactor.core.publisher.Flux;
  *
  */
 @ReactiveFeignClient(value = "engineClient", url = "${api.engine.base-url}", fallback = EngineFallback.class)
-@Headers("Connection: keep-alive")
 public interface EngineClient {
 
-	@GetMapping(value = "/start", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<Figure> start();
 
 	@GetMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import feign.Headers;
 import reactivefeign.spring.config.ReactiveFeignClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -16,6 +17,9 @@ import reactor.core.publisher.Mono;
 @Headers("Connection: keep-alive")
 public interface FiguresClient {
 
+	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<Figure> start();
+
 	@GetMapping(value = "/askForNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Figure> askForNextFigure();
+	public Mono<Void> askForNextFigure();
 }
