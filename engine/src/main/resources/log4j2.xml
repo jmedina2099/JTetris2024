@@ -42,7 +42,7 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="reactor.netty.channel.ChannelOperations" additivity="false" level="debug" includeLocation="true">
+        <Logger name="reactor.netty.channel.ChannelOperations" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
@@ -54,7 +54,7 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="com.netflix.discovery" additivity="false" level="info" includeLocation="true">
+        <Logger name="com.netflix.discovery" additivity="false" level="warn" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
@@ -99,6 +99,10 @@
             <AppenderRef ref="Console" />
         </Logger>
         <Logger name="org.jmedina.jtetris.engine.service" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.jmedina.jtetris.engine.publisher" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>

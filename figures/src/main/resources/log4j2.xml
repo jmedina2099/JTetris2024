@@ -38,7 +38,7 @@
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="com.netflix.discovery" additivity="false" level="info" includeLocation="true">
+        <Logger name="com.netflix.discovery" additivity="false" level="warn" includeLocation="true">
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>
