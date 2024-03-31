@@ -26,7 +26,31 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="reactor" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.reactivestreams" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="io.netty" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="reactor.netty" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="reactor.netty.channel.ChannelOperations" additivity="false" level="debug" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.apache.kafka" additivity="false" level="warn" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.apache.kafka.clients.NetworkClient" additivity="false" level="error" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
@@ -42,6 +66,14 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="org.springframework.web.reactive" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.http.server.reactive" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.springframework.cloud.netflix" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
@@ -50,7 +82,7 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.springframework.kafka.listener.KafkaMessageListenerContainer" additivity="false" level="warn" includeLocation="true">
+        <Logger name="org.springframework.kafka" additivity="false" level="warn" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>

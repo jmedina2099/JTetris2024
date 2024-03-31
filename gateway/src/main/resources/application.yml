@@ -1,13 +1,27 @@
 server:
   port: ${app.gateway.port}
   shutdown: graceful
+  netty:
+    connection-timeout: 1h
+    idle-timeout: 1h
+    read-timeout: 1h
+    write-timeout: 1h
+    max-keep-alive-requests: 10
 spring:
   application:
     name: ${app.gateway.name}
+  mvc:
+    async:
+      request-timeout: 1h
   cloud:
     gateway:
       httpclient:
         wiretap: true
+        connect-timeout: 3600000
+        response-timeout: 1h
+        pool:
+          max-idle-time: 1h
+          max-life-time: 1h
       httpserver:
         wiretap: true
       globalcors:
@@ -18,22 +32,32 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
             allow-credentials: true
-    discovery:
-      reactive:
-        enabled: true
     loadbalancer:
       enabled: true
+      ribbon:
+        enabled: false
     refresh:
       enabled: false      
+    discovery:
+      enabled: true
+      client:
+        health-indicator:
+          enabled: true
+      reactive:
+        enabled: true
 eureka:
   client:
     serviceUrl:
       defaultZone: ${app.eureka.server}
+    healthcheck:
+      enabled: true
   instance:
     hostname: ${app.gateway.eureka.instance.host}
     preferIpAddress: false
     statusPageUrlPath: ${management.context-path}/actuator/info
     healthCheckUrlPath: ${management.context-path}/actuator/health
+    lease-renewal-interval-in-seconds: 300
+    lease-expiration-duration-in-seconds: 900
 management:
   context-path: ${app.gateway.context.path}
   info:

@@ -36,47 +36,37 @@ export class AppComponent implements OnInit {
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     const key = event.key;
-    const timeStamp: number[] = [0];
     const elapsedTime = Date.now() - this.lastCallTime;
-    const child = this.route.snapshot.firstChild;
     if (elapsedTime > 50) {
       switch (key) {
         case 'ArrowRight':
           this.lastCallTime = Date.now();
           this.fetchService.moveRight().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
-            complete: () => this.endFillFallingBoxes(timeStamp),
+            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
           });
           break;
         case 'ArrowLeft':
           this.lastCallTime = Date.now();
           this.fetchService.moveLeft().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
-            complete: () => this.endFillFallingBoxes(timeStamp),
+            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
           });
           break;
         case 'ArrowUp':
           this.lastCallTime = Date.now();
           this.fetchService.rotateRight().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
-            complete: () => this.endFillFallingBoxes(timeStamp),
+            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
           });
           break;
         case 'ArrowDown':
           this.lastCallTime = Date.now();
           this.fetchService.rotateLeft().subscribe({
-            next: (box: Box) => this.fillFallingBoxes(box, timeStamp),
-            complete: () => this.endFillFallingBoxes(timeStamp),
+            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
           });
           break;
         case ' ':
-          if (child) {
-            child.data['fallingBoxes'] = [];
-          }
           this.lastCallTime = Date.now();
           this.fetchService.bottomDown().subscribe({
-            next: (box: Box) => this.fillBoardBoxes(box, timeStamp),
-            complete: () => this.endFillBoardBoxes(timeStamp),
+            next: (boxes: Box[]) => this.fillBoardArrayBoxes(boxes),
           });
           break;
         default:
@@ -85,57 +75,36 @@ export class AppComponent implements OnInit {
     }
   }
 
-  fillFallingBoxes(box: Box, timeStamp: number[]): void {
-    const child = this.route.snapshot.firstChild;
-    if (child) {
-      const initialTimeStamp: number = child.data['initialTimeStamp'] as number;
-      const currentTimeStamp: number = child.data['timeStamp'] as number;
-      if (
-        initialTimeStamp <= box.initialTimeStamp &&
-        currentTimeStamp < box.timeStamp
-      ) {
-        if (timeStamp[0] == 0) {
-          child.data['fallingBoxes'] = [];
-          timeStamp[0] = box.timeStamp;
+  fillFallingArrayBoxes(boxes: Box[]): void {
+    if (boxes && boxes.length > 0) {
+      const child = this.route.snapshot.firstChild;
+      if (child) {
+        const initialTimeStamp: number = child.data['figureFalling']
+          ?.initialTimeStamp as number;
+        const currentTimeStamp: number = child.data['figureFalling']
+          ?.timeStamp as number;
+        if (
+          initialTimeStamp <= boxes[0].initialTimeStamp &&
+          currentTimeStamp < boxes[0].timeStamp
+        ) {
+          child.data['figureFalling'].boxes = boxes;
+          child.data['figureFalling'].timeStamp = boxes[0].timeStamp;
         }
-        child.data['fallingBoxes'].push(box);
       }
     }
   }
 
-  fillBoardBoxes(box: Box, timeStamp: number[]): void {
-    const child = this.route.snapshot.firstChild;
-    if (child) {
-      const currentTimeStamp: number = child.data['board'].timeStamp as number;
-      if (currentTimeStamp < box.timeStamp) {
-        if (timeStamp[0] == 0) {
-          child.data['board'].boxes = [];
-          timeStamp[0] = box.timeStamp;
+  fillBoardArrayBoxes(boxes: Box[]): void {
+    if (boxes && boxes.length > 0) {
+      const child = this.route.snapshot.firstChild;
+      if (child) {
+        const currentTimeStamp: number = child.data['board']
+          ?.timeStamp as number;
+        if (currentTimeStamp < boxes[0].timeStamp) {
+          child.data['board'].boxes = boxes;
+          child.data['board'].timeStamp = boxes[0].timeStamp;
         }
-        child.data['board'].boxes.push(box);
       }
     }
-  }
-
-  endFillFallingBoxes(timeStamp: number[]): void {
-    const child = this.route.snapshot.firstChild;
-    if (child) {
-      if (timeStamp[0] != 0) {
-        //console.log( '--> endFillFallingBoxes (reactive) = '+timeStamp[0] );
-        child.data['timeStamp'] = timeStamp[0];
-      }
-    }
-  }
-
-  endFillBoardBoxes(timeStamp: number[]) {
-    const child = this.route.snapshot.firstChild;
-    if (child) {
-      if (timeStamp[0] != 0) {
-        //console.log( '--> endFillBoardBoxes (reactive) = '+timeStamp[0] );
-        child.data['board'].timeStamp = timeStamp[0];
-      }
-    }
-    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
-    this.handleKeyboardEvent(event);
   }
 }

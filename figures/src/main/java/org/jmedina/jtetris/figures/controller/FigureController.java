@@ -1,5 +1,7 @@
 package org.jmedina.jtetris.figures.controller;
 
+import java.time.Duration;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.figure.Figure;
@@ -34,7 +36,15 @@ public class FigureController {
 	@GetMapping(value = "/askForNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Figure> askForNextFigure() {
 		this.logger.debug("===> FigureController.askForNextFigure()");
-		return Mono.just(this.figureService.askForNextFigure());
+		return Mono.just(this.figureService.askForNextFigure()).timeout(Duration.ofHours(1)).doOnNext(figure -> {
+			this.logger.debug("===> FIGURES - NEXT = " + figure);
+		}).doOnCancel(() -> {
+			this.logger.debug("===> FIGURES - CANCEL!");
+		}).doOnTerminate(() -> {
+			this.logger.debug("===> FIGURES - TERMINATE!");
+		}).doOnError(e -> {
+			this.logger.error("==*=> ERROR =", e);
+		});
 	}
 
 }

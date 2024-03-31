@@ -5,6 +5,7 @@ import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServe
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import reactivefeign.spring.config.EnableReactiveFeignClients;
+import reactor.netty.ReactorNetty;
 
 /**
  * @author Jorge Medina
@@ -15,6 +16,10 @@ import reactivefeign.spring.config.EnableReactiveFeignClients;
 public class TetrisApplication {
 
 	public static void main(String[] args) {
+		System.setProperty(ReactorNetty.POOL_MAX_IDLE_TIME, "3600000");
+		System.setProperty(ReactorNetty.POOL_MAX_LIFE_TIME, "3600000");
+		System.setProperty(ReactorNetty.POOL_LEASING_STRATEGY, "fifo");
+		System.setProperty("io.netty.tryReflectionSetAccessible", "true");
 		SpringApplication.run(TetrisApplication.class, args);
 	}
 }

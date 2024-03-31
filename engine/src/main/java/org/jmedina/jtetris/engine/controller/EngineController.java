@@ -1,12 +1,13 @@
 package org.jmedina.jtetris.engine.controller;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.Message;
+import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
-import org.jmedina.jtetris.engine.service.FigureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -30,8 +31,8 @@ import reactor.core.publisher.Mono;
 public class EngineController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final FigureService figureService;
 	private final EngineService engineService;
+	private final FigurePublisher figurePublisher;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -40,46 +41,52 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/start", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<Box> start() {
+	public Flux<Figure> start() {
 		this.logger.debug("===> EngineController.start()");
 		this.engineService.start();
-		Mono<Figure> mono = this.figureService.askForNextFigure();
-		return mono.flatMapMany( f -> {
-			this.logger.debug("===> EngineController.start.addFallingFigure()");
-			this.engineService.addFallingFigure(f);
-			return Flux.fromArray(f.getBoxes().toArray(new Box[0])); 
+		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
+			this.logger.debug("===> ENGINE - NEXT = " + figure);
+			this.engineService.addFallingFigure(figure);
+		}).doOnComplete(() -> {
+			this.logger.debug("===> ENGINE - COMPLETE!");
+		}).doOnCancel(() -> {
+			this.logger.debug("===> ENGINE - CANCEL!");
+		}).doOnTerminate(() -> {
+			this.logger.debug("===> ENGINE - TERMINATE!");
+		}).doOnError(e -> {
+			this.logger.error("==*=> ERROR =", e);
 		});
 	}
 
-	@GetMapping(value = "/moveRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<Box> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
 		Optional<Box[]> optional = this.engineService.moveRight();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
-	@GetMapping(value = "/moveLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/moveLeft", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<Box> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
 		Optional<Box[]> optional = this.engineService.moveLeft();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
-	@GetMapping(value = "/rotateRight", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/rotateRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<Box> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		Optional<Box[]> optional = this.engineService.rotateRight();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
-	@GetMapping(value = "/rotateLeft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/rotateLeft", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<Box> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		Optional<Box[]> optional = this.engineService.rotateLeft();
 		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
 	}
 
-	@GetMapping(value = "/bottomDown", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<Box> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		Optional<Box[]> optional = this.engineService.bottomDown();

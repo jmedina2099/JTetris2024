@@ -14,6 +14,8 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.gateway.route.builder.UriSpec;
 import org.springframework.context.annotation.Bean;
 
+import reactor.netty.ReactorNetty;
+
 /**
  * @author Jorge Medina
  *
@@ -29,22 +31,23 @@ public class GatewayServerApplication {
 		this.logger.debug("===> GatewayServerApplication.customRouteLocator");
 		return builder.routes()
 				.route("serviceApi", r -> r.path("/service-api/**").filters(corsFilters()).uri("lb://API"))
-				.route("serviceEngine",
-						r -> r.path("/service-engine/**").filters(corsFilters()).uri("lb://ENGINE"))
-				.route("serviceFigures",
-						r -> r.path("/service-figures/**").filters(corsFilters()).uri("lb://FIGURES"))
+				.route("serviceEngine", r -> r.path("/service-engine/**").filters(corsFilters()).uri("lb://ENGINE"))
+				.route("serviceFigures", r -> r.path("/service-figures/**").filters(corsFilters()).uri("lb://FIGURES"))
 				.build();
 	}
-	
+
 	@Bean
 	Function<GatewayFilterSpec, UriSpec> corsFilters() {
-        return f -> f
-        		.stripPrefix(1)
-        		.dedupeResponseHeader("Access-Control-Allow-Origin", "RETAIN_UNIQUE")
-        		.dedupeResponseHeader("Access-Control-Allow-Credentials", "RETAIN_UNIQUE");
-    }
+		return f -> f.stripPrefix(1).addRequestHeader("Cache-Control", "no-cache")
+				.addRequestHeader("Connection", "keep-alive").addRequestHeader("X-Accel-Buffering", "no")
+				.dedupeResponseHeader("Access-Control-Allow-Origin", "RETAIN_UNIQUE")
+				.dedupeResponseHeader("Access-Control-Allow-Credentials", "RETAIN_UNIQUE");
+	}
 
 	public static void main(String[] args) {
+		System.setProperty(ReactorNetty.POOL_MAX_IDLE_TIME, "3600000");
+		System.setProperty(ReactorNetty.POOL_MAX_LIFE_TIME, "3600000");
+		System.setProperty(ReactorNetty.POOL_LEASING_STRATEGY, "fifo");
 		SpringApplication.run(GatewayServerApplication.class, args);
 	}
 

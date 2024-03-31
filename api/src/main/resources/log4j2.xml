@@ -26,6 +26,26 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="reactor" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.reactivestreams" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="io.netty" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="reactor.netty" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="reactor.netty.channel.ChannelOperations" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="com.netflix.discovery" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
@@ -35,6 +55,14 @@
             <AppenderRef ref="Console" />
         </Logger>
         <Logger name="org.springframework" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.web.reactive" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.http.server.reactive" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
         </Logger>

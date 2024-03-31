@@ -1,6 +1,7 @@
 .project
 .settings/*
-feign/target/*
+feign-reactor-spring-configuration/target/*
+feign-reactor-webclient/target/*
 eureka/target/*
 gateway/target/*
 api/target/*

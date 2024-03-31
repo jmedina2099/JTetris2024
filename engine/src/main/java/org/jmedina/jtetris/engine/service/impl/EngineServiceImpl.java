@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
-import org.jmedina.jtetris.engine.service.FigureService;
 import org.jmedina.jtetris.engine.service.GridSupportService;
 import org.jmedina.jtetris.engine.service.KafkaService;
 import org.jmedina.jtetris.engine.util.RotationUtil;
@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class EngineServiceImpl implements EngineService {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final FigureService figureService;
+	private final FigurePublisher figurePublisher;
 	private final KafkaService kafkaService;
 	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;
@@ -122,10 +122,7 @@ public class EngineServiceImpl implements EngineService {
 							.ifPresent(this.kafkaService::sendMessageBoard);
 				}
 				this.fallingFigure = null;
-				this.figureService.askForNextFigure().subscribe(f -> {
-					this.logger.debug("==> askForNextFigure.subscribe = " + f);
-					addFallingFigure(f);
-				});
+				this.figurePublisher.askAndSendNextFigure();
 			} finally {
 				lock.unlock();
 			}

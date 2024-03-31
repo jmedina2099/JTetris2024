@@ -1,14 +1,10 @@
 <div class="ventana">
   <div>
-    <input
-      id="startButton"
-      type="button"
-      value="Start"
-      (click)="nextFigure()" />
+    <input id="startButton" type="button" value="Start" (click)="start()" />
   </div>
   <br />
   <div class="panel">
     <app-box *ngFor="let box of getFallingBoxes()" [box]="box"></app-box>
-    <app-box *ngFor="let box of getBoard().boxes" [box]="box"></app-box>
+    <app-box *ngFor="let box of getBoard()" [box]="box"></app-box>
   </div>
 </div>

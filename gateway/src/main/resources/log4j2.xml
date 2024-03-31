@@ -26,6 +26,22 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="reactor.core" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.reactivestreams" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="reactor.netty.http" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="reactor.netty.channel.ChannelOperations" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="com.netflix.discovery" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />

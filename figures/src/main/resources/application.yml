@@ -1,9 +1,20 @@
 server:
   port: ${app.figures.port}
   shutdown: graceful
+  netty:
+    connection-timeout: 1h
+    idle-timeout: 1h
+    read-timeout: 1h
+    write-timeout: 1h
+    max-keep-alive-requests: 10
 spring:
   application:
     name: ${app.figures.name}
+  mvc:
+    async:
+      request-timeout: 1h
+  webflux:
+    base-path: ${app.figures.context.path} # reactive
   cloud:
     loadbalancer:
       enabled: true
@@ -11,6 +22,13 @@ spring:
         enabled: false
     refresh:
       enabled: false
+    discovery:
+      enabled: true
+      client:
+        health-indicator:
+          enabled: true
+      reactive:
+        enabled: true
   data:
     mongodb:
       uri: mongodb://${app.mongo.sever}/${figures.mongodb.name}
@@ -18,17 +36,23 @@ spring:
     bootstrap-servers: ${app.kafka.servers}
     producer:
       client-id: figuresProducerClientId
-  webflux:
-    base-path: ${app.figures.context.path} # reactive
 eureka:
   client:
     serviceUrl:
       defaultZone: ${app.eureka.server}
+    healthcheck:
+      enabled: true
+    registry-fetch-interval-seconds: 300
+    eureka-server-connect-timeout-seconds: 300
+    eureka-server-read-timeout-seconds: 300
+    eureka-connection-idle-timeout-seconds: 300
   instance:
     hostname: ${app.figures.eureka.instance.host}
     preferIpAddress: false
     statusPageUrlPath: ${management.context-path}/actuator/info
     healthCheckUrlPath: ${management.context-path}/actuator/health
+    lease-renewal-interval-in-seconds: 300
+    lease-expiration-duration-in-seconds: 900
 management:
   context-path: ${app.figures.context.path}
   info:

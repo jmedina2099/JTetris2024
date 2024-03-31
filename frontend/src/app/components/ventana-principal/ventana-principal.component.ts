@@ -25,11 +25,11 @@ export class VentanaPrincipalComponent implements OnInit {
   }
 
   getFallingBoxes() {
-    return this.route.snapshot.data['fallingBoxes'];
+    return this.route.snapshot.data['figureFalling']?.boxes;
   }
 
   getBoard() {
-    return this.route.snapshot.data['board'];
+    return this.route.snapshot.data['board']?.boxes;
   }
 
   initSocket(): void {
@@ -39,32 +39,28 @@ export class VentanaPrincipalComponent implements OnInit {
         //console.log('on nextFigureMessage = ' + data);
         const figure: Figure = JSON.parse(data) as Figure;
         const initialTimeStamp: number = this.route.snapshot.data[
-          'initialTimeStamp'
-        ] as number;
+          'figureFalling'
+        ]?.initialTimeStamp as number;
         if (initialTimeStamp < figure.initialTimeStamp) {
           //console.log( '--> nextFigureMessage (kafka) = '+figure.timeStamp );
-          this.route.snapshot.data['initialTimeStamp'] =
-            figure.initialTimeStamp;
-          this.route.snapshot.data['timeStamp'] = figure.timeStamp;
-          this.route.snapshot.data['fallingBoxes'] = figure.boxes;
+          this.route.snapshot.data['figureFalling'] = figure;
         }
       });
       this.socket.on('fallingFigureMessage', (data: string) => {
         //console.log('on fallingFigureMessage = ' + data);
         const figure: Figure = JSON.parse(data) as Figure;
         const initialTimeStamp: number = this.route.snapshot.data[
-          'initialTimeStamp'
-        ] as number;
+          'figureFalling'
+        ]?.initialTimeStamp as number;
         const currentTimeStamp: number = this.route.snapshot.data[
-          'timeStamp'
-        ] as number;
+          'figureFalling'
+        ]?.timeStamp as number;
         if (
           initialTimeStamp <= figure.initialTimeStamp &&
           currentTimeStamp < figure.timeStamp
         ) {
           //console.log( '--> fallingFigureMessage (kafka) = '+figure.timeStamp );
-          this.route.snapshot.data['timeStamp'] = figure.timeStamp;
-          this.route.snapshot.data['fallingBoxes'] = figure.boxes;
+          this.route.snapshot.data['figureFalling'] = figure;
         }
       });
       this.socket.on('boardMessage', (data: string) => {
@@ -87,41 +83,31 @@ export class VentanaPrincipalComponent implements OnInit {
     }
   }
 
-  nextFigure(): void {
+  start(): void {
     const startButtonElement = window.document.getElementById('startButton');
     if (startButtonElement) {
       startButtonElement.blur();
     }
-    this.route.snapshot.data['board'].boxes = [];
-    this.route.snapshot.data['board'].timeStamp = 0;
-    this.route.snapshot.data['initialTimeStamp'] = 0;
-    this.route.snapshot.data['timeStamp'] = 0;
-    this.route.snapshot.data['fallingBoxes'] = [];
-    const timeStamp: number[] = [0];
+    this.reset();
     this.fetchService.start().subscribe({
-      next: (box: Box) => this.fillNextFigure(box, timeStamp),
-      complete: () => this.endFillNextFigure(timeStamp),
+      next: (figure: Figure) => this.fillNextFigure(figure),
     });
   }
 
-  fillNextFigure(box: Box, timeStamp: number[]): void {
-    const initialTimeStamp: number = this.route.snapshot.data[
-      'initialTimeStamp'
-    ] as number;
-    if (initialTimeStamp < box.initialTimeStamp) {
-      if (timeStamp[0] == 0) {
-        this.route.snapshot.data['fallingBoxes'] = [];
-        timeStamp[0] = box.timeStamp;
-      }
-      this.route.snapshot.data['fallingBoxes'].push(box);
-    }
+  reset(): void {
+    this.route.snapshot.data['board'].boxes = [];
+    this.route.snapshot.data['board'].timeStamp = 0;
+    this.route.snapshot.data['figureFalling'].initialTimeStamp = 0;
+    this.route.snapshot.data['figureFalling'].timeStamp = 0;
+    this.route.snapshot.data['figureFalling'].boxes = [];
   }
 
-  endFillNextFigure(timeStamp: number[]): void {
-    if (timeStamp[0] != 0) {
-      //console.log( '--> endFillNextFigure (reactive) = '+timeStamp[0] );
-      this.route.snapshot.data['initialTimeStamp'] = timeStamp[0];
-      this.route.snapshot.data['timeStamp'] = timeStamp[0];
+  fillNextFigure(figure: Figure): void {
+    //console.log( '--> fillNextFigure (reactive) = '+JSON.stringify(figure) );
+    const initialTimeStamp: number = this.route.snapshot.data['figureFalling']
+      ?.initialTimeStamp as number;
+    if (initialTimeStamp < figure.initialTimeStamp) {
+      this.route.snapshot.data['figureFalling'] = figure;
     }
   }
 }

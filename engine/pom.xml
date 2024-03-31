@@ -74,6 +74,11 @@
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<jvmArguments>
+								--add-opens=java.base/java.nio=ALL-UNNAMED
+								--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</jvmArguments>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
@@ -115,9 +120,9 @@
 			<version>${feign-reactive.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.playtika.reactivefeign</groupId>
+			<groupId>org.jmedina.jtetris</groupId>
 			<artifactId>feign-reactor-webclient</artifactId>
-			<version>${feign-reactive.version}</version>
+			<version>${feign-reactor-webclient.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jmedina.jtetris</groupId>
@@ -173,4 +178,26 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-war</id>
+						<phase>package</phase>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Add-Exports>java.base/jdk.internal.misc</Add-Exports>
+									<Add-Opens>java.base/java.nio</Add-Opens>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

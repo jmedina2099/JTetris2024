@@ -15,11 +15,15 @@ eureka:
     fetchRegistry: false
     service-url:
       defaultZone: ${app.eureka.server}
+    healthcheck:
+      enabled: true
   instance:
     hostname: ${app.eureka.instance.host}
     preferIpAddress: false
     statusPageUrlPath: ${management.context-path}/actuator/info
     healthCheckUrlPath: ${management.context-path}/actuator/health
+    lease-renewal-interval-in-seconds: 300
+    lease-expiration-duration-in-seconds: 900
 management:
   context-path: ${app.eureka.context.path}
   info:
