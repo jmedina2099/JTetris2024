@@ -41,7 +41,7 @@ public abstract class Figure {
 		this.initialTimeStamp = System.nanoTime();
 		this.timeStamp = this.initialTimeStamp;
 		this.boxes = new ArrayList<>(this.type.getTuplas().stream().map(t -> {
-			return new Box(t, this.initialTimeStamp, this.timeStamp);
+			return new Box(t);
 		}).collect(Collectors.toList()));
 		this.center = type.getCenter();
 	}

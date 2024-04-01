@@ -1,10 +1,9 @@
 package org.jmedina.jtetris.engine.util;
 
-import java.util.List;
 import java.util.Optional;
 
-import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.Board;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,11 +39,11 @@ public class SerializeUtil {
 		return Optional.empty();
 	}
 
-	public Optional<String> convertBoxesToString(List<Box> boxes) {
+	public Optional<String> convertBoardToString(Board board) {
 		try {
-			return Optional.of(this.mapper.writeValueAsString(boxes));
+			return Optional.of(this.mapper.writeValueAsString(board));
 		} catch (JsonProcessingException e) {
-			this.logger.error("==> Error trying to convert boxes to JSON!!!", e);
+			this.logger.error("==> Error trying to convert board to JSON!!!", e);
 		}
 		return Optional.empty();
 	}

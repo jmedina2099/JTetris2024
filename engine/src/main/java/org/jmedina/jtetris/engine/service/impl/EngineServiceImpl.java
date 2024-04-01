@@ -13,7 +13,9 @@ import java.util.stream.Stream;
 import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.Board;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
+import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.GridSupportService;
 import org.jmedina.jtetris.engine.service.KafkaService;
@@ -34,7 +36,8 @@ import lombok.RequiredArgsConstructor;
 public class EngineServiceImpl implements EngineService {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final EnginePublisher figurePublisher;
+	private final FigurePublisher figurePublisher;
+	private final EnginePublisher enginePublisher;
 	private final KafkaService kafkaService;
 	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;
@@ -65,61 +68,57 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	@Override
-	public Optional<Box[]> moveRight() {
+	public Optional<Boolean> moveRight() {
 		this.logger.debug("==> Engine.moveRight()");
 		return moveFigure(MoveDirectionEnumeration.RIGHT);
 	}
 
 	@Override
-	public Optional<Box[]> moveLeft() {
+	public Optional<Boolean> moveLeft() {
 		this.logger.debug("==> Engine.moveLeft()");
 		return moveFigure(MoveDirectionEnumeration.LEFT);
 	}
 
 	@Override
-	public Optional<Box[]> rotateRight() {
+	public Optional<Boolean> rotateRight() {
 		this.logger.debug("==> Engine.rotateRight()");
 		int direction = this.fallingFigure.numRotations == 2 ? -1 : 1;
 		return rotate(direction);
 	}
 
 	@Override
-	public Optional<Box[]> rotateLeft() {
+	public Optional<Boolean> rotateLeft() {
 		this.logger.debug("==> Engine.rotateLeft()");
 		int direction = -1;
 		return rotate(direction);
 	}
 
 	@Override
-	public Optional<Box[]> bottomDown() {
+	public Optional<Board> bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
 		if (Objects.isNull(this.fallingFigure)) {
 			return Optional.empty();
 		}
 		boolean isLockAcquired = lock.tryLock();
+		Board board = null;
 		if (isLockAcquired) {
 			try {
 				this.gridSupport.removeFromGrid(this.fallingFigure);
 				while (canMoveDown(this.fallingFigure) && this.gridSupport.noHit(this.fallingFigure, 0, 1)) {
 					this.fallingFigure.moveDown();
-					this.fallingFigure.setTimeStampPropagate(System.nanoTime());
+					this.fallingFigure.setTimeStamp(System.nanoTime());
+					this.enginePublisher.sendMovementFigure(this.fallingFigure);
 					this.serializeUtil.convertFigureToString(this.fallingFigure)
 							.ifPresent(this.kafkaService::sendMessageFigure);
 				}
 				this.gridSupport.addToGrid(this.fallingFigure);
 				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-
-				AtomicReference<Long> timeStamp = new AtomicReference<Long>();
-				timeStamp.set(System.nanoTime());
-				this.falledBoxes.stream().forEach(b -> b.timeStamp = timeStamp.get());
-				this.serializeUtil.convertBoxesToString(this.falledBoxes)
-						.ifPresent(this.kafkaService::sendMessageBoard);
+				board = new Board(this.falledBoxes, System.nanoTime());
+				this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
 
 				if (checkMakeLines(this.fallingFigure) > 0) {
-					timeStamp.set(System.nanoTime());
-					this.falledBoxes.stream().forEach(b -> b.timeStamp = timeStamp.get());
-					this.serializeUtil.convertBoxesToString(this.falledBoxes)
-							.ifPresent(this.kafkaService::sendMessageBoard);
+					board = new Board(this.falledBoxes, System.nanoTime());
+					this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
 				}
 				this.fallingFigure = null;
 				this.figurePublisher.askForNextFigure();
@@ -127,12 +126,12 @@ public class EngineServiceImpl implements EngineService {
 				lock.unlock();
 			}
 		}
-		return Optional.of(this.falledBoxes.toArray(new Box[0]));
+		return Optional.of(board);
 	}
 
-	private Optional<Box[]> moveFigure(MoveDirectionEnumeration direction) {
+	private Optional<Boolean> moveFigure(MoveDirectionEnumeration direction) {
 		if (Objects.isNull(this.fallingFigure)) {
-			return Optional.empty();
+			return Optional.of(false);
 		}
 		boolean isLockAcquired;
 		try {
@@ -147,10 +146,11 @@ public class EngineServiceImpl implements EngineService {
 					} else if (direction.equals(MoveDirectionEnumeration.RIGHT)) {
 						this.fallingFigure.moveRight();
 					}
-					this.fallingFigure.setTimeStampPropagate(System.nanoTime());
+					this.fallingFigure.setTimeStamp(System.nanoTime());
+					this.enginePublisher.sendMovementFigure(this.fallingFigure);
 					this.serializeUtil.convertFigureToString(this.fallingFigure)
 							.ifPresent(this.kafkaService::sendMessageFigure);
-					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
+					return Optional.of(true);
 				}
 			}
 		} catch (Exception e) {
@@ -159,7 +159,7 @@ public class EngineServiceImpl implements EngineService {
 			this.gridSupport.addToGrid(this.fallingFigure);
 			lock.unlock();
 		}
-		return Optional.empty();
+		return Optional.of(false);
 	}
 
 	private boolean canMoveRight(Figure figure) {
@@ -183,12 +183,12 @@ public class EngineServiceImpl implements EngineService {
 		return true;
 	}
 
-	private Optional<Box[]> rotate(int direction) {
+	private Optional<Boolean> rotate(int direction) {
 		if (Objects.isNull(this.fallingFigure)) {
-			return Optional.empty();
+			return Optional.of(false);
 		}
 		if (this.fallingFigure.numRotations == 0) {
-			return Optional.empty();
+			return Optional.of(false);
 		}
 
 		boolean isLockAcquired = false;
@@ -198,10 +198,11 @@ public class EngineServiceImpl implements EngineService {
 				this.gridSupport.removeFromGrid(this.fallingFigure);
 				Figure figureTmp = this.fallingFigure.clone();
 				if (rotateHelper(figureTmp, direction)) {
-					this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
 					this.fallingFigure = figureTmp;
-					this.fallingFigure.setTimeStampPropagate(System.nanoTime());
-					return Optional.of(this.fallingFigure.getBoxes().toArray(new Box[0]));
+					this.fallingFigure.setTimeStamp(System.nanoTime());
+					this.enginePublisher.sendMovementFigure(this.fallingFigure);
+					this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					return Optional.of(true);
 				}
 			}
 		} catch (Exception e) {
@@ -210,7 +211,7 @@ public class EngineServiceImpl implements EngineService {
 			this.gridSupport.addToGrid(this.fallingFigure);
 			lock.unlock();
 		}
-		return Optional.empty();
+		return Optional.of(false);
 	}
 
 	private boolean rotateHelper(Figure figure, int direction) {

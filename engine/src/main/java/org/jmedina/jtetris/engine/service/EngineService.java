@@ -2,8 +2,8 @@ package org.jmedina.jtetris.engine.service;
 
 import java.util.Optional;
 
-import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.Board;
 
 /**
  * @author Jorge Medina
@@ -15,13 +15,13 @@ public interface EngineService {
 
 	public void addFallingFigure(Figure figure);
 
-	public Optional<Box[]> moveRight();
+	public Optional<Boolean> moveRight();
 
-	public Optional<Box[]> moveLeft();
+	public Optional<Boolean> moveLeft();
 
-	public Optional<Box[]> rotateRight();
+	public Optional<Boolean> rotateRight();
 
-	public Optional<Box[]> rotateLeft();
+	public Optional<Boolean> rotateLeft();
 
-	public Optional<Box[]> bottomDown();
+	public Optional<Board> bottomDown();
 }

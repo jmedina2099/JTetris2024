@@ -74,10 +74,8 @@ public class Figure implements Cloneable {
 		return sb.toString();
 	}
 
-	public void setTimeStampPropagate(long nanoTime) {
+	public void setTimeStamp(long nanoTime) {
 		this.timeStamp = nanoTime;
-		this.boxes.stream().forEach(b -> b.timeStamp = nanoTime);
-
 	}
 
 }

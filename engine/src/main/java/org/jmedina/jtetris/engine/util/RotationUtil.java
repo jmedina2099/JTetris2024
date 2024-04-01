@@ -28,7 +28,7 @@ public class RotationUtil {
 
 		List<Point2D.Double> coordsRotated = Arrays.asList(srcPts);
 		List<Box> boxesRotated = coordsRotated.stream()
-				.map(c -> new Box(c.getX(), c.getY(), figure.getInitialTimeStamp(), figure.getTimeStamp()))
+				.map(c -> new Box(c.getX(), c.getY()))
 				.collect(Collectors.toList());
 
 		figure.setBoxes(boxesRotated);

@@ -3,7 +3,7 @@ package org.jmedina.jtetris.api.controller;
 import java.time.Duration;
 
 import org.jmedina.jtetris.api.client.EngineClient;
-import org.jmedina.jtetris.api.model.Box;
+import org.jmedina.jtetris.api.model.Board;
 import org.jmedina.jtetris.api.model.Figure;
 import org.jmedina.jtetris.api.model.Message;
 import org.slf4j.Logger;
@@ -56,31 +56,31 @@ public class TetrisController {
 	}
 
 	@PostMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Flux<Box>> moveRight() {
+	public ResponseEntity<Mono<Boolean>> moveRight() {
 		this.logger.debug("===> TetrisController.moveRight()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveRight());
 	}
 
 	@PostMapping(value = "/moveLeft", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Flux<Box>> moveLeft() {
+	public ResponseEntity<Mono<Boolean>> moveLeft() {
 		this.logger.debug("===> TetrisController.moveLeft()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveLeft());
 	}
 
 	@PostMapping(value = "/rotateRight", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Flux<Box>> rotateRight() {
+	public ResponseEntity<Mono<Boolean>> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateRight());
 	}
 
 	@PostMapping(value = "/rotateLeft", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Flux<Box>> rotateLeft() {
+	public ResponseEntity<Mono<Boolean>> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
 	}
 
 	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Flux<Box>> bottomDown() {
+	public ResponseEntity<Mono<Board>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
 	}

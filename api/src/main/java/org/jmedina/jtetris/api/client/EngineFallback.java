@@ -1,10 +1,11 @@
 package org.jmedina.jtetris.api.client;
 
-import org.jmedina.jtetris.api.model.Box;
+import org.jmedina.jtetris.api.model.Board;
 import org.jmedina.jtetris.api.model.Figure;
 import org.springframework.stereotype.Component;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Jorge Medina
@@ -19,27 +20,27 @@ public class EngineFallback implements EngineClient {
 	}
 
 	@Override
-	public Flux<Box> moveRight() {
-		return Flux.empty();
+	public Mono<Boolean> moveRight() {
+		return Mono.just(false);
 	}
 
 	@Override
-	public Flux<Box> moveLeft() {
-		return Flux.empty();
+	public Mono<Boolean> moveLeft() {
+		return Mono.just(false);
 	}
 
 	@Override
-	public Flux<Box> rotateRight() {
-		return Flux.empty();
+	public Mono<Boolean> rotateRight() {
+		return Mono.just(false);
 	}
 
 	@Override
-	public Flux<Box> rotateLeft() {
-		return Flux.empty();
+	public Mono<Boolean> rotateLeft() {
+		return Mono.just(false);
 	}
 
 	@Override
-	public Flux<Box> bottomDown() {
-		return Flux.empty();
+	public Mono<Board> bottomDown() {
+		return Mono.empty();
 	}
 }

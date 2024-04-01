@@ -1,8 +1,8 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
-import { Box } from './model/figure/box';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from './services/app/app.service';
+import { Board } from './model/board/board';
 
 @Component({
   selector: 'app-root',
@@ -41,32 +41,24 @@ export class AppComponent implements OnInit {
       switch (key) {
         case 'ArrowRight':
           this.lastCallTime = Date.now();
-          this.fetchService.moveRight().subscribe({
-            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
-          });
+          this.fetchService.moveRight().subscribe();
           break;
         case 'ArrowLeft':
           this.lastCallTime = Date.now();
-          this.fetchService.moveLeft().subscribe({
-            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
-          });
+          this.fetchService.moveLeft().subscribe();
           break;
         case 'ArrowUp':
           this.lastCallTime = Date.now();
-          this.fetchService.rotateRight().subscribe({
-            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
-          });
+          this.fetchService.rotateRight().subscribe();
           break;
         case 'ArrowDown':
           this.lastCallTime = Date.now();
-          this.fetchService.rotateLeft().subscribe({
-            next: (boxes: Box[]) => this.fillFallingArrayBoxes(boxes),
-          });
+          this.fetchService.rotateLeft().subscribe();
           break;
         case ' ':
           this.lastCallTime = Date.now();
           this.fetchService.bottomDown().subscribe({
-            next: (boxes: Box[]) => this.fillBoardArrayBoxes(boxes),
+            next: (board: Board) => this.setBoardOperation(board),
           });
           break;
         default:
@@ -75,34 +67,16 @@ export class AppComponent implements OnInit {
     }
   }
 
-  fillFallingArrayBoxes(boxes: Box[]): void {
-    if (boxes && boxes.length > 0) {
-      const child = this.route.snapshot.firstChild;
-      if (child) {
-        const initialTimeStamp: number = child.data['figureFalling']
-          ?.initialTimeStamp as number;
-        const currentTimeStamp: number = child.data['figureFalling']
-          ?.timeStamp as number;
-        if (
-          initialTimeStamp <= boxes[0].initialTimeStamp &&
-          currentTimeStamp < boxes[0].timeStamp
-        ) {
-          child.data['figureFalling'].boxes = boxes;
-          child.data['figureFalling'].timeStamp = boxes[0].timeStamp;
-        }
-      }
-    }
-  }
-
-  fillBoardArrayBoxes(boxes: Box[]): void {
-    if (boxes && boxes.length > 0) {
+  setBoardOperation(board: Board): void {
+    //console.log( '---> setBoardOperation (reactive)...' );
+    if (board && board.boxes.length > 0) {
       const child = this.route.snapshot.firstChild;
       if (child) {
         const currentTimeStamp: number = child.data['board']
           ?.timeStamp as number;
-        if (currentTimeStamp < boxes[0].timeStamp) {
-          child.data['board'].boxes = boxes;
-          child.data['board'].timeStamp = boxes[0].timeStamp;
+        if (currentTimeStamp < board.timeStamp) {
+          //console.log( '--> set board (reactive) = '+board.timeStamp );
+          child.data['board'] = board;
         }
       }
     }

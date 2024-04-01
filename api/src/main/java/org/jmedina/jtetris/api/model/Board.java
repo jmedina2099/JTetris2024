@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class Figure {
+public class Board {
 
 	private List<Box> boxes = new ArrayList<>();
-	private long initialTimeStamp;
 	private long timeStamp;
+
 }

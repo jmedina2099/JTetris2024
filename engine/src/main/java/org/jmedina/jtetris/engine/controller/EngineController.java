@@ -3,10 +3,11 @@ package org.jmedina.jtetris.engine.controller;
 import java.time.Duration;
 import java.util.Optional;
 
-import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.Board;
 import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
+import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class EngineController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final EngineService engineService;
+	private final FigurePublisher figurePublisher;
 	private final EnginePublisher enginePublisher;
 
 	@GetMapping("/hello")
@@ -44,53 +46,63 @@ public class EngineController {
 	public Flux<Figure> start() {
 		this.logger.debug("===> EngineController.start()");
 		this.engineService.start();
-		return Flux.from(this.enginePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
-			this.logger.debug("===> ENGINE - NEXT = " + figure);
+		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
+			this.logger.debug("===> ENGINE - start() - NEXT = " + figure);
 			this.engineService.addFallingFigure(figure);
 		}).doOnComplete(() -> {
-			this.logger.debug("===> ENGINE - COMPLETE!");
+			this.logger.debug("===> ENGINE - figurePublisher - COMPLETE!");
 		}).doOnCancel(() -> {
-			this.logger.debug("===> ENGINE - CANCEL!");
+			this.logger.debug("===> ENGINE - figurePublisher - CANCEL!");
 		}).doOnTerminate(() -> {
-			this.logger.debug("===> ENGINE - TERMINATE!");
+			this.logger.debug("===> ENGINE - figurePublisher - TERMINATE!");
+		}).doOnError(e -> {
+			this.logger.error("==*=> ERROR =", e);
+		}).mergeWith(this.enginePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
+			this.logger.debug("===> ENGINE - enginePublisher - NEXT = " + figure);
+		}).doOnComplete(() -> {
+			this.logger.debug("===> ENGINE - enginePublisher - COMPLETE!");
+		}).doOnCancel(() -> {
+			this.logger.debug("===> ENGINE - enginePublisher - CANCEL!");
+		}).doOnTerminate(() -> {
+			this.logger.debug("===> ENGINE - enginePublisher - TERMINATE!");
 		}).doOnError(e -> {
 			this.logger.error("==*=> ERROR =", e);
 		});
 	}
 
 	@GetMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Box> moveRight() {
+	public Mono<Boolean> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
-		Optional<Box[]> optional = this.engineService.moveRight();
-		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
+		Optional<Boolean> optional = this.engineService.moveRight();
+		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
 	}
 
 	@GetMapping(value = "/moveLeft", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Box> moveLeft() {
+	public Mono<Boolean> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
-		Optional<Box[]> optional = this.engineService.moveLeft();
-		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
+		Optional<Boolean> optional = this.engineService.moveLeft();
+		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
 	}
 
 	@GetMapping(value = "/rotateRight", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Box> rotateRight() {
+	public Mono<Boolean> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
-		Optional<Box[]> optional = this.engineService.rotateRight();
-		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
+		Optional<Boolean> optional = this.engineService.rotateRight();
+		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
 	}
 
 	@GetMapping(value = "/rotateLeft", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Box> rotateLeft() {
+	public Mono<Boolean> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
-		Optional<Box[]> optional = this.engineService.rotateLeft();
-		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
+		Optional<Boolean> optional = this.engineService.rotateLeft();
+		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Box> bottomDown() {
+	public Mono<Board> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
-		Optional<Box[]> optional = this.engineService.bottomDown();
-		return optional.isPresent() ? Flux.fromArray(optional.get()) : Flux.empty();
+		Optional<Board> optional = this.engineService.bottomDown();
+		return optional.isPresent() ? Mono.just(optional.get()) : Mono.empty();
 	}
 
 }
