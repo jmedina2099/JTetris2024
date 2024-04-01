@@ -13,7 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
-		<use.kafka>false</use.kafka>
+		<use.kafka>false</use.kafka> <!-- This is optional, only for better UX -->
 		<java.version>17</java.version>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
