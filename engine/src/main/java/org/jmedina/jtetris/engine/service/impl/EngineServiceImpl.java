@@ -63,7 +63,6 @@ public class EngineServiceImpl implements EngineService {
 		if (this.fallingFigure == null || this.fallingFigure.getInitialTimeStamp() < figure.getInitialTimeStamp()) {
 			this.logger.debug("==> Engine.addFallingFigure.adding.. " + figure.getInitialTimeStamp());
 			this.fallingFigure = figure;
-			this.gridSupport.addToGrid(this.fallingFigure);
 		}
 	}
 
@@ -103,7 +102,6 @@ public class EngineServiceImpl implements EngineService {
 		Board board = null;
 		if (isLockAcquired) {
 			try {
-				this.gridSupport.removeFromGrid(this.fallingFigure);
 				while (canMoveDown(this.fallingFigure) && this.gridSupport.noHit(this.fallingFigure, 0, 1)) {
 					this.fallingFigure.moveDown();
 					this.fallingFigure.setTimeStamp(System.nanoTime());
@@ -137,7 +135,6 @@ public class EngineServiceImpl implements EngineService {
 		try {
 			isLockAcquired = lock.tryLock(1, TimeUnit.SECONDS);
 			if (isLockAcquired) {
-				this.gridSupport.removeFromGrid(this.fallingFigure);
 				if ((direction.equals(MoveDirectionEnumeration.LEFT) ? canMoveLeft(this.fallingFigure)
 						: canMoveRight(this.fallingFigure))
 						&& this.gridSupport.noHit(this.fallingFigure, direction.getOffset(), 0)) {
@@ -156,7 +153,6 @@ public class EngineServiceImpl implements EngineService {
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR = ", e);
 		} finally {
-			this.gridSupport.addToGrid(this.fallingFigure);
 			lock.unlock();
 		}
 		return Optional.of(false);
@@ -195,7 +191,6 @@ public class EngineServiceImpl implements EngineService {
 		try {
 			isLockAcquired = lock.tryLock(1, TimeUnit.SECONDS);
 			if (isLockAcquired) {
-				this.gridSupport.removeFromGrid(this.fallingFigure);
 				Figure figureTmp = this.fallingFigure.clone();
 				if (rotateHelper(figureTmp, direction)) {
 					this.fallingFigure = figureTmp;
@@ -208,7 +203,6 @@ public class EngineServiceImpl implements EngineService {
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR = ", e);
 		} finally {
-			this.gridSupport.addToGrid(this.fallingFigure);
 			lock.unlock();
 		}
 		return Optional.of(false);
