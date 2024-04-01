@@ -14,6 +14,7 @@ import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.Board;
+import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
@@ -38,6 +39,7 @@ public class EngineServiceImpl implements EngineService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FigurePublisher figurePublisher;
 	private final EnginePublisher enginePublisher;
+	private final BoardPublisher boardPublisher;
 	private final KafkaService kafkaService;
 	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;
@@ -93,10 +95,10 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	@Override
-	public Optional<Board> bottomDown() {
+	public Optional<Boolean> bottomDown() {
 		this.logger.debug("==> Engine.bottomDown()");
 		if (Objects.isNull(this.fallingFigure)) {
-			return Optional.empty();
+			return Optional.of(false);
 		}
 		boolean isLockAcquired = lock.tryLock();
 		Board board = null;
@@ -112,10 +114,12 @@ public class EngineServiceImpl implements EngineService {
 				this.gridSupport.addToGrid(this.fallingFigure);
 				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
 				board = new Board(this.falledBoxes, System.nanoTime());
+				this.boardPublisher.sendBoard(board);
 				this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
 
 				if (checkMakeLines(this.fallingFigure) > 0) {
 					board = new Board(this.falledBoxes, System.nanoTime());
+					this.boardPublisher.sendBoard(board);
 					this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
 				}
 				this.fallingFigure = null;
@@ -124,7 +128,7 @@ public class EngineServiceImpl implements EngineService {
 				lock.unlock();
 			}
 		}
-		return Optional.of(board);
+		return Optional.of(true);
 	}
 
 	private Optional<Boolean> moveFigure(MoveDirectionEnumeration direction) {

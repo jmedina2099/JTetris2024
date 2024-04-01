@@ -15,7 +15,17 @@ import reactor.core.publisher.Mono;
 public class EngineFallback implements EngineClient {
 
 	@Override
-	public Flux<Figure> start() {
+	public Mono<Boolean> start() {
+		return Mono.just(false);
+	}
+
+	@Override
+	public Flux<Figure> getFigureConversation() {
+		return Flux.empty();
+	}
+
+	@Override
+	public Flux<Board> getBoardConversation() {
 		return Flux.empty();
 	}
 
@@ -40,7 +50,7 @@ public class EngineFallback implements EngineClient {
 	}
 
 	@Override
-	public Mono<Board> bottomDown() {
+	public Mono<Boolean> bottomDown() {
 		return Mono.empty();
 	}
 }

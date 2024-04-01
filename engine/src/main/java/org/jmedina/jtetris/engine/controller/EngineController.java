@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.Board;
 import org.jmedina.jtetris.engine.model.Message;
+import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
@@ -35,6 +36,7 @@ public class EngineController {
 	private final EngineService engineService;
 	private final FigurePublisher figurePublisher;
 	private final EnginePublisher enginePublisher;
+	private final BoardPublisher boardPublisher;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -43,11 +45,17 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Figure> start() {
+	public Mono<Boolean> start() {
 		this.logger.debug("===> EngineController.start()");
 		this.engineService.start();
+		return Mono.just(true);
+	}
+
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<Figure> getFigureConversation() {
+		this.logger.debug("===> EngineController.getFigureConversation()");
 		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
-			this.logger.debug("===> ENGINE - start() - NEXT = " + figure);
+			this.logger.debug("===> ENGINE - figurePublisher - NEXT = " + figure);
 			this.engineService.addFallingFigure(figure);
 		}).doOnComplete(() -> {
 			this.logger.debug("===> ENGINE - figurePublisher - COMPLETE!");
@@ -65,6 +73,22 @@ public class EngineController {
 			this.logger.debug("===> ENGINE - enginePublisher - CANCEL!");
 		}).doOnTerminate(() -> {
 			this.logger.debug("===> ENGINE - enginePublisher - TERMINATE!");
+		}).doOnError(e -> {
+			this.logger.error("==*=> ERROR =", e);
+		});
+	}
+
+	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<Board> getBoardConversation() {
+		this.logger.debug("===> EngineController.getBoardConversation()");
+		return Flux.from(this.boardPublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
+			this.logger.debug("===> ENGINE - boardPublisher - NEXT = " + figure);
+		}).doOnComplete(() -> {
+			this.logger.debug("===> ENGINE - boardPublisher - COMPLETE!");
+		}).doOnCancel(() -> {
+			this.logger.debug("===> ENGINE - boardPublisher - CANCEL!");
+		}).doOnTerminate(() -> {
+			this.logger.debug("===> ENGINE - boardPublisher - TERMINATE!");
 		}).doOnError(e -> {
 			this.logger.error("==*=> ERROR =", e);
 		});
@@ -99,10 +123,10 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Board> bottomDown() {
+	public Mono<Boolean> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
-		Optional<Board> optional = this.engineService.bottomDown();
-		return optional.isPresent() ? Mono.just(optional.get()) : Mono.empty();
+		Optional<Boolean> optional = this.engineService.bottomDown();
+		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
 	}
 
 }

@@ -17,27 +17,39 @@ export class FetchService {
     private http: HttpClient
   ) {}
 
-  start(): Observable<Figure> {
-    return this.sseService.observeFigure(this.fetchUrl + '/start');
+  public start(): Observable<boolean> {
+    return this.http.post<boolean>(this.fetchUrl + '/start', null);
   }
 
-  moveRight(): Observable<boolean> {
+  public getFigureConversation(): Observable<Figure> {
+    return this.sseService.observeFigure(
+      this.fetchUrl + '/getFigureConversation'
+    );
+  }
+
+  public getBoardConversation(): Observable<Board> {
+    return this.sseService.observeBoard(
+      this.fetchUrl + '/getBoardConversation'
+    );
+  }
+
+  public moveRight(): Observable<boolean> {
     return this.http.post<boolean>(this.fetchUrl + '/moveRight', null);
   }
 
-  moveLeft(): Observable<boolean> {
+  public moveLeft(): Observable<boolean> {
     return this.http.post<boolean>(this.fetchUrl + '/moveLeft', null);
   }
 
-  rotateRight(): Observable<boolean> {
+  public rotateRight(): Observable<boolean> {
     return this.http.post<boolean>(this.fetchUrl + '/rotateRight', null);
   }
 
-  rotateLeft(): Observable<boolean> {
+  public rotateLeft(): Observable<boolean> {
     return this.http.post<boolean>(this.fetchUrl + '/rotateLeft', null);
   }
 
-  bottomDown(): Observable<Board> {
-    return this.http.post<Board>(this.fetchUrl + '/bottomDown', null);
+  public bottomDown(): Observable<boolean> {
+    return this.http.post<boolean>(this.fetchUrl + '/bottomDown', null);
   }
 }

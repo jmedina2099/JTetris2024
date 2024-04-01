@@ -2,7 +2,6 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from './services/app/app.service';
-import { Board } from './model/board/board';
 
 @Component({
   selector: 'app-root',
@@ -57,27 +56,10 @@ export class AppComponent implements OnInit {
           break;
         case ' ':
           this.lastCallTime = Date.now();
-          this.fetchService.bottomDown().subscribe({
-            next: (board: Board) => this.setBoardOperation(board),
-          });
+          this.fetchService.bottomDown().subscribe();
           break;
         default:
           break;
-      }
-    }
-  }
-
-  setBoardOperation(board: Board): void {
-    //console.log( '---> setBoardOperation (reactive)...' );
-    if (board && board.boxes.length > 0) {
-      const child = this.route.snapshot.firstChild;
-      if (child) {
-        const currentTimeStamp: number = child.data['board']
-          ?.timeStamp as number;
-        if (currentTimeStamp < board.timeStamp) {
-          //console.log( '--> set board (reactive) = '+board.timeStamp );
-          child.data['board'] = board;
-        }
       }
     }
   }

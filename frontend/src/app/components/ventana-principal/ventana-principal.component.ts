@@ -88,7 +88,16 @@ export class VentanaPrincipalComponent implements OnInit {
     }
     this.reset();
     this.fetchService.start().subscribe({
-      next: (figure: Figure) => this.setFigureOperation(figure),
+      next: (value: boolean) => {
+        if (value) {
+          this.fetchService.getFigureConversation().subscribe({
+            next: (figure: Figure) => this.setFigureOperation(figure),
+          });
+          this.fetchService.getBoardConversation().subscribe({
+            next: (board: Board) => this.setBoardOperation(board),
+          });
+        }
+      },
     });
   }
 
@@ -112,6 +121,18 @@ export class VentanaPrincipalComponent implements OnInit {
     ) {
       //console.log( '--> set figure (reactive) = '+figure.timeStamp );
       this.route.snapshot.data['figureFalling'] = figure;
+    }
+  }
+
+  setBoardOperation(board: Board): void {
+    //console.log( '---> setBoardOperation (reactive)...' );
+    if (board && board.boxes.length > 0) {
+      const currentTimeStamp: number = this.route.snapshot.data['board']
+        ?.timeStamp as number;
+      if (currentTimeStamp < board.timeStamp) {
+        //console.log( '--> set board (reactive) = '+board.timeStamp );
+        this.route.snapshot.data['board'] = board;
+      }
     }
   }
 }

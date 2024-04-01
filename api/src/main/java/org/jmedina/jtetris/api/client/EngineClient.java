@@ -17,7 +17,13 @@ import reactor.core.publisher.Mono;
 public interface EngineClient {
 
 	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Figure> start();
+	public Mono<Boolean> start();
+
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<Figure> getFigureConversation();
+
+	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<Board> getBoardConversation();
 
 	@GetMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> moveRight();
@@ -32,6 +38,6 @@ public interface EngineClient {
 	public Mono<Boolean> rotateLeft();
 
 	@GetMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Board> bottomDown();
+	public Mono<Boolean> bottomDown();
 
 }

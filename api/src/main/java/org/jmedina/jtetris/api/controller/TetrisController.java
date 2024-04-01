@@ -38,18 +38,41 @@ public class TetrisController {
 		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("Hello from api reactive!!!")));
 	}
 
-	@GetMapping(value = "/start", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<Figure>> start() {
+	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Mono<Boolean>> start() {
 		this.logger.debug("===> TetrisController.start()");
+		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start());
+	}
+
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Figure>> getFigureConversation() {
+		this.logger.debug("===> TetrisController.getFigureConversation()");
 		return ResponseEntity.status(HttpStatus.OK)
-				.body(this.engineClient.start().timeout(Duration.ofHours(1)).doOnNext(figure -> {
-					this.logger.debug("===> API - NEXT = " + figure);
+				.body(this.engineClient.getFigureConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
+					this.logger.debug("===> API - getFigureConversation - NEXT = " + figure);
 				}).doOnComplete(() -> {
-					this.logger.debug("===> API - COMPLETE!");
+					this.logger.debug("===> API - getFigureConversation - COMPLETE!");
 				}).doOnCancel(() -> {
-					this.logger.debug("===> API - CANCEL!");
+					this.logger.debug("===> API - getFigureConversation - CANCEL!");
 				}).doOnTerminate(() -> {
-					this.logger.debug("===> API - TERMINATE!");
+					this.logger.debug("===> API - getFigureConversation - TERMINATE!");
+				}).doOnError(e -> {
+					this.logger.error("==*=> ERROR =", e);
+				}));
+	}
+
+	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public ResponseEntity<Flux<Board>> getBoardConversation() {
+		this.logger.debug("===> TetrisController.getBoardConversation()");
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(this.engineClient.getBoardConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
+					this.logger.debug("===> API - getBoardConversation - NEXT = " + figure);
+				}).doOnComplete(() -> {
+					this.logger.debug("===> API - getBoardConversation - COMPLETE!");
+				}).doOnCancel(() -> {
+					this.logger.debug("===> API - getBoardConversation - CANCEL!");
+				}).doOnTerminate(() -> {
+					this.logger.debug("===> API - getBoardConversation - TERMINATE!");
 				}).doOnError(e -> {
 					this.logger.error("==*=> ERROR =", e);
 				}));
@@ -80,7 +103,7 @@ public class TetrisController {
 	}
 
 	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Mono<Board>> bottomDown() {
+	public ResponseEntity<Mono<Boolean>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
 	}
