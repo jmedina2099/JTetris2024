@@ -20,6 +20,7 @@ import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
 import org.jmedina.jtetris.figures.util.RandomUtil;
 import org.jmedina.jtetris.figures.util.SerializeUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -40,15 +41,20 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final FigureTemplateOperations figureTemplateOperations;
 	private final FigureRepository figureRepository;
-	private final KafkaServiceImpl kafkaService;
 	private final SerializeUtil serializeUtil;
 	private final RandomUtil random;
+
+	@Autowired(required = false)
+	private KafkaServiceImpl kafkaService;
 
 	@Value("${figures.topic.nextFigure}")
 	private String nextFigureTopic;
 
 	@Value("classpath:data/initialData.json")
 	private Resource initialDataResource;
+
+	@Value("${use.kafka}")
+	private boolean useKafka;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -77,7 +83,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 		default:
 			throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 		}
-		this.kafkaService.sendMessage(this.serializeUtil.convertFigureToString(figure), this.nextFigureTopic);
+		sendFigureToKafka(figure);
 		return figure;
 	}
 
@@ -91,6 +97,13 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			saveFiguras(generateFigurasFromString(linesFromResource(this.initialDataResource)));
 		}
 		this.logger.debug("==> FigureService.loadFigurasFromDB() ==> DONE");
+	}
+
+	private void sendFigureToKafka(Figure figure) {
+		this.logger.debug("==> FigureService.sendFigureToKafka() = " + this.kafkaService);
+		if (this.useKafka) {
+			this.kafkaService.sendMessage(this.serializeUtil.convertFigureToString(figure), this.nextFigureTopic);
+		}
 	}
 
 	private void saveFiguras(List<Figura> figuras) {

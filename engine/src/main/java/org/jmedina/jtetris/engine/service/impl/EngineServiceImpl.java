@@ -24,6 +24,8 @@ import org.jmedina.jtetris.engine.util.RotationUtil;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -40,13 +42,18 @@ public class EngineServiceImpl implements EngineService {
 	private final FigurePublisher figurePublisher;
 	private final EnginePublisher enginePublisher;
 	private final BoardPublisher boardPublisher;
-	private final KafkaService kafkaService;
 	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;
 	private final SerializeUtil serializeUtil;
 	private Figure fallingFigure;
 	private List<Box> falledBoxes;
 	private ReentrantLock lock = new ReentrantLock();
+
+	@Autowired(required = false)
+	private KafkaService kafkaService;
+
+	@Value("${use.kafka}")
+	private boolean useKafka;
 
 	public static final int WIDTH = 10;
 	public static final int HEIGHT = 20;
@@ -108,19 +115,18 @@ public class EngineServiceImpl implements EngineService {
 					this.fallingFigure.moveDown();
 					this.fallingFigure.setTimeStamp(System.nanoTime());
 					this.enginePublisher.sendMovementFigure(this.fallingFigure);
-					this.serializeUtil.convertFigureToString(this.fallingFigure)
-							.ifPresent(this.kafkaService::sendMessageFigure);
+					sendFigureToKafka(this.fallingFigure);
 				}
 				this.gridSupport.addToGrid(this.fallingFigure);
 				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
 				board = new Board(this.falledBoxes, System.nanoTime());
 				this.boardPublisher.sendBoard(board);
-				this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
+				sendBoardToKafka(board);
 
 				if (checkMakeLines(this.fallingFigure) > 0) {
 					board = new Board(this.falledBoxes, System.nanoTime());
 					this.boardPublisher.sendBoard(board);
-					this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
+					sendBoardToKafka(board);
 				}
 				this.fallingFigure = null;
 				this.figurePublisher.askForNextFigure();
@@ -129,6 +135,20 @@ public class EngineServiceImpl implements EngineService {
 			}
 		}
 		return Optional.of(true);
+	}
+
+	private void sendFigureToKafka(Figure figure) {
+		this.logger.debug("==> Engine.sendFigureToKafka() = " + this.kafkaService);
+		if (this.useKafka) {
+			this.serializeUtil.convertFigureToString(figure).ifPresent(this.kafkaService::sendMessageFigure);
+		}
+	}
+
+	private void sendBoardToKafka(Board board) {
+		this.logger.debug("==> Engine.sendBoardToKafka() = " + this.kafkaService);
+		if (this.useKafka) {
+			this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
+		}
 	}
 
 	private Optional<Boolean> moveFigure(MoveDirectionEnumeration direction) {
@@ -149,8 +169,7 @@ public class EngineServiceImpl implements EngineService {
 					}
 					this.fallingFigure.setTimeStamp(System.nanoTime());
 					this.enginePublisher.sendMovementFigure(this.fallingFigure);
-					this.serializeUtil.convertFigureToString(this.fallingFigure)
-							.ifPresent(this.kafkaService::sendMessageFigure);
+					sendFigureToKafka(this.fallingFigure);
 					return Optional.of(true);
 				}
 			}
@@ -200,7 +219,7 @@ public class EngineServiceImpl implements EngineService {
 					this.fallingFigure = figureTmp;
 					this.fallingFigure.setTimeStamp(System.nanoTime());
 					this.enginePublisher.sendMovementFigure(this.fallingFigure);
-					this.serializeUtil.convertFigureToString(figureTmp).ifPresent(this.kafkaService::sendMessageFigure);
+					sendFigureToKafka(this.fallingFigure);
 					return Optional.of(true);
 				}
 			}

@@ -73,3 +73,5 @@ figures:
     nextFigure: nextFigureTopic
   mongodb:
     name: ${app.mongo.db.name}
+use:
+  kafka: ${use.kafka}

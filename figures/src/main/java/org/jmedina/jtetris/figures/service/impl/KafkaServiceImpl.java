@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.service.KafkaService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Service
+@ConditionalOnProperty(name = "use.kafka", havingValue = "true")
 public class KafkaServiceImpl implements KafkaService, ApplicationListener<ContextRefreshedEvent> {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
@@ -31,7 +33,7 @@ public class KafkaServiceImpl implements KafkaService, ApplicationListener<Conte
 
 	@Value("${spring.kafka.bootstrap-servers}")
 	private String bootstrapAddress;
-	
+
 	@Value("${figures.topic.nextFigure}")
 	private String nextFigureTopic;
 
