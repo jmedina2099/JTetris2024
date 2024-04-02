@@ -11,3 +11,24 @@
   border: 1px solid white;
   position: relative;
 }
+
+.statistics {
+  position: relative;
+  top: 20px;
+  left: 250px;
+  width: 400px;
+}
+
+.statistics .row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.statistics .column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+}

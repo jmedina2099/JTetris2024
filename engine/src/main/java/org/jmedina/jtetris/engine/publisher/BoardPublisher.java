@@ -6,6 +6,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,23 @@ public class BoardPublisher implements Publisher<BoardOperation>, Subscription {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Subscriber<? super BoardOperation> subscriber;
 
+	@Value("${use.weblux}")
+	private boolean useWebflux;
+
 	@Override
 	public void subscribe(Subscriber<? super BoardOperation> subscriber) {
 		this.logger.debug("===> BoardPublisher.subscribe()");
 		this.subscriber = subscriber;
-		this.subscriber.onSubscribe(this);
+		if (this.useWebflux) {
+			this.subscriber.onSubscribe(this);
+		}
 	}
 
 	public void sendBoard(BoardOperation board) {
 		this.logger.debug("===> BoardPublisher.sendMovementFigure()");
-		this.subscriber.onNext(board);
-
+		if (this.useWebflux) {
+			this.subscriber.onNext(board);
+		}
 	}
 
 	@Override

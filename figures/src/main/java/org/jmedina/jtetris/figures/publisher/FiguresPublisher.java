@@ -7,6 +7,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -23,17 +24,25 @@ public class FiguresPublisher implements Publisher<FigureOperation>, Subscriptio
 	private final FigureService figureService;
 	private Subscriber<? super FigureOperation> subscriber;
 
+	@Value("${use.weblux}")
+	private boolean useWebflux;
+
 	@Override
 	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
 		this.logger.debug("===> FiguresPublisher.subscribe()");
 		this.subscriber = subscriber;
-		this.subscriber.onSubscribe(this);
+		if (this.useWebflux) {
+			this.subscriber.onSubscribe(this);
+		}
 		askAndSendNextFigureOperation();
 	}
 
 	public void askAndSendNextFigureOperation() {
 		this.logger.debug("===> FiguresPublisher.askAndSendNextFigure()");
-		this.subscriber.onNext(this.figureService.askForNextFigureOperation());
+		FigureOperation figureOperation = this.figureService.askForNextFigureOperation();
+		if (this.useWebflux) {
+			this.subscriber.onNext(figureOperation);
+		}
 	}
 
 	@Override

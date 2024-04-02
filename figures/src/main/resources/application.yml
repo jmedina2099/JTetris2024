@@ -75,3 +75,4 @@ figures:
     name: ${app.mongo.db.name}
 use:
   kafka: ${use.kafka}
+  weblux: ${use.webflux}

@@ -54,28 +54,32 @@ public class EngineController {
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<FigureOperation> getFigureConversation() {
 		this.logger.debug("===> EngineController.getFigureConversation()");
-		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
-			this.logger.debug("===> ENGINE - figurePublisher - NEXT = " + figure);
-			this.engineService.addFigureOperation(figure);
-		}).doOnComplete(() -> {
-			this.logger.debug("===> ENGINE - figurePublisher - COMPLETE!");
-		}).doOnCancel(() -> {
-			this.logger.debug("===> ENGINE - figurePublisher - CANCEL!");
-		}).doOnTerminate(() -> {
-			this.logger.debug("===> ENGINE - figurePublisher - TERMINATE!");
-		}).doOnError(e -> {
-			this.logger.error("==*=> ERROR =", e);
-		}).mergeWith(this.enginePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
-			this.logger.debug("===> ENGINE - enginePublisher - NEXT = " + figure);
-		}).doOnComplete(() -> {
-			this.logger.debug("===> ENGINE - enginePublisher - COMPLETE!");
-		}).doOnCancel(() -> {
-			this.logger.debug("===> ENGINE - enginePublisher - CANCEL!");
-		}).doOnTerminate(() -> {
-			this.logger.debug("===> ENGINE - enginePublisher - TERMINATE!");
-		}).doOnError(e -> {
-			this.logger.error("==*=> ERROR =", e);
-		});
+		Flux<FigureOperation> fluxFromFigures = Flux.from(this.figurePublisher).timeout(Duration.ofHours(1))
+				.doOnNext(figure -> {
+					this.logger.debug("===> ENGINE - figurePublisher - NEXT = " + figure);
+					this.engineService.addFigureOperation(figure);
+				}).doOnComplete(() -> {
+					this.logger.debug("===> ENGINE - figurePublisher - COMPLETE!");
+				}).doOnCancel(() -> {
+					this.logger.debug("===> ENGINE - figurePublisher - CANCEL!");
+				}).doOnTerminate(() -> {
+					this.logger.debug("===> ENGINE - figurePublisher - TERMINATE!");
+				}).doOnError(e -> {
+					this.logger.error("==*=> ERROR =", e);
+				});
+		Flux<FigureOperation> fluxFromEngine = Flux.from(this.enginePublisher).timeout(Duration.ofHours(1))
+				.doOnNext(figure -> {
+					this.logger.debug("===> ENGINE - enginePublisher - NEXT = " + figure);
+				}).doOnComplete(() -> {
+					this.logger.debug("===> ENGINE - enginePublisher - COMPLETE!");
+				}).doOnCancel(() -> {
+					this.logger.debug("===> ENGINE - enginePublisher - CANCEL!");
+				}).doOnTerminate(() -> {
+					this.logger.debug("===> ENGINE - enginePublisher - TERMINATE!");
+				}).doOnError(e -> {
+					this.logger.error("==*=> ERROR =", e);
+				});
+		return fluxFromFigures.mergeWith(fluxFromEngine).timeout(Duration.ofHours(1));
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -4,4 +4,5 @@ export const environment = {
   //baseUrl: 'http://localhost:9081/api', // microservice node
   userUri: '/user',
   gameUri: '/game',
+  showStatistics: false,
 };

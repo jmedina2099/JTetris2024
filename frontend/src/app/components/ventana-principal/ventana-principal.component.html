@@ -7,4 +7,21 @@
     <app-box *ngFor="let box of getFallingBoxes()" [box]="box"></app-box>
     <app-box *ngFor="let box of getBoardBoxes()" [box]="box"></app-box>
   </div>
+  <div class="statistics" *ngIf="showStatistics">
+    <div class="row">
+      <div class="column">Tube</div>
+      <div class="column">Figure</div>
+      <div class="column">Board</div>
+    </div>
+    <div class="row">
+      <div class="column">Flux</div>
+      <div class="column">{{ statistics[0][0] }}</div>
+      <div class="column">{{ statistics[0][1] }}</div>
+    </div>
+    <div class="row">
+      <div class="column">Kafka</div>
+      <div class="column">{{ statistics[1][0] }}</div>
+      <div class="column">{{ statistics[1][1] }}</div>
+    </div>
+  </div>
 </div>

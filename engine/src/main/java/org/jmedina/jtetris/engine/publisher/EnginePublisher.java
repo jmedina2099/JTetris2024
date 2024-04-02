@@ -6,6 +6,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -21,16 +22,23 @@ public class EnginePublisher implements Publisher<FigureOperation>, Subscription
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Subscriber<? super FigureOperation> subscriber;
 
+	@Value("${use.weblux}")
+	private boolean useWebflux;
+
 	@Override
 	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
 		this.logger.debug("===> EnginePublisher.subscribe()");
 		this.subscriber = subscriber;
-		this.subscriber.onSubscribe(this);
+		if (this.useWebflux) {
+			this.subscriber.onSubscribe(this);
+		}
 	}
 
 	public void sendFigureOperation(FigureOperation figureOperation) {
 		this.logger.debug("===> EnginePublisher.sendMovementFigure()");
-		this.subscriber.onNext(figureOperation);
+		if (this.useWebflux) {
+			this.subscriber.onNext(figureOperation);
+		}
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import {
 } from 'src/app/model/figure/figureOperation';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { WebSocketService } from 'src/app/services/socket-io/web-socket.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-ventana-principal',
@@ -17,6 +18,11 @@ import { WebSocketService } from 'src/app/services/socket-io/web-socket.service'
 })
 export class VentanaPrincipalComponent implements OnInit {
   private socket: Socket | undefined;
+  protected statistics: number[][] = [
+    [0, 0],
+    [0, 0],
+  ];
+  protected showStatistics: boolean = environment.showStatistics;
 
   constructor(
     private fetchService: FetchService,
@@ -55,22 +61,22 @@ export class VentanaPrincipalComponent implements OnInit {
       this.socket.on('nextFigureMessage', (data: string) => {
         //console.log('on nextFigureMessage (kafka)...');
         const op: FigureOperation = JSON.parse(data) as FigureOperation;
-        this.validateFigureOperation(op, 2)
-          ? this.setFigureOperation(op, 2)
+        this.validateFigureOperation(op, 1)
+          ? this.setFigureOperation(op, 1)
           : false;
       });
       this.socket.on('fallingFigureMessage', (data: string) => {
         //console.log('on fallingFigureMessage (kafka)...');
         const op: FigureOperation = JSON.parse(data) as FigureOperation;
-        this.validateFigureOperation(op, 2)
-          ? this.setFigureOperation(op, 2)
+        this.validateFigureOperation(op, 1)
+          ? this.setFigureOperation(op, 1)
           : false;
       });
       this.socket.on('boardMessage', (data: string) => {
         //console.log('on boardMessage (kafka)...');
         const op: BoardOperation = JSON.parse(data) as BoardOperation;
-        this.validateBoardOperation(op, 2)
-          ? this.setBoardOperation(op, 2)
+        this.validateBoardOperation(op, 1)
+          ? this.setBoardOperation(op, 1)
           : false;
       });
       this.socket.on('connect', () => {
@@ -90,14 +96,14 @@ export class VentanaPrincipalComponent implements OnInit {
         if (value) {
           this.fetchService.getFigureConversation().subscribe({
             next: (op: FigureOperation) =>
-              this.validateFigureOperation(op, 1)
-                ? this.setFigureOperation(op, 1)
+              this.validateFigureOperation(op, 0)
+                ? this.setFigureOperation(op, 0)
                 : false,
           });
           this.fetchService.getBoardConversation().subscribe({
             next: (op: BoardOperation) =>
-              this.validateBoardOperation(op, 1)
-                ? this.setBoardOperation(op, 1)
+              this.validateBoardOperation(op, 0)
+                ? this.setBoardOperation(op, 0)
                 : false,
           });
         }
@@ -113,10 +119,14 @@ export class VentanaPrincipalComponent implements OnInit {
     this.route.snapshot.data['figureOperation'].initialTimeStamp = 0;
     this.route.snapshot.data['figureOperation'].timeStamp = 0;
     this.route.snapshot.data['figureOperation'].operation = undefined;
+    this.statistics = [
+      [0, 0],
+      [0, 0],
+    ];
   }
 
   private getTube(id: number): string {
-    return id == 1 ? 'reactive' : 'kafka';
+    return id == 0 ? 'reactive' : id == 1 ? 'kafka' : '';
   }
 
   private validateFigureOperation(op: FigureOperation, id: number): boolean {
@@ -144,7 +154,7 @@ export class VentanaPrincipalComponent implements OnInit {
         break;
       }
       default: {
-        console.log('--> Invalid FigureOperation: ' + operation);
+        console.log('--> Invalid FigureOperation: %s %d', operation, id);
         break;
       }
     }
@@ -156,18 +166,20 @@ export class VentanaPrincipalComponent implements OnInit {
     const currentTimeStamp: number = this.getBoardTimeStamp();
     const boardTimeStamp: number = op.timeStamp;
     if (currentTimeStamp < boardTimeStamp) {
-      return true;
+      return true || id;
     }
     return false;
   }
 
   private setFigureOperation(op: FigureOperation, id: number): void {
-    //console.log('--> set figure (%s) = (%s)',this.getTube(id),JSON.stringify(op));
+    this.statistics[id][0]++;
+    //console.log('--> set figure (%s)-(%d) = (%s)',this.getTube(id),this.statistics[id][0],JSON.stringify(op));
     this.route.snapshot.data['figureOperation'] = op;
   }
 
   private setBoardOperation(op: BoardOperation, id: number): void {
-    //console.log('--> set board (%s) = (%s)',this.getTube(id),JSON.stringify(op));
+    this.statistics[id][1]++;
+    //console.log('--> set board (%s)-(%d) = (%s)',this.getTube(id),this.statistics[id][1],JSON.stringify(op));
     this.route.snapshot.data['boardOperation'] = op;
     if (this.getFigureTimeStamp() < op.timeStamp) {
       this.route.snapshot.data['figureOperation'].timeStamp = op.timeStamp;
