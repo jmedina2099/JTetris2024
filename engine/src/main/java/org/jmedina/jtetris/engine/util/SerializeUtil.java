@@ -2,8 +2,8 @@ package org.jmedina.jtetris.engine.util;
 
 import java.util.Optional;
 
-import org.jmedina.jtetris.engine.figure.Figure;
-import org.jmedina.jtetris.engine.model.Board;
+import org.jmedina.jtetris.engine.model.BoardOperation;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,29 +21,29 @@ public class SerializeUtil {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public Optional<Figure> convertStringToFigure(String message) {
+	public Optional<FigureOperation> convertStringToFigureOperation(String message) {
 		try {
-			return Optional.of(this.mapper.readValue(message, Figure.class));
+			return Optional.of(this.mapper.readValue(message, FigureOperation.class));
 		} catch (JsonProcessingException e) {
-			this.logger.error("==> Error trying to convert JSON to figure!!!", e);
+			this.logger.error("==> Error trying to convert JSON to figure operation!!!", e);
 		}
 		return Optional.empty();
 	}
 
-	public Optional<String> convertFigureToString(Figure figure) {
+	public Optional<String> convertFigureOperationToString(FigureOperation figureOperation) {
 		try {
-			return Optional.of(this.mapper.writeValueAsString(figure));
+			return Optional.of(this.mapper.writeValueAsString(figureOperation));
 		} catch (JsonProcessingException e) {
-			this.logger.error("==> Error trying to convert figure to JSON!!!", e);
+			this.logger.error("==> Error trying to convert figure operation to JSON!!!", e);
 		}
 		return Optional.empty();
 	}
 
-	public Optional<String> convertBoardToString(Board board) {
+	public Optional<String> convertBoardToString(BoardOperation board) {
 		try {
 			return Optional.of(this.mapper.writeValueAsString(board));
 		} catch (JsonProcessingException e) {
-			this.logger.error("==> Error trying to convert board to JSON!!!", e);
+			this.logger.error("==> Error trying to convert board operation to JSON!!!", e);
 		}
 		return Optional.empty();
 	}

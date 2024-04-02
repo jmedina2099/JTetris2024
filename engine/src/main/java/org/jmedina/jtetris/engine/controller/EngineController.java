@@ -3,8 +3,8 @@ package org.jmedina.jtetris.engine.controller;
 import java.time.Duration;
 import java.util.Optional;
 
-import org.jmedina.jtetris.engine.figure.Figure;
-import org.jmedina.jtetris.engine.model.Board;
+import org.jmedina.jtetris.engine.model.BoardOperation;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
@@ -52,11 +52,11 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Figure> getFigureConversation() {
+	public Flux<FigureOperation> getFigureConversation() {
 		this.logger.debug("===> EngineController.getFigureConversation()");
 		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
 			this.logger.debug("===> ENGINE - figurePublisher - NEXT = " + figure);
-			this.engineService.addFallingFigure(figure);
+			this.engineService.addFigureOperation(figure);
 		}).doOnComplete(() -> {
 			this.logger.debug("===> ENGINE - figurePublisher - COMPLETE!");
 		}).doOnCancel(() -> {
@@ -79,7 +79,7 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Board> getBoardConversation() {
+	public Flux<BoardOperation> getBoardConversation() {
 		this.logger.debug("===> EngineController.getBoardConversation()");
 		return Flux.from(this.boardPublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
 			this.logger.debug("===> ENGINE - boardPublisher - NEXT = " + figure);

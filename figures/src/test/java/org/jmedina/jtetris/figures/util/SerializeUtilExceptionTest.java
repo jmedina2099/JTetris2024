@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
+import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -62,9 +63,9 @@ class SerializeUtilExceptionTest extends KafkaHelperTesting {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Caja caja = new Caja();
+		FigureOperation caja = new FigureOperation();
 		ServiceException exception = assertThrows(ServiceException.class, () -> {
-			this.serializeUtil.convertFigureToString(caja);
+			this.serializeUtil.convertFigureOperationToString(caja);
 		});
 		assertEquals("com.fasterxml.jackson.databind.JsonMappingException: ERROR", exception.getMessage());
 	}

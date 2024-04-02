@@ -1,7 +1,7 @@
 package org.jmedina.jtetris.api.client;
 
-import org.jmedina.jtetris.api.model.Board;
-import org.jmedina.jtetris.api.model.Figure;
+import org.jmedina.jtetris.api.model.BoardOperation;
+import org.jmedina.jtetris.api.model.FigureOperation;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -20,10 +20,10 @@ public interface EngineClient {
 	public Mono<Boolean> start();
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Figure> getFigureConversation();
+	public Flux<FigureOperation> getFigureConversation();
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Board> getBoardConversation();
+	public Flux<BoardOperation> getBoardConversation();
 
 	@GetMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> moveRight();

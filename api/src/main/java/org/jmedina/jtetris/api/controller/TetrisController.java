@@ -3,8 +3,8 @@ package org.jmedina.jtetris.api.controller;
 import java.time.Duration;
 
 import org.jmedina.jtetris.api.client.EngineClient;
-import org.jmedina.jtetris.api.model.Board;
-import org.jmedina.jtetris.api.model.Figure;
+import org.jmedina.jtetris.api.model.BoardOperation;
+import org.jmedina.jtetris.api.model.FigureOperation;
 import org.jmedina.jtetris.api.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class TetrisController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<Figure>> getFigureConversation() {
+	public ResponseEntity<Flux<FigureOperation>> getFigureConversation() {
 		this.logger.debug("===> TetrisController.getFigureConversation()");
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this.engineClient.getFigureConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
@@ -62,7 +62,7 @@ public class TetrisController {
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<Board>> getBoardConversation() {
+	public ResponseEntity<Flux<BoardOperation>> getBoardConversation() {
 		this.logger.debug("===> TetrisController.getBoardConversation()");
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this.engineClient.getBoardConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {

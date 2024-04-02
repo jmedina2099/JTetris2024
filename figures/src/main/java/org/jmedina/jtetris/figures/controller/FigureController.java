@@ -4,7 +4,7 @@ import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmedina.jtetris.figures.figure.Figure;
+import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.model.Message;
 import org.jmedina.jtetris.figures.publisher.FiguresPublisher;
 import org.springframework.http.MediaType;
@@ -34,9 +34,9 @@ public class FigureController {
 		return Mono.just(new Message("Hello from figures reactive!!!"));
 	}
 
-	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Figure> start() {
-		this.logger.debug("===> FigureController.askForNextFigure()");
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<FigureOperation> getFigureConversation() {
+		this.logger.debug("===> FigureController.getFigureConversation()");
 		return Flux.from(this.figurePublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
 			this.logger.debug("===> FIGURES - NEXT = " + figure);
 		}).doOnCancel(() -> {
@@ -51,7 +51,7 @@ public class FigureController {
 	@GetMapping(value = "/askForNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Void> askAndSendNextFigure() {
 		this.logger.debug("===> FigureController.askAndSendNextFigure()");
-		this.figurePublisher.askAndSendNextFigure();
+		this.figurePublisher.askAndSendNextFigureOperation();
 		return Mono.empty();
 	}
 }

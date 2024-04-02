@@ -1,7 +1,7 @@
 package org.jmedina.jtetris.api.client;
 
-import org.jmedina.jtetris.api.model.Board;
-import org.jmedina.jtetris.api.model.Figure;
+import org.jmedina.jtetris.api.model.BoardOperation;
+import org.jmedina.jtetris.api.model.FigureOperation;
 import org.springframework.stereotype.Component;
 
 import reactor.core.publisher.Flux;
@@ -20,12 +20,12 @@ public class EngineFallback implements EngineClient {
 	}
 
 	@Override
-	public Flux<Figure> getFigureConversation() {
+	public Flux<FigureOperation> getFigureConversation() {
 		return Flux.empty();
 	}
 
 	@Override
-	public Flux<Board> getBoardConversation() {
+	public Flux<BoardOperation> getBoardConversation() {
 		return Flux.empty();
 	}
 

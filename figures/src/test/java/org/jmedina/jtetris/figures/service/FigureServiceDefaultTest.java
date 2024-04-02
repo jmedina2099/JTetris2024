@@ -32,7 +32,7 @@ class FigureServiceDefaultTest extends KafkaHelperTesting {
 	@DisplayName("Test for asking to send the next figure")
 	void testAskForNextFigure() throws Exception {
 		this.logger.debug("==> FigureServiceDefaultTest.testAskForNextFigure()");
-		this.figureService.askForNextFigure();
+		this.figureService.askForNextFigureOperation();
 		super.assertMessageListenerLatch();
 		super.assertMessageFigure();
 	}

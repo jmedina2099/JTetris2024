@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.engine.publisher;
 
-import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.FigureService;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -16,26 +16,26 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Service
-public class FigurePublisher implements Publisher<Figure> {
+public class FigurePublisher implements Publisher<FigureOperation> {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FigureService figureService;
-	private Subscriber<? super Figure> subscriber;
+	private Subscriber<? super FigureOperation> subscriber;
 
 	@Override
-	public void subscribe(Subscriber<? super Figure> subscriber) {
-		this.logger.debug("===> EnginePublisher.subscribe()");
+	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
+		this.logger.debug("===> FigurePublisher.subscribe()");
 		this.subscriber = subscriber;
-		start();
+		getFigureConversation();
 	}
 
-	private void start() {
-		this.logger.debug("===> EnginePublisher.start()");
-		this.figureService.start().subscribe(this.subscriber);
+	private void getFigureConversation() {
+		this.logger.debug("===> FigurePublisher.getFigureConversation()");
+		this.figureService.getFigureConversation().subscribe(this.subscriber);
 	}
 
 	public void askForNextFigure() {
-		this.logger.debug("===> EnginePublisher.askForNextFigure()");
+		this.logger.debug("===> FigurePublisher.askForNextFigure()");
 		this.figureService.askForNextFigure().subscribe();
 	}
 

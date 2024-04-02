@@ -31,15 +31,11 @@ public abstract class Figure {
 	protected List<Box> boxes;
 	protected Point2D.Double center = new Point2D.Double();
 	public int numRotations;
-	private long initialTimeStamp;
-	private long timeStamp;
 
 	protected void init(FiguraEnumeration type) {
 		this.type = type;
 		this.id = type.getId();
 		this.numRotations = type.getNumRotations();
-		this.initialTimeStamp = System.nanoTime();
-		this.timeStamp = this.initialTimeStamp;
 		this.boxes = new ArrayList<>(this.type.getTuplas().stream().map(t -> {
 			return new Box(t);
 		}).collect(Collectors.toList()));

@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.engine.publisher;
 
-import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -16,22 +16,21 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Service
-public class EnginePublisher implements Publisher<Figure>, Subscription {
+public class EnginePublisher implements Publisher<FigureOperation>, Subscription {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private Subscriber<? super Figure> subscriber;
+	private Subscriber<? super FigureOperation> subscriber;
 
 	@Override
-	public void subscribe(Subscriber<? super Figure> subscriber) {
+	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
 		this.logger.debug("===> EnginePublisher.subscribe()");
 		this.subscriber = subscriber;
 		this.subscriber.onSubscribe(this);
 	}
 
-	public void sendMovementFigure(Figure figure) {
+	public void sendFigureOperation(FigureOperation figureOperation) {
 		this.logger.debug("===> EnginePublisher.sendMovementFigure()");
-		this.subscriber.onNext(figure);
-
+		this.subscriber.onNext(figureOperation);
 	}
 
 	@Override

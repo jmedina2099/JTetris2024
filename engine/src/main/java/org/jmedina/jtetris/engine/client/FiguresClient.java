@@ -1,10 +1,9 @@
 package org.jmedina.jtetris.engine.client;
 
-import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import feign.Headers;
 import reactivefeign.spring.config.ReactiveFeignClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,11 +13,10 @@ import reactor.core.publisher.Mono;
  *
  */
 @ReactiveFeignClient(value = "figuresClient", url = "${engine.figures.base-url}", fallback = FiguresFallback.class)
-@Headers("Connection: keep-alive")
 public interface FiguresClient {
 
-	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Figure> start();
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<FigureOperation> getFigureConversation();
 
 	@GetMapping(value = "/askForNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Void> askForNextFigure();

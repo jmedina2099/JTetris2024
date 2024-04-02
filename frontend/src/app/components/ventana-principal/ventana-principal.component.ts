@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Socket } from 'socket.io-client';
-import { Board } from 'src/app/model/board/board';
-import { Figure } from 'src/app/model/figure/figure';
+import { BoardOperation } from 'src/app/model/board/boardOperation';
+import { Box } from 'src/app/model/figure/box';
+import {
+  FigureOperation,
+  FigureOperationType,
+} from 'src/app/model/figure/figureOperation';
 import { FetchService } from 'src/app/services/fetch/fetch.service';
 import { WebSocketService } from 'src/app/services/socket-io/web-socket.service';
 
@@ -24,12 +28,25 @@ export class VentanaPrincipalComponent implements OnInit {
     this.initSocket();
   }
 
-  protected getFallingBoxes() {
-    return this.route.snapshot.data['figureFalling']?.boxes;
+  protected getFallingBoxes(): Box[] {
+    return this.route.snapshot.data['figureOperation']?.figure.boxes as Box[];
   }
 
-  protected getBoard() {
-    return this.route.snapshot.data['board']?.boxes;
+  protected getBoardBoxes(): Box[] {
+    return this.route.snapshot.data['boardOperation']?.boxes as Box[];
+  }
+
+  private getFigureInitialTimeStamp(): number {
+    return this.route.snapshot.data['figureOperation']
+      ?.initialTimeStamp as number;
+  }
+
+  private getFigureTimeStamp(): number {
+    return this.route.snapshot.data['figureOperation']?.timeStamp as number;
+  }
+
+  private getBoardTimeStamp(): number {
+    return this.route.snapshot.data['boardOperation']?.timeStamp as number;
   }
 
   private initSocket(): void {
@@ -37,43 +54,24 @@ export class VentanaPrincipalComponent implements OnInit {
     if (this.socket) {
       this.socket.on('nextFigureMessage', (data: string) => {
         //console.log('on nextFigureMessage (kafka)...');
-        const figure: Figure = JSON.parse(data) as Figure;
-        const initialTimeStamp: number = this.route.snapshot.data[
-          'figureFalling'
-        ]?.initialTimeStamp as number;
-        if (initialTimeStamp < figure.initialTimeStamp) {
-          //console.log( '--> set next figure (kafka) = '+figure.timeStamp );
-          this.route.snapshot.data['figureFalling'] = figure;
-        }
+        const op: FigureOperation = JSON.parse(data) as FigureOperation;
+        this.validateFigureOperation(op, 2)
+          ? this.setFigureOperation(op, 2)
+          : false;
       });
       this.socket.on('fallingFigureMessage', (data: string) => {
         //console.log('on fallingFigureMessage (kafka)...');
-        const figure: Figure = JSON.parse(data) as Figure;
-        const initialTimeStamp: number = this.route.snapshot.data[
-          'figureFalling'
-        ]?.initialTimeStamp as number;
-        const currentTimeStamp: number = this.route.snapshot.data[
-          'figureFalling'
-        ]?.timeStamp as number;
-        if (
-          initialTimeStamp <= figure.initialTimeStamp &&
-          currentTimeStamp < figure.timeStamp
-        ) {
-          //console.log( '--> set falling figure (kafka) = '+figure.timeStamp );
-          this.route.snapshot.data['figureFalling'] = figure;
-        }
+        const op: FigureOperation = JSON.parse(data) as FigureOperation;
+        this.validateFigureOperation(op, 2)
+          ? this.setFigureOperation(op, 2)
+          : false;
       });
       this.socket.on('boardMessage', (data: string) => {
         //console.log('on boardMessage (kafka)...');
-        const board = JSON.parse(data) as Board | undefined;
-        const boardTimeStamp: number = this.route.snapshot.data['board']
-          ?.timeStamp as number;
-        if (board && board.boxes.length > 0) {
-          if (boardTimeStamp < board.timeStamp) {
-            //console.log( '--> set board (kafka) = '+board.timeStamp );
-            this.route.snapshot.data['board'] = board;
-          }
-        }
+        const op: BoardOperation = JSON.parse(data) as BoardOperation;
+        this.validateBoardOperation(op, 2)
+          ? this.setBoardOperation(op, 2)
+          : false;
       });
       this.socket.on('connect', () => {
         console.log('on connect !!!');
@@ -91,10 +89,16 @@ export class VentanaPrincipalComponent implements OnInit {
       next: (value: boolean) => {
         if (value) {
           this.fetchService.getFigureConversation().subscribe({
-            next: (figure: Figure) => this.setFigureOperation(figure),
+            next: (op: FigureOperation) =>
+              this.validateFigureOperation(op, 1)
+                ? this.setFigureOperation(op, 1)
+                : false,
           });
           this.fetchService.getBoardConversation().subscribe({
-            next: (board: Board) => this.setBoardOperation(board),
+            next: (op: BoardOperation) =>
+              this.validateBoardOperation(op, 1)
+                ? this.setBoardOperation(op, 1)
+                : false,
           });
         }
       },
@@ -102,37 +106,72 @@ export class VentanaPrincipalComponent implements OnInit {
   }
 
   private reset(): void {
-    this.route.snapshot.data['board'].boxes = [];
-    this.route.snapshot.data['board'].timeStamp = 0;
-    this.route.snapshot.data['figureFalling'].initialTimeStamp = 0;
-    this.route.snapshot.data['figureFalling'].timeStamp = 0;
-    this.route.snapshot.data['figureFalling'].boxes = [];
+    this.route.snapshot.data['boardOperation'].boxes = [];
+    this.route.snapshot.data['boardOperation'].timeStamp = 0;
+    this.route.snapshot.data['boardOperation'].operation = undefined;
+    this.route.snapshot.data['figureOperation'].figure = {};
+    this.route.snapshot.data['figureOperation'].initialTimeStamp = 0;
+    this.route.snapshot.data['figureOperation'].timeStamp = 0;
+    this.route.snapshot.data['figureOperation'].operation = undefined;
   }
 
-  private setFigureOperation(figure: Figure): void {
-    //console.log( '--> setFigureOperation (reactive)...' );
-    const initialTimeStamp: number = this.route.snapshot.data['figureFalling']
-      ?.initialTimeStamp as number;
-    const currentTimeStamp: number = this.route.snapshot.data['figureFalling']
-      ?.timeStamp as number;
-    if (
-      initialTimeStamp <= figure.initialTimeStamp &&
-      currentTimeStamp < figure.timeStamp
-    ) {
-      //console.log( '--> set figure (reactive) = '+figure.timeStamp );
-      this.route.snapshot.data['figureFalling'] = figure;
-    }
+  private getTube(id: number): string {
+    return id == 1 ? 'reactive' : 'kafka';
   }
 
-  setBoardOperation(board: Board): void {
-    //console.log( '---> setBoardOperation (reactive)...' );
-    if (board && board.boxes.length > 0) {
-      const currentTimeStamp: number = this.route.snapshot.data['board']
-        ?.timeStamp as number;
-      if (currentTimeStamp < board.timeStamp) {
-        //console.log( '--> set board (reactive) = '+board.timeStamp );
-        this.route.snapshot.data['board'] = board;
+  private validateFigureOperation(op: FigureOperation, id: number): boolean {
+    //console.log('--> validateFigureOperation (%s)...', this.getTube(id));
+    const operation: FigureOperationType = op.operation;
+    const initialTimeStamp: number = this.getFigureInitialTimeStamp();
+    const currentTimeStamp: number = this.getFigureTimeStamp();
+    const figInitialTimeStamp: number = op.initialTimeStamp as number;
+    const figTimeStamp: number = op.timeStamp as number;
+    switch (operation) {
+      case 'NEW_OPERATION': {
+        if (initialTimeStamp < figInitialTimeStamp) {
+          return true;
+        }
+        break;
       }
+      case 'MOVEMENT_OPERATION':
+      case 'ROTATION_OPERATION': {
+        if (
+          initialTimeStamp === figInitialTimeStamp &&
+          currentTimeStamp < figTimeStamp
+        ) {
+          return true;
+        }
+        break;
+      }
+      default: {
+        console.log('--> Invalid FigureOperation: ' + operation);
+        break;
+      }
+    }
+    return false;
+  }
+
+  private validateBoardOperation(op: BoardOperation, id: number): boolean {
+    //console.log('---> validateAndSetBoardOperation (%s)', this.getTube(id));
+    const currentTimeStamp: number = this.getBoardTimeStamp();
+    const boardTimeStamp: number = op.timeStamp;
+    if (currentTimeStamp < boardTimeStamp) {
+      return true;
+    }
+    return false;
+  }
+
+  private setFigureOperation(op: FigureOperation, id: number): void {
+    //console.log('--> set figure (%s) = (%s)',this.getTube(id),JSON.stringify(op));
+    this.route.snapshot.data['figureOperation'] = op;
+  }
+
+  private setBoardOperation(op: BoardOperation, id: number): void {
+    //console.log('--> set board (%s) = (%s)',this.getTube(id),JSON.stringify(op));
+    this.route.snapshot.data['boardOperation'] = op;
+    if (this.getFigureTimeStamp() < op.timeStamp) {
+      this.route.snapshot.data['figureOperation'].timeStamp = op.timeStamp;
+      this.route.snapshot.data['figureOperation'].figure = {};
     }
   }
 }

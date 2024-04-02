@@ -1,0 +1,7 @@
+package org.jmedina.jtetris.api.enumeration;
+
+public enum BoardOperationEnumeration {
+
+	BOARD_WITH_ADDED_FIGURE, BOARD_WITH_OCURRED_ONE_LINE, BOARD_WITH_OCURRED_TWO_LINES, BOARD_WITH_OCURRED_THREE_LINES,
+	BOARD_WITH_OCURRED_FOUR_LINES;
+}

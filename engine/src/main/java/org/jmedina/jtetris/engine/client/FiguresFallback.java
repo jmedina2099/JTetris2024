@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.engine.client;
 
-import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.springframework.stereotype.Component;
 
 import reactor.core.publisher.Flux;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class FiguresFallback implements FiguresClient {
 
 	@Override
-	public Flux<Figure> start() {
+	public Flux<FigureOperation> getFigureConversation() {
 		return Flux.empty();
 	}
 

@@ -9,12 +9,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.domain.Figura;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
+import org.jmedina.jtetris.figures.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.Figure;
 import org.jmedina.jtetris.figures.figure.Te;
 import org.jmedina.jtetris.figures.figure.Vertical;
+import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.repository.FigureRepository;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
@@ -63,8 +65,8 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	}
 
 	@Override
-	public Figure askForNextFigure() throws ServiceException {
-		this.logger.debug("==> FigureService.getNextFigure()");
+	public FigureOperation askForNextFigureOperation() throws ServiceException {
+		this.logger.debug("==> FigureService.askForNextFigureOperation()");
 		Figure figure = null;
 		int value = this.random.nextInt(FiguraEnumeration.values().length);
 		switch (value) {
@@ -83,8 +85,11 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 		default:
 			throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 		}
-		sendFigureToKafka(figure);
-		return figure;
+		long nanos;
+		FigureOperation figureOperation = FigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION)
+				.figure(figure).initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
+		sendFigureOperationToKafka(figureOperation);
+		return figureOperation;
 	}
 
 	@Override
@@ -99,10 +104,10 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 		this.logger.debug("==> FigureService.loadFigurasFromDB() ==> DONE");
 	}
 
-	private void sendFigureToKafka(Figure figure) {
-		this.logger.debug("==> FigureService.sendFigureToKafka() = " + this.kafkaService);
+	private void sendFigureOperationToKafka(FigureOperation op) {
+		this.logger.debug("==> FigureService.sendFigureOperationToKafka() = " + this.kafkaService);
 		if (this.useKafka) {
-			this.kafkaService.sendMessage(this.serializeUtil.convertFigureToString(figure), this.nextFigureTopic);
+			this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(op), this.nextFigureTopic);
 		}
 	}
 

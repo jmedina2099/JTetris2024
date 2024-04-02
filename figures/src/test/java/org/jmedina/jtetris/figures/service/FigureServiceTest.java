@@ -46,7 +46,7 @@ class FigureServiceTest extends KafkaHelperTesting {
 	void testAskForNextFigureCaja() throws Exception {
 		this.logger.debug("==> testAskForNextFigureCaja()");
 		when(this.randomUtil.nextInt(2)).thenReturn(0);
-		this.figureService.askForNextFigure();
+		this.figureService.askForNextFigureOperation();
 		super.assertMessageListenerLatch();
 		super.assertMessageCaja();
 	}
@@ -57,7 +57,7 @@ class FigureServiceTest extends KafkaHelperTesting {
 	void testAskForNextFigureEle() throws Exception {
 		this.logger.debug("==> FigureServiceTest.testAskForNextFigureEle()");
 		when(this.randomUtil.nextInt(2)).thenReturn(1);
-		this.figureService.askForNextFigure();
+		this.figureService.askForNextFigureOperation();
 		super.assertMessageListenerLatch();
 		super.assertMessageEle();
 	}
@@ -69,7 +69,7 @@ class FigureServiceTest extends KafkaHelperTesting {
 		this.logger.debug("==> FigureServiceTest.testAskForNextFigureException()");
 		when(this.randomUtil.nextInt(2)).thenReturn(-1);
 		ServiceException exception = assertThrows(ServiceException.class, () -> {
-			this.figureService.askForNextFigure();
+			this.figureService.askForNextFigureOperation();
 		});
 		assertEquals("java.lang.IllegalArgumentException: Unexpected value: -1", exception.getMessage());
 	}

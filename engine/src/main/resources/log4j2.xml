@@ -106,7 +106,7 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.jmedina.jtetris.engine.listener" additivity="false" level="info" includeLocation="true">
+        <Logger name="org.jmedina.jtetris.engine.kafka.listener" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>

@@ -1,7 +1,7 @@
 package org.jmedina.jtetris.figures.util;
 
 import org.jmedina.jtetris.figures.exception.ServiceException;
-import org.jmedina.jtetris.figures.figure.Figure;
+import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,9 +26,9 @@ public class SerializeUtil {
 		}
 	}
 
-	public String convertFigureToString(Figure figure) throws ServiceException {
+	public String convertFigureOperationToString(FigureOperation figureOperation) throws ServiceException {
 		try {
-			return this.mapper.writeValueAsString(figure);
+			return this.mapper.writeValueAsString(figureOperation);
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}

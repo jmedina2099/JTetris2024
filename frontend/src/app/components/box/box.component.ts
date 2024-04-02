@@ -8,5 +8,5 @@ import { Box } from 'src/app/model/figure/box';
 })
 export class BoxComponent {
   @Input()
-  box: Box = { x: 0, y: 0, initialTimeStamp: 0, timeStamp: 0 };
+  box: Box = { x: 0, y: 0 };
 }

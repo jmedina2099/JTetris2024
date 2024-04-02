@@ -10,10 +10,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jmedina.jtetris.engine.enumeration.BoardOperationEnumeration;
+import org.jmedina.jtetris.engine.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
-import org.jmedina.jtetris.engine.model.Board;
+import org.jmedina.jtetris.engine.model.BoardOperation;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
@@ -46,6 +49,7 @@ public class EngineServiceImpl implements EngineService {
 	private final RotationUtil rotationUtil;
 	private final SerializeUtil serializeUtil;
 	private Figure fallingFigure;
+	private long initialTimeStamp;
 	private List<Box> falledBoxes;
 	private ReentrantLock lock = new ReentrantLock();
 
@@ -67,11 +71,12 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	@Override
-	public void addFallingFigure(Figure figure) {
+	public void addFigureOperation(FigureOperation figureOperation) {
 		this.logger.debug("==> Engine.addFallingFigure()");
-		if (this.fallingFigure == null || this.fallingFigure.getInitialTimeStamp() < figure.getInitialTimeStamp()) {
-			this.logger.debug("==> Engine.addFallingFigure.adding.. " + figure.getInitialTimeStamp());
-			this.fallingFigure = figure;
+		if (this.fallingFigure == null || this.initialTimeStamp < figureOperation.getInitialTimeStamp()) {
+			this.logger.debug("==> Engine.addFallingFigure.adding.. " + figureOperation.getInitialTimeStamp());
+			this.fallingFigure = figureOperation.getFigure();
+			this.initialTimeStamp = figureOperation.getInitialTimeStamp();
 		}
 	}
 
@@ -108,25 +113,21 @@ public class EngineServiceImpl implements EngineService {
 			return Optional.of(false);
 		}
 		boolean isLockAcquired = lock.tryLock();
-		Board board = null;
+		int numLinesMaded = 0;
 		if (isLockAcquired) {
 			try {
 				while (canMoveDown(this.fallingFigure) && this.gridSupport.noHit(this.fallingFigure, 0, 1)) {
 					this.fallingFigure.moveDown();
-					this.fallingFigure.setTimeStamp(System.nanoTime());
-					this.enginePublisher.sendMovementFigure(this.fallingFigure);
-					sendFigureToKafka(this.fallingFigure);
+					sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
 				}
 				this.gridSupport.addToGrid(this.fallingFigure);
 				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-				board = new Board(this.falledBoxes, System.nanoTime());
-				this.boardPublisher.sendBoard(board);
-				sendBoardToKafka(board);
+				sendAsyncEventsForBoardOperation(
+						getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
 
-				if (checkMakeLines(this.fallingFigure) > 0) {
-					board = new Board(this.falledBoxes, System.nanoTime());
-					this.boardPublisher.sendBoard(board);
-					sendBoardToKafka(board);
+				if ((numLinesMaded = checkMakeLines(this.fallingFigure)) > 0) {
+					sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
+							BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 				}
 				this.fallingFigure = null;
 				this.figurePublisher.askForNextFigure();
@@ -137,14 +138,14 @@ public class EngineServiceImpl implements EngineService {
 		return Optional.of(true);
 	}
 
-	private void sendFigureToKafka(Figure figure) {
-		this.logger.debug("==> Engine.sendFigureToKafka() = " + this.kafkaService);
+	private void sendFigureOperationToKafka(FigureOperation op) {
+		this.logger.debug("==> Engine.sendFigureOperationToKafka() = " + this.kafkaService);
 		if (this.useKafka) {
-			this.serializeUtil.convertFigureToString(figure).ifPresent(this.kafkaService::sendMessageFigure);
+			this.serializeUtil.convertFigureOperationToString(op).ifPresent(this.kafkaService::sendMessageFigure);
 		}
 	}
 
-	private void sendBoardToKafka(Board board) {
+	private void sendBoardToKafka(BoardOperation board) {
 		this.logger.debug("==> Engine.sendBoardToKafka() = " + this.kafkaService);
 		if (this.useKafka) {
 			this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
@@ -167,9 +168,7 @@ public class EngineServiceImpl implements EngineService {
 					} else if (direction.equals(MoveDirectionEnumeration.RIGHT)) {
 						this.fallingFigure.moveRight();
 					}
-					this.fallingFigure.setTimeStamp(System.nanoTime());
-					this.enginePublisher.sendMovementFigure(this.fallingFigure);
-					sendFigureToKafka(this.fallingFigure);
+					sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
 					return Optional.of(true);
 				}
 			}
@@ -179,6 +178,30 @@ public class EngineServiceImpl implements EngineService {
 			lock.unlock();
 		}
 		return Optional.of(false);
+	}
+
+	private void sendAsyncEventsForFigureOperation(FigureOperation figureOperation) {
+		this.enginePublisher.sendFigureOperation(figureOperation);
+		sendFigureOperationToKafka(figureOperation);
+	}
+
+	private void sendAsyncEventsForBoardOperation(BoardOperation board) {
+		this.boardPublisher.sendBoard(board);
+		sendBoardToKafka(board);
+	}
+
+	private FigureOperation getFigureOperationForMovement(Figure figure) {
+		return FigureOperation.builder().operation(FigureOperationEnumeration.MOVEMENT_OPERATION).figure(figure)
+				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
+	}
+
+	private FigureOperation getFigureOperationForRotation(Figure figure) {
+		return FigureOperation.builder().operation(FigureOperationEnumeration.ROTATION_OPERATION).figure(figure)
+				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
+	}
+
+	private BoardOperation getBoardOperation(List<Box> boxes, BoardOperationEnumeration op) {
+		return BoardOperation.builder().operation(op).boxes(boxes).timeStamp(System.nanoTime()).build();
 	}
 
 	private boolean canMoveRight(Figure figure) {
@@ -217,9 +240,7 @@ public class EngineServiceImpl implements EngineService {
 				Figure figureTmp = this.fallingFigure.clone();
 				if (rotateHelper(figureTmp, direction)) {
 					this.fallingFigure = figureTmp;
-					this.fallingFigure.setTimeStamp(System.nanoTime());
-					this.enginePublisher.sendMovementFigure(this.fallingFigure);
-					sendFigureToKafka(this.fallingFigure);
+					sendAsyncEventsForFigureOperation(getFigureOperationForRotation(this.fallingFigure));
 					return Optional.of(true);
 				}
 			}

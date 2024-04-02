@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EventSourceService } from './event-source.service';
 import { environment } from 'src/environments/environment';
-import { Figure } from 'src/app/model/figure/figure';
-import { Board } from 'src/app/model/board/board';
+import { BoardOperation } from 'src/app/model/board/boardOperation';
+import { FigureOperation } from 'src/app/model/figure/figureOperation';
 
 @Injectable({
   providedIn: 'root',
@@ -21,13 +21,13 @@ export class FetchService {
     return this.http.post<boolean>(this.fetchUrl + '/start', null);
   }
 
-  public getFigureConversation(): Observable<Figure> {
+  public getFigureConversation(): Observable<FigureOperation> {
     return this.sseService.observeFigure(
       this.fetchUrl + '/getFigureConversation'
     );
   }
 
-  public getBoardConversation(): Observable<Board> {
+  public getBoardConversation(): Observable<BoardOperation> {
     return this.sseService.observeBoard(
       this.fetchUrl + '/getBoardConversation'
     );

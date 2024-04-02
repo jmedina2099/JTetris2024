@@ -41,7 +41,7 @@ class FigureControllerExceptionIT {
 	@DisplayName("Test for askForNextFigure endpoint with Exception")
 	void testGetAskForNextFigure() throws Exception {
 		this.logger.debug("==> FigureServiceTest.testGetAskForNextFigure()");
-		doThrow(new ServiceException(new Exception("TEST"))).when(this.figureService).askForNextFigure();
+		doThrow(new ServiceException(new Exception("TEST"))).when(this.figureService).askForNextFigureOperation();
 		EntityExchangeResult<String> response = this.client.get().uri("/askForNextFigure")
 				.header(ACCEPT, "application/json").accept(APPLICATION_JSON).exchange().expectStatus()
 				.is5xxServerError().expectBody(String.class).returnResult();

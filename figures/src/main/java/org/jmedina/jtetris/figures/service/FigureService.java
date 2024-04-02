@@ -1,7 +1,7 @@
 package org.jmedina.jtetris.figures.service;
 
 import org.jmedina.jtetris.figures.exception.ServiceException;
-import org.jmedina.jtetris.figures.figure.Figure;
+import org.jmedina.jtetris.figures.model.FigureOperation;
 
 /**
  * @author Jorge Medina
@@ -9,7 +9,7 @@ import org.jmedina.jtetris.figures.figure.Figure;
  */
 public interface FigureService {
 
-	public Figure askForNextFigure() throws ServiceException;
+	public FigureOperation askForNextFigureOperation() throws ServiceException;
 
 	public void loadFigurasFromDB();
 }

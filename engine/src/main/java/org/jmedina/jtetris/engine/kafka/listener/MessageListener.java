@@ -1,8 +1,9 @@
 package org.jmedina.jtetris.engine.kafka.listener;
 
+import java.util.Objects;
 import java.util.Optional;
 
-import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
 import org.slf4j.Logger;
@@ -30,11 +31,10 @@ public class MessageListener {
 	@KafkaListener(topics = "${engine.topic.nextFigure}", groupId = "${engine.groupId.message}")
 	public void listenGroupFigureMessage(String message) {
 		this.logger.debug("==> MessageListener.listenGroupFigureMessage() = {} ", message);
-		Optional<Figure> optional = this.serializeUtil.convertStringToFigure(message);
-		if (optional.isPresent()) {
-			if (!ObjectUtils.isEmpty(optional.get().getBoxes())) {
-				this.engineService.addFallingFigure(optional.get());
-			}
+		Optional<FigureOperation> optional = this.serializeUtil.convertStringToFigureOperation(message);
+		if (optional.isPresent() && Objects.nonNull(optional.get().getFigure())
+				&& !ObjectUtils.isEmpty(optional.get().getFigure().getBoxes())) {
+			this.engineService.addFigureOperation(optional.get());
 		}
 	}
 }

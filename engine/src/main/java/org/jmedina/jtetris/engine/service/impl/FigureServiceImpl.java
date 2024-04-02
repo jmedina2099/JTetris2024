@@ -1,7 +1,7 @@
 package org.jmedina.jtetris.engine.service.impl;
 
 import org.jmedina.jtetris.engine.client.FiguresClient;
-import org.jmedina.jtetris.engine.figure.Figure;
+import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.FigureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +23,9 @@ public class FigureServiceImpl implements FigureService {
 	private final FiguresClient figuresClient;
 
 	@Override
-	public Flux<Figure> start() {
-		this.logger.debug("==> FigureService.askForNextFigure()");
-		return this.figuresClient.start();
+	public Flux<FigureOperation> getFigureConversation() {
+		this.logger.debug("==> FigureService.getFigureConversation()");
+		return this.figuresClient.getFigureConversation();
 	}
 
 	@Override
