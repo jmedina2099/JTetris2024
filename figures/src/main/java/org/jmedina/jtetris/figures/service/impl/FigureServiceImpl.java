@@ -67,28 +67,34 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	@Override
 	public FigureOperation askForNextFigureOperation() throws ServiceException {
 		this.logger.debug("==> FigureService.askForNextFigureOperation()");
-		Figure figure = null;
-		int value = this.random.nextInt(FiguraEnumeration.values().length);
-		switch (value) {
-		case 0:
-			figure = new Caja();
-			break;
-		case 1:
-			figure = new Vertical();
-			break;
-		case 2:
-			figure = new Ele();
-			break;
-		case 3:
-			figure = new Te();
-			break;
-		default:
-			throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
+		FigureOperation figureOperation = null;
+		try {
+			Figure figure = null;
+			int value = this.random.nextInt(FiguraEnumeration.values().length);
+			switch (value) {
+			case 0:
+				figure = new Caja();
+				break;
+			case 1:
+				figure = new Vertical();
+				break;
+			case 2:
+				figure = new Ele();
+				break;
+			case 3:
+				figure = new Te();
+				break;
+			default:
+				throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
+			}
+			long nanos;
+			figureOperation = FigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION)
+					.figure(figure).initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
+			sendFigureOperationToKafka(figureOperation);
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return null;
 		}
-		long nanos;
-		FigureOperation figureOperation = FigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION)
-				.figure(figure).initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
-		sendFigureOperationToKafka(figureOperation);
 		return figureOperation;
 	}
 

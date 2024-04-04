@@ -13,5 +13,7 @@ public interface FigureService {
 
 	public Flux<FigureOperation> getFigureConversation();
 
-	public Mono<Void> askForNextFigure();
+	public Mono<Boolean> askForNextFigure();
+
+	public Mono<Boolean> stop();
 }

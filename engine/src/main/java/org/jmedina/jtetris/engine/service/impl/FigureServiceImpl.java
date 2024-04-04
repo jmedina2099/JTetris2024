@@ -29,8 +29,14 @@ public class FigureServiceImpl implements FigureService {
 	}
 
 	@Override
-	public Mono<Void> askForNextFigure() {
+	public Mono<Boolean> askForNextFigure() {
 		this.logger.debug("==> FigureService.askForNextFigure()");
 		return this.figuresClient.askForNextFigure();
+	}
+
+	@Override
+	public Mono<Boolean> stop() {
+		this.logger.debug("==> FigureService.stop()");
+		return this.figuresClient.stop();
 	}
 }

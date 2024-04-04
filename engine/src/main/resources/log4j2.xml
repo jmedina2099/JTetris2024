@@ -26,6 +26,14 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="org.apache.tomcat" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="io.undertow" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="reactor" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />

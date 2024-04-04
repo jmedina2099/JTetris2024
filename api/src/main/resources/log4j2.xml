@@ -26,6 +26,14 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="org.apache.tomcat" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="io.undertow" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="reactor" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
@@ -87,6 +95,10 @@
             <AppenderRef ref="Console" />
         </Logger>
         <Logger name="org.jmedina.jtetris.api.controller" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.jmedina.jtetris.api.publisher" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
         </Logger>

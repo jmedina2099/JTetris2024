@@ -26,6 +26,14 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="org.apache.tomcat" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="io.undertow" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="reactor.core" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />
@@ -54,7 +62,15 @@
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.springframework.cloud.gateway" additivity="false" level="debug" includeLocation="true">
+        <Logger name="org.springframework.web.reactive" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.http.server.reactive" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.cloud.gateway" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />
         </Logger>

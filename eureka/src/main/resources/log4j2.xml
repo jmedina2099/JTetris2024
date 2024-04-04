@@ -26,6 +26,14 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="org.apache.tomcat" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEureka" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="io.undertow" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEureka" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="com.netflix.eureka" additivity="false" level="warn" includeLocation="true">
             <AppenderRef ref="appLogEureka" />
             <AppenderRef ref="Console" />

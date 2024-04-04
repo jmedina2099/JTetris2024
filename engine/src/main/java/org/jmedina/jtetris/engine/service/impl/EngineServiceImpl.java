@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -18,7 +17,6 @@ import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
-import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.GridSupportService;
@@ -42,8 +40,6 @@ import lombok.RequiredArgsConstructor;
 public class EngineServiceImpl implements EngineService {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final FigurePublisher figurePublisher;
-	private final EnginePublisher enginePublisher;
 	private final BoardPublisher boardPublisher;
 	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;
@@ -52,6 +48,7 @@ public class EngineServiceImpl implements EngineService {
 	private long initialTimeStamp;
 	private List<Box> falledBoxes;
 	private ReentrantLock lock = new ReentrantLock();
+	private FigurePublisher figurePublisher;
 
 	@Autowired(required = false)
 	private KafkaService kafkaService;
@@ -59,21 +56,32 @@ public class EngineServiceImpl implements EngineService {
 	@Value("${use.kafka}")
 	private boolean useKafka;
 
+	private boolean isRunning = false;
+
 	public static final int WIDTH = 10;
 	public static final int HEIGHT = 20;
 
 	@Override
-	public void start() {
+	public void start(FigurePublisher figurePublisher) {
 		this.logger.debug("==> Engine.start()");
-		this.fallingFigure = null;
-		this.falledBoxes = new ArrayList<>();
-		this.gridSupport.initializeGrid();
+		this.isRunning = true;
+		this.figurePublisher = figurePublisher;
+		reset();
+	}
+
+	@Override
+	public void stop() {
+		this.logger.debug("==> Engine.stop()");
+		this.isRunning = false;
+		this.figurePublisher.stop();
+		reset();
 	}
 
 	@Override
 	public void addFigureOperation(FigureOperation figureOperation) {
-		this.logger.debug("==> Engine.addFallingFigure()");
-		if (this.fallingFigure == null || this.initialTimeStamp < figureOperation.getInitialTimeStamp()) {
+		this.logger.debug("==> Engine.addFallingFigure() = " + figureOperation);
+		if (this.isRunning
+				&& (this.fallingFigure == null || this.initialTimeStamp < figureOperation.getInitialTimeStamp())) {
 			this.logger.debug("==> Engine.addFallingFigure.adding.. " + figureOperation.getInitialTimeStamp());
 			this.fallingFigure = figureOperation.getFigure();
 			this.initialTimeStamp = figureOperation.getInitialTimeStamp();
@@ -95,6 +103,9 @@ public class EngineServiceImpl implements EngineService {
 	@Override
 	public Optional<Boolean> rotateRight() {
 		this.logger.debug("==> Engine.rotateRight()");
+		if (Objects.isNull(this.fallingFigure)) {
+			return Optional.of(false);
+		}
 		int direction = this.fallingFigure.numRotations == 2 ? -1 : 1;
 		return rotate(direction);
 	}
@@ -102,6 +113,9 @@ public class EngineServiceImpl implements EngineService {
 	@Override
 	public Optional<Boolean> rotateLeft() {
 		this.logger.debug("==> Engine.rotateLeft()");
+		if (Objects.isNull(this.fallingFigure)) {
+			return Optional.of(false);
+		}
 		int direction = -1;
 		return rotate(direction);
 	}
@@ -113,29 +127,39 @@ public class EngineServiceImpl implements EngineService {
 			return Optional.of(false);
 		}
 		boolean isLockAcquired = lock.tryLock();
-		int numLinesMaded = 0;
-		if (isLockAcquired) {
-			try {
-				while (canMoveDown(this.fallingFigure) && this.gridSupport.noHit(this.fallingFigure, 0, 1)) {
-					this.fallingFigure.moveDown();
-					sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
-				}
-				this.gridSupport.addToGrid(this.fallingFigure);
-				this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-				sendAsyncEventsForBoardOperation(
-						getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
-
-				if ((numLinesMaded = checkMakeLines(this.fallingFigure)) > 0) {
-					sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
-							BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
-				}
-				this.fallingFigure = null;
-				this.figurePublisher.askForNextFigure();
-			} finally {
-				lock.unlock();
-			}
+		if (!isLockAcquired) {
+			return Optional.of(false);
 		}
-		return Optional.of(true);
+		try {
+			while (canMoveDown(this.fallingFigure) && this.gridSupport.noHit(this.fallingFigure, 0, 1)) {
+				this.fallingFigure.moveDown();
+				sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
+			}
+			this.gridSupport.addToGrid(this.fallingFigure);
+			this.falledBoxes.addAll(this.fallingFigure.getBoxes());
+			sendAsyncEventsForBoardOperation(
+					getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
+
+			int numLinesMaded = 0;
+			if ((numLinesMaded = checkMakeLines(this.fallingFigure)) > 0) {
+				sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
+						BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
+			}
+			this.fallingFigure = null;
+			this.figurePublisher.askForNextFigure();
+			return Optional.of(true);
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+		} finally {
+			lock.unlock();
+		}
+		return Optional.of(false);
+	}
+
+	private void reset() {
+		this.fallingFigure = null;
+		this.falledBoxes = new ArrayList<>();
+		this.gridSupport.initializeGrid();
 	}
 
 	private void sendFigureOperationToKafka(FigureOperation op) {
@@ -156,21 +180,21 @@ public class EngineServiceImpl implements EngineService {
 		if (Objects.isNull(this.fallingFigure)) {
 			return Optional.of(false);
 		}
-		boolean isLockAcquired;
+		boolean isLockAcquired = lock.tryLock();
+		if (!isLockAcquired) {
+			return Optional.of(false);
+		}
 		try {
-			isLockAcquired = lock.tryLock(1, TimeUnit.SECONDS);
-			if (isLockAcquired) {
-				if ((direction.equals(MoveDirectionEnumeration.LEFT) ? canMoveLeft(this.fallingFigure)
-						: canMoveRight(this.fallingFigure))
-						&& this.gridSupport.noHit(this.fallingFigure, direction.getOffset(), 0)) {
-					if (direction.equals(MoveDirectionEnumeration.LEFT)) {
-						this.fallingFigure.moveLeft();
-					} else if (direction.equals(MoveDirectionEnumeration.RIGHT)) {
-						this.fallingFigure.moveRight();
-					}
-					sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
-					return Optional.of(true);
+			if ((direction.equals(MoveDirectionEnumeration.LEFT) ? canMoveLeft(this.fallingFigure)
+					: canMoveRight(this.fallingFigure))
+					&& this.gridSupport.noHit(this.fallingFigure, direction.getOffset(), 0)) {
+				if (direction.equals(MoveDirectionEnumeration.LEFT)) {
+					this.fallingFigure.moveLeft();
+				} else if (direction.equals(MoveDirectionEnumeration.RIGHT)) {
+					this.fallingFigure.moveRight();
 				}
+				sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
+				return Optional.of(true);
 			}
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR = ", e);
@@ -181,7 +205,7 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	private void sendAsyncEventsForFigureOperation(FigureOperation figureOperation) {
-		this.enginePublisher.sendFigureOperation(figureOperation);
+		this.figurePublisher.sendFigureOperation(figureOperation);
 		sendFigureOperationToKafka(figureOperation);
 	}
 
@@ -226,23 +250,19 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	private Optional<Boolean> rotate(int direction) {
-		if (Objects.isNull(this.fallingFigure)) {
-			return Optional.of(false);
-		}
 		if (this.fallingFigure.numRotations == 0) {
 			return Optional.of(false);
 		}
-
-		boolean isLockAcquired = false;
+		boolean isLockAcquired = lock.tryLock();
+		if (!isLockAcquired) {
+			return Optional.of(false);
+		}
 		try {
-			isLockAcquired = lock.tryLock(1, TimeUnit.SECONDS);
-			if (isLockAcquired) {
-				Figure figureTmp = this.fallingFigure.clone();
-				if (rotateHelper(figureTmp, direction)) {
-					this.fallingFigure = figureTmp;
-					sendAsyncEventsForFigureOperation(getFigureOperationForRotation(this.fallingFigure));
-					return Optional.of(true);
-				}
+			Figure figureTmp = this.fallingFigure.clone();
+			if (rotateHelper(figureTmp, direction)) {
+				this.fallingFigure = figureTmp;
+				sendAsyncEventsForFigureOperation(getFigureOperationForRotation(this.fallingFigure));
+				return Optional.of(true);
 			}
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR = ", e);

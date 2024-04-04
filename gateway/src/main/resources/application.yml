@@ -1,18 +1,16 @@
 server:
   port: ${app.gateway.port}
   shutdown: graceful
+  undertow:
+    no-request-timeout: 1h
   netty:
     connection-timeout: 1h
     idle-timeout: 1h
     read-timeout: 1h
     write-timeout: 1h
-    max-keep-alive-requests: 10
 spring:
   application:
     name: ${app.gateway.name}
-  mvc:
-    async:
-      request-timeout: 1h
   cloud:
     gateway:
       httpclient:

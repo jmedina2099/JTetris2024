@@ -24,9 +24,12 @@ import reactor.netty.resources.ConnectionProvider;
 public class WebReactiveOptions extends ReactiveOptions {
 
   public static final WebReactiveOptions DEFAULT_OPTIONS = (WebReactiveOptions)new WebReactiveOptions.Builder()
-          .setReadTimeoutMillis(3600000) // 1 hour
+          .setReadTimeoutMillis(3600000)
           .setWriteTimeoutMillis(3600000)
+          .setResponseTimeoutMillis(3600000)
           .setConnectTimeoutMillis(3600000)
+          .setConnectionMaxIdleTimeMillis(3600000L)
+          .setConnectionMaxLifeTimeMillis(3600000L)
           .build();
 
   private final Long readTimeoutMillis;

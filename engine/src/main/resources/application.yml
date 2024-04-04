@@ -1,18 +1,16 @@
 server:
   port: ${app.engine.port}
   shutdown: graceful
+  undertow:
+    no-request-timeout: 1h
   netty:
     connection-timeout: 1h
     idle-timeout: 1h
     read-timeout: 1h
     write-timeout: 1h
-    max-keep-alive-requests: 10
 spring:
   application:
     name: ${app.engine.name}
-  mvc:
-    async:
-      request-timeout: 1h
   webflux:
     base-path: ${app.engine.context.path} # reactive
   cloud:
@@ -29,12 +27,6 @@ spring:
           enabled: true
       reactive:
         enabled: true
-    openfeign:
-      client:
-        config:
-          default:
-            connectTimeout: 3600000
-            readTimeout: 3600000
   jpa:
     hibernate:
       ddl-auto: update

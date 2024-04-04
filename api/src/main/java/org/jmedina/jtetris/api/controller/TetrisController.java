@@ -6,6 +6,8 @@ import org.jmedina.jtetris.api.client.EngineClient;
 import org.jmedina.jtetris.api.model.BoardOperation;
 import org.jmedina.jtetris.api.model.FigureOperation;
 import org.jmedina.jtetris.api.model.Message;
+import org.jmedina.jtetris.api.publisher.BoardPublisher;
+import org.jmedina.jtetris.api.publisher.FigurePublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,80 +33,143 @@ public class TetrisController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final EngineClient engineClient;
+	private final FigurePublisher figurePublisher;
+	private final BoardPublisher boardPublisher;
 
 	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Message>> hello() {
 		this.logger.debug("===> TetrisController.hello()");
-		return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("Hello from api reactive!!!")));
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(Mono.just(new Message("Hello from api reactive!!!")));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.empty());
+		}
 	}
 
 	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Boolean>> start() {
 		this.logger.debug("===> TetrisController.start()");
-		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start());
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.just(false));
+		}
+	}
+
+	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Mono<Boolean>> stop() {
+		this.logger.debug("===> TetrisController.stop()");
+		try {
+			this.engineClient.stop().subscribe();
+			this.figurePublisher.stop();
+			this.boardPublisher.stop();
+			return ResponseEntity.status(HttpStatus.OK).body(Mono.just(true));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.just(false));
+		}
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public ResponseEntity<Flux<FigureOperation>> getFigureConversation() {
 		this.logger.debug("===> TetrisController.getFigureConversation()");
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(this.engineClient.getFigureConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
-					this.logger.debug("===> API - getFigureConversation - NEXT = " + figure);
-				}).doOnComplete(() -> {
-					this.logger.debug("===> API - getFigureConversation - COMPLETE!");
-				}).doOnCancel(() -> {
-					this.logger.debug("===> API - getFigureConversation - CANCEL!");
-				}).doOnTerminate(() -> {
-					this.logger.debug("===> API - getFigureConversation - TERMINATE!");
-				}).doOnError(e -> {
-					this.logger.error("==*=> ERROR =", e);
-				}));
+		Flux<FigureOperation> fluxOfFigures = null;
+		try {
+			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
+				this.logger.debug("===> API - Flux.from.figurePublisher - NEXT = " + figure);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> API - Flux.from.figurePublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> API - Flux.from.figurePublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> API - Flux.from.figurePublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
+			});
+			return ResponseEntity.status(HttpStatus.OK).body(fluxOfFigures.timeout(Duration.ofHours(1)));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Flux.empty());
+		}
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public ResponseEntity<Flux<BoardOperation>> getBoardConversation() {
 		this.logger.debug("===> TetrisController.getBoardConversation()");
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(this.engineClient.getBoardConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
-					this.logger.debug("===> API - getBoardConversation - NEXT = " + figure);
-				}).doOnComplete(() -> {
-					this.logger.debug("===> API - getBoardConversation - COMPLETE!");
-				}).doOnCancel(() -> {
-					this.logger.debug("===> API - getBoardConversation - CANCEL!");
-				}).doOnTerminate(() -> {
-					this.logger.debug("===> API - getBoardConversation - TERMINATE!");
-				}).doOnError(e -> {
-					this.logger.error("==*=> ERROR =", e);
-				}));
+		Flux<BoardOperation> fluxOfBoards = null;
+		try {
+			fluxOfBoards = Flux.from(this.boardPublisher).doOnNext(figure -> {
+				this.logger.debug("===> API - Flux.from.boardPublisher - NEXT = " + figure);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> API - Flux.from.boardPublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> API - Flux.from.boardPublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> API - Flux.from.boardPublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
+			});
+			return ResponseEntity.status(HttpStatus.OK).body(fluxOfBoards.timeout(Duration.ofHours(1)));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Flux.empty());
+		}
 	}
 
 	@PostMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Boolean>> moveRight() {
 		this.logger.debug("===> TetrisController.moveRight()");
-		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveRight());
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveRight());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.just(false));
+		}
 	}
 
 	@PostMapping(value = "/moveLeft", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Boolean>> moveLeft() {
 		this.logger.debug("===> TetrisController.moveLeft()");
-		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveLeft());
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveLeft());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.just(false));
+		}
 	}
 
 	@PostMapping(value = "/rotateRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Boolean>> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
-		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateRight());
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateRight());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.just(false));
+		}
 	}
 
 	@PostMapping(value = "/rotateLeft", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Boolean>> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
-		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.just(false));
+		}
 	}
 
 	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Boolean>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
-		return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.just(false));
+		}
 	}
 }

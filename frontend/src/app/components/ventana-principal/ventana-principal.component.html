@@ -1,6 +1,17 @@
 <div class="ventana">
   <div>
-    <input id="startButton" type="button" value="Start" (click)="start()" />
+    <input
+      *ngIf="!isRunning"
+      id="startButton"
+      type="button"
+      value="Start"
+      (click)="start()" />
+    <input
+      *ngIf="isRunning"
+      id="startButton"
+      type="button"
+      value="Stop"
+      (click)="stop()" />
   </div>
   <br />
   <div class="panel">

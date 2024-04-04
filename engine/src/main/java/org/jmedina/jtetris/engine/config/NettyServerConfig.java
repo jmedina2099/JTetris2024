@@ -31,7 +31,7 @@ public class NettyServerConfig {
 	@Bean
 	NettyServerCustomizer nettyServerCustomizer() {
 		return httpServer -> httpServer.idleTimeout(Duration.ofHours(1)).readTimeout(Duration.ofHours(1))
-				.requestTimeout(Duration.ofHours(1)).maxKeepAliveRequests(10);
+				.requestTimeout(Duration.ofHours(1)).maxKeepAliveRequests(-1);
 	}
 
 	@Bean

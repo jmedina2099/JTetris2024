@@ -19,7 +19,11 @@ public class FiguresFallback implements FiguresClient {
 	}
 
 	@Override
-	public Mono<Void> askForNextFigure() {
+	public Mono<Boolean> askForNextFigure() {
 		return Mono.empty();
+	}
+
+	public Mono<Boolean> stop() {
+		return Mono.just(false);
 	}
 }

@@ -23,6 +23,7 @@ export class VentanaPrincipalComponent implements OnInit {
     [0, 0],
   ];
   protected showStatistics: boolean = environment.showStatistics;
+  protected isRunning = false;
 
   constructor(
     private fetchService: FetchService,
@@ -93,20 +94,34 @@ export class VentanaPrincipalComponent implements OnInit {
     this.reset();
     this.fetchService.start().subscribe({
       next: (value: boolean) => {
+        this.isRunning = value;
         if (value) {
           this.fetchService.getFigureConversation().subscribe({
             next: (op: FigureOperation) =>
               this.validateFigureOperation(op, 0)
                 ? this.setFigureOperation(op, 0)
                 : false,
+            //error: err => console.log('--> getFigureConversation.error = '+err),
+            //complete: () => console.log('--> getFigureConversation.complete!'),
           });
           this.fetchService.getBoardConversation().subscribe({
             next: (op: BoardOperation) =>
               this.validateBoardOperation(op, 0)
                 ? this.setBoardOperation(op, 0)
                 : false,
+            //error: err => console.log('--> getBoardConversation.error = '+err),
+            //complete: () => console.log('--> getBoardConversation.complete!'),
           });
         }
+      },
+    });
+  }
+
+  protected stop(): void {
+    this.fetchService.stop().subscribe({
+      next: () => {
+        this.reset();
+        this.isRunning = false;
       },
     });
   }
@@ -130,7 +145,7 @@ export class VentanaPrincipalComponent implements OnInit {
   }
 
   private validateFigureOperation(op: FigureOperation, id: number): boolean {
-    //console.log('--> validateFigureOperation (%s)...', this.getTube(id));
+    //console.log('--> validateFigureOperation (%s) = (%s)', this.getTube(id),JSON.stringify(op));
     const operation: FigureOperationType = op.operation;
     const initialTimeStamp: number = this.getFigureInitialTimeStamp();
     const currentTimeStamp: number = this.getFigureTimeStamp();
@@ -162,7 +177,7 @@ export class VentanaPrincipalComponent implements OnInit {
   }
 
   private validateBoardOperation(op: BoardOperation, id: number): boolean {
-    //console.log('---> validateAndSetBoardOperation (%s)', this.getTube(id));
+    //console.log('---> validateAndSetBoardOperation (%s) = (%s)', this.getTube(id),JSON.stringify(op));
     const currentTimeStamp: number = this.getBoardTimeStamp();
     const boardTimeStamp: number = op.timeStamp;
     if (currentTimeStamp < boardTimeStamp) {

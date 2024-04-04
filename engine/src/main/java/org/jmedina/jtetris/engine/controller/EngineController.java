@@ -7,7 +7,6 @@ import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
-import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.slf4j.Logger;
@@ -15,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,101 +35,146 @@ public class EngineController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final EngineService engineService;
 	private final FigurePublisher figurePublisher;
-	private final EnginePublisher enginePublisher;
 	private final BoardPublisher boardPublisher;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
 		this.logger.debug("===> EngineController.hello()");
-		return Mono.just(new Message("Hello from engine reactive!!!"));
+		try {
+			return Mono.just(new Message("Hello from engine reactive!!!"));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.empty();
+		}
 	}
 
-	@GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> start() {
 		this.logger.debug("===> EngineController.start()");
-		this.engineService.start();
-		return Mono.just(true);
+		try {
+			this.engineService.start(this.figurePublisher);
+			return Mono.just(true);
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false);
+		}
 	}
 
-	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Boolean> stop() {
+		this.logger.debug("===> EngineController.stop()");
+		try {
+			this.engineService.stop();
+			this.boardPublisher.stop();
+			return Mono.just(true);
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false);
+		}
+	}
+
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<FigureOperation> getFigureConversation() {
 		this.logger.debug("===> EngineController.getFigureConversation()");
-		Flux<FigureOperation> fluxFromFigures = Flux.from(this.figurePublisher).timeout(Duration.ofHours(1))
-				.doOnNext(figure -> {
-					this.logger.debug("===> ENGINE - figurePublisher - NEXT = " + figure);
-					this.engineService.addFigureOperation(figure);
-				}).doOnComplete(() -> {
-					this.logger.debug("===> ENGINE - figurePublisher - COMPLETE!");
-				}).doOnCancel(() -> {
-					this.logger.debug("===> ENGINE - figurePublisher - CANCEL!");
-				}).doOnTerminate(() -> {
-					this.logger.debug("===> ENGINE - figurePublisher - TERMINATE!");
-				}).doOnError(e -> {
-					this.logger.error("==*=> ERROR =", e);
-				});
-		Flux<FigureOperation> fluxFromEngine = Flux.from(this.enginePublisher).timeout(Duration.ofHours(1))
-				.doOnNext(figure -> {
-					this.logger.debug("===> ENGINE - enginePublisher - NEXT = " + figure);
-				}).doOnComplete(() -> {
-					this.logger.debug("===> ENGINE - enginePublisher - COMPLETE!");
-				}).doOnCancel(() -> {
-					this.logger.debug("===> ENGINE - enginePublisher - CANCEL!");
-				}).doOnTerminate(() -> {
-					this.logger.debug("===> ENGINE - enginePublisher - TERMINATE!");
-				}).doOnError(e -> {
-					this.logger.error("==*=> ERROR =", e);
-				});
-		return fluxFromFigures.mergeWith(fluxFromEngine).timeout(Duration.ofHours(1));
+		Flux<FigureOperation> fluxOfFigures = null;
+		try {
+			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR =", e);
+			});
+			return fluxOfFigures.timeout(Duration.ofHours(1));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Flux.empty();
+		}
 	}
 
-	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<BoardOperation> getBoardConversation() {
 		this.logger.debug("===> EngineController.getBoardConversation()");
-		return Flux.from(this.boardPublisher).timeout(Duration.ofHours(1)).doOnNext(figure -> {
-			this.logger.debug("===> ENGINE - boardPublisher - NEXT = " + figure);
-		}).doOnComplete(() -> {
-			this.logger.debug("===> ENGINE - boardPublisher - COMPLETE!");
-		}).doOnCancel(() -> {
-			this.logger.debug("===> ENGINE - boardPublisher - CANCEL!");
-		}).doOnTerminate(() -> {
-			this.logger.debug("===> ENGINE - boardPublisher - TERMINATE!");
-		}).doOnError(e -> {
-			this.logger.error("==*=> ERROR =", e);
-		});
+		Flux<BoardOperation> fluxOfBoards = null;
+		try {
+			fluxOfBoards = Flux.from(this.boardPublisher).doOnNext(figure -> {
+				this.logger.debug("===> ENGINE - Flux.from.boardPublisher - NEXT = " + figure);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.boardPublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.boardPublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.boardPublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR =", e);
+			});
+			return fluxOfBoards.timeout(Duration.ofHours(1));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Flux.empty();
+		}
 	}
 
-	@GetMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
-		Optional<Boolean> optional = this.engineService.moveRight();
-		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
+		try {
+			return convertOptionalToMonoBoolean(this.engineService.moveRight());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false);
+		}
 	}
 
-	@GetMapping(value = "/moveLeft", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/moveLeft", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
-		Optional<Boolean> optional = this.engineService.moveLeft();
-		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
+		try {
+			return convertOptionalToMonoBoolean(this.engineService.moveLeft());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false);
+		}
 	}
 
-	@GetMapping(value = "/rotateRight", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/rotateRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
-		Optional<Boolean> optional = this.engineService.rotateRight();
-		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
+		try {
+			return convertOptionalToMonoBoolean(this.engineService.rotateRight());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false);
+		}
 	}
 
-	@GetMapping(value = "/rotateLeft", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/rotateLeft", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
-		Optional<Boolean> optional = this.engineService.rotateLeft();
-		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
+		try {
+			return convertOptionalToMonoBoolean(this.engineService.rotateLeft());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false);
+		}
 	}
 
-	@GetMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
-		Optional<Boolean> optional = this.engineService.bottomDown();
+		try {
+			return convertOptionalToMonoBoolean(this.engineService.bottomDown());
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false);
+		}
+	}
+
+	private Mono<Boolean> convertOptionalToMonoBoolean(Optional<Boolean> optional) {
 		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
 	}
 

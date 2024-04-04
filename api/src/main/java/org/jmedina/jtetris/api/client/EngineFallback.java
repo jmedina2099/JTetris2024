@@ -19,6 +19,10 @@ public class EngineFallback implements EngineClient {
 		return Mono.just(false);
 	}
 
+	public Mono<Boolean> stop() {
+		return Mono.just(false);
+	}
+
 	@Override
 	public Flux<FigureOperation> getFigureConversation() {
 		return Flux.empty();
