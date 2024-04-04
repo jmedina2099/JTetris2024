@@ -23,6 +23,9 @@ const routes: Routes = [
         timeStamp: 0,
         operation: undefined,
       },
+      waitForBottomDown: {
+        waiting: false,
+      },
     },
   },
 ];

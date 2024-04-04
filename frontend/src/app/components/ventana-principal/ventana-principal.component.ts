@@ -154,6 +154,7 @@ export class VentanaPrincipalComponent implements OnInit {
     switch (operation) {
       case 'NEW_OPERATION': {
         if (initialTimeStamp < figInitialTimeStamp) {
+          this.route.snapshot.data['waitForBottomDown'].waiting = false;
           return true;
         }
         break;

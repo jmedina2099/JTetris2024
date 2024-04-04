@@ -36,50 +36,58 @@ export class AppComponent implements OnInit {
   handleKeyboardEvent(event: KeyboardEvent): void {
     const key = event.key;
     const elapsedTime = Date.now() - this.lastCallTime;
-    if (elapsedTime > 50) {
-      switch (key) {
-        case 'ArrowRight':
-          this.lastCallTime = Date.now();
-          this.fetchService.moveRight().subscribe({
-            //next: (value: Boolean) => console.log('--> moveRight.next = '+value),
-            //error: err => console.log('--> moveRight.error = '+err),
-            //complete: () => console.log('--> moveRight.complete!'),
-          });
-          break;
-        case 'ArrowLeft':
-          this.lastCallTime = Date.now();
-          this.fetchService.moveLeft().subscribe({
-            //next: (value: Boolean) => console.log('--> moveLeft = '+value),
-            //error: err => console.log('--> moveLeft.error = '+err),
-            //complete: () => console.log('--> moveLeft.complete!'),
-          });
-          break;
-        case 'ArrowUp':
-          this.lastCallTime = Date.now();
-          this.fetchService.rotateRight().subscribe({
-            //next: (value: Boolean) => console.log('--> rotateRight = '+value),
-            //error: err => console.log('--> rotateRight.error = '+err),
-            //complete: () => console.log('--> rotateRight.complete!'),
-          });
-          break;
-        case 'ArrowDown':
-          this.lastCallTime = Date.now();
-          this.fetchService.rotateLeft().subscribe({
-            //next: (value: Boolean) => console.log('--> rotateLeft = '+value),
-            //error: err => console.log('--> rotateLeft.error = '+err),
-            //complete: () => console.log('--> rotateLeft.complete!'),
-          });
-          break;
-        case ' ':
-          this.lastCallTime = Date.now();
-          this.fetchService.bottomDown().subscribe({
-            //next: (value: Boolean) => console.log('--> bottomDown = '+value),
-            //error: err => console.log('--> bottomDown.error = '+err),
-            //complete: () => console.log('--> bottomDown.complete!'),
-          });
-          break;
-        default:
-          break;
+    const child = this.route.snapshot.firstChild;
+    if (child) {
+      const waiting = child.data['waitForBottomDown'].waiting;
+      if (elapsedTime > 50 && !waiting) {
+        switch (key) {
+          case 'ArrowRight':
+            this.lastCallTime = Date.now();
+            this.fetchService.moveRight().subscribe({
+              //next: (value: Boolean) => console.log('--> moveRight.next = '+value),
+              //error: err => console.log('--> moveRight.error = '+err),
+              //complete: () => console.log('--> moveRight.complete!'),
+            });
+            break;
+          case 'ArrowLeft':
+            this.lastCallTime = Date.now();
+            this.fetchService.moveLeft().subscribe({
+              //next: (value: Boolean) => console.log('--> moveLeft = '+value),
+              //error: err => console.log('--> moveLeft.error = '+err),
+              //complete: () => console.log('--> moveLeft.complete!'),
+            });
+            break;
+          case 'ArrowUp':
+            this.lastCallTime = Date.now();
+            this.fetchService.rotateRight().subscribe({
+              //next: (value: Boolean) => console.log('--> rotateRight = '+value),
+              //error: err => console.log('--> rotateRight.error = '+err),
+              //complete: () => console.log('--> rotateRight.complete!'),
+            });
+            break;
+          case 'ArrowDown':
+            this.lastCallTime = Date.now();
+            this.fetchService.rotateLeft().subscribe({
+              //next: (value: Boolean) => console.log('--> rotateLeft = '+value),
+              //error: err => console.log('--> rotateLeft.error = '+err),
+              //complete: () => console.log('--> rotateLeft.complete!'),
+            });
+            break;
+          case ' ':
+            this.lastCallTime = Date.now();
+            child.data['waitForBottomDown'].waiting = true;
+            console.log(
+              '---> waiting... ' + child.data['waitForBottomDown'].waiting
+            );
+            this.fetchService.bottomDown().subscribe({
+              //next: (value: Boolean) => console.log('--> bottomDown = '+value),
+              //error: err => console.log('--> bottomDown.error = '+err),
+              //complete: () => console.log('--> bottomDown.complete!'),
+            });
+            break;
+          default:
+            break;
+        }
       }
     }
   }
