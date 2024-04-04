@@ -1,8 +1,8 @@
 package org.jmedina.jtetris.engine.publisher;
 
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.reactivestreams.Publisher;
@@ -23,7 +23,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	private boolean isRunning = false;
 	private Subscriber<? super T> subscriber;
 	private AtomicInteger requestCounter;
-	private Queue<T> queue = new LinkedList<>();
+	private Queue<T> queue = new ConcurrentLinkedDeque<T>();
 
 	@Override
 	public void subscribe(Subscriber<? super T> subscriber) {
@@ -80,7 +80,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 		this.logger.debug("===> END - CustomPublisher.tryToSend()");
 	}
 
-	private void doOnNext(T op) {
+	private synchronized void doOnNext(T op) {
 		this.logger.debug("===> CustomPublisher.doOnNext() = " + op);
 		try {
 			this.subscriber.onNext(op);
