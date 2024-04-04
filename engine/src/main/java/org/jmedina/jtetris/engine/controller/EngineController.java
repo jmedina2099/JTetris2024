@@ -123,7 +123,7 @@ public class EngineController {
 	public Mono<Boolean> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.moveRight());
+			return convertOptionalToMonoBoolean(this.engineService.moveRight()).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false);
@@ -134,7 +134,7 @@ public class EngineController {
 	public Mono<Boolean> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.moveLeft());
+			return convertOptionalToMonoBoolean(this.engineService.moveLeft()).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false);
@@ -145,7 +145,7 @@ public class EngineController {
 	public Mono<Boolean> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.rotateRight());
+			return convertOptionalToMonoBoolean(this.engineService.rotateRight()).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false);
@@ -156,7 +156,7 @@ public class EngineController {
 	public Mono<Boolean> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.rotateLeft());
+			return convertOptionalToMonoBoolean(this.engineService.rotateLeft()).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false);
@@ -167,7 +167,7 @@ public class EngineController {
 	public Mono<Boolean> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.bottomDown());
+			return convertOptionalToMonoBoolean(this.engineService.bottomDown()).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false);

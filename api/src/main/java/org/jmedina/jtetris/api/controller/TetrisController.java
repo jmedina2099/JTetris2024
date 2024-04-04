@@ -122,7 +122,7 @@ public class TetrisController {
 	public ResponseEntity<Mono<Boolean>> moveRight() {
 		this.logger.debug("===> TetrisController.moveRight()");
 		try {
-			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveRight());
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveRight().timeout(Duration.ofSeconds(3)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Mono.just(false));
@@ -133,7 +133,7 @@ public class TetrisController {
 	public ResponseEntity<Mono<Boolean>> moveLeft() {
 		this.logger.debug("===> TetrisController.moveLeft()");
 		try {
-			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveLeft());
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.moveLeft().timeout(Duration.ofSeconds(3)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Mono.just(false));
@@ -144,7 +144,7 @@ public class TetrisController {
 	public ResponseEntity<Mono<Boolean>> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		try {
-			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateRight());
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateRight().timeout(Duration.ofSeconds(3)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Mono.just(false));
@@ -155,7 +155,7 @@ public class TetrisController {
 	public ResponseEntity<Mono<Boolean>> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		try {
-			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft());
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.rotateLeft().timeout(Duration.ofSeconds(3)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Mono.just(false));
@@ -166,7 +166,7 @@ public class TetrisController {
 	public ResponseEntity<Mono<Boolean>> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		try {
-			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown());
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.bottomDown().timeout(Duration.ofSeconds(3)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Mono.just(false));

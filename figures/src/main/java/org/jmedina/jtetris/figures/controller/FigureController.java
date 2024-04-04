@@ -68,7 +68,7 @@ public class FigureController {
 		this.logger.debug("===> FigureController.askAndSendNextFigure()");
 		try {
 			this.figurePublisher.askAndSendNextFigureOperation();
-			return Mono.just(true);
+			return Mono.just(true).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false);

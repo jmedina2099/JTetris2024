@@ -1,5 +1,7 @@
 package org.jmedina.jtetris.api.publisher;
 
+import java.time.Duration;
+
 import org.jmedina.jtetris.api.client.EngineClient;
 import org.jmedina.jtetris.api.model.BoardOperation;
 import org.reactivestreams.Subscriber;
@@ -29,7 +31,7 @@ public class BoardPublisher extends CustomPublisher<BoardOperation> {
 
 	private void getBoardConversation() {
 		this.logger.debug("===> BoardPublisher.getBoardConversation()");
-		this.engineClient.getBoardConversation().doOnNext(figure -> {
+		this.engineClient.getBoardConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
 			this.logger.debug("===> API - getBoardConversation - NEXT = " + figure);
 		}).doOnComplete(() -> {
 			this.logger.debug("===> API - getBoardConversation - COMPLETE!");

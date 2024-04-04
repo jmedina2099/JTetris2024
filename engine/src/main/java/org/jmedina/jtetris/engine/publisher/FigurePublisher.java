@@ -1,5 +1,7 @@
 package org.jmedina.jtetris.engine.publisher;
 
+import java.time.Duration;
+
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.FigureService;
@@ -42,7 +44,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 
 	public void askForNextFigure() {
 		this.logger.debug("===> FigurePublisher.askForNextFigure()");
-		this.figureService.askForNextFigure().doOnNext(figure -> {
+		this.figureService.askForNextFigure().timeout(Duration.ofSeconds(3)).doOnNext(figure -> {
 			this.logger.debug("===> ENGINE - askForNextFigure - NEXT = " + figure);
 		}).doOnCancel(() -> {
 			this.logger.debug("===> ENGINE - askForNextFigure - CANCEL!");
@@ -57,7 +59,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 
 	private void getFigureConversation() {
 		this.logger.debug("===> FigurePublisher.getFigureConversation()");
-		this.figureService.getFigureConversation().doOnNext(figure -> {
+		this.figureService.getFigureConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
 			this.logger.debug("===> ENGINE - getFigureConversation - NEXT = " + figure);
 		}).doOnComplete(() -> {
 			this.logger.debug("===> ENGINE - getFigureConversation - COMPLETE!");
