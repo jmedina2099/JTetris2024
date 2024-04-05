@@ -73,7 +73,10 @@ public class EngineServiceImpl implements EngineService {
 	public void stop() {
 		this.logger.debug("==> Engine.stop()");
 		this.isRunning = false;
-		this.figurePublisher.stop();
+		if (Objects.nonNull(this.figurePublisher)) {
+			this.figurePublisher.stop();
+		}
+		this.boardPublisher.stop();
 		reset();
 	}
 
@@ -133,20 +136,20 @@ public class EngineServiceImpl implements EngineService {
 		try {
 			while (canMoveDown(this.fallingFigure) && this.gridSupport.noHit(this.fallingFigure, 0, 1)) {
 				this.fallingFigure.moveDown();
-				sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
+				//sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure.clone()));
 			}
 			this.gridSupport.addToGrid(this.fallingFigure);
 			this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-			sendAsyncEventsForBoardOperation(
-					getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
+			//sendAsyncEventsForBoardOperation(
+					//getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
 
 			int numLinesMaded = 0;
 			if ((numLinesMaded = checkMakeLines(this.fallingFigure)) > 0) {
-				sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
-						BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 			}
+			sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
+					BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 			this.fallingFigure = null;
-			this.figurePublisher.askForNextFigure();
+			this.figurePublisher.getNextFigure();
 			return Optional.of(true);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);

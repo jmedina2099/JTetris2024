@@ -53,10 +53,10 @@ public class EngineController {
 		this.logger.debug("===> EngineController.start()");
 		try {
 			this.engineService.start(this.figurePublisher);
-			return Mono.just(true);
+			return Mono.just(true).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
@@ -65,11 +65,12 @@ public class EngineController {
 		this.logger.debug("===> EngineController.stop()");
 		try {
 			this.engineService.stop();
+			this.figurePublisher.stop();
 			this.boardPublisher.stop();
-			return Mono.just(true);
+			return Mono.just(true).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
@@ -79,16 +80,16 @@ public class EngineController {
 		Flux<FigureOperation> fluxOfFigures = null;
 		try {
 			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
-				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
-			}).doOnComplete(() -> {
-				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - COMPLETE!");
-			}).doOnCancel(() -> {
-				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - CANCEL!");
-			}).doOnTerminate(() -> {
-				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - TERMINATE!");
-			}).doOnError(e -> {
-				this.logger.error("==*=> ERROR =", e);
-			});
+						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
+					}).doOnComplete(() -> {
+						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - COMPLETE!");
+					}).doOnCancel(() -> {
+						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - CANCEL!");
+					}).doOnTerminate(() -> {
+						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - TERMINATE!");
+					}).doOnError(e -> {
+						this.logger.error("==*=> ERROR =", e);
+					});
 			return fluxOfFigures.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
@@ -123,10 +124,10 @@ public class EngineController {
 	public Mono<Boolean> moveRight() {
 		this.logger.debug("===> EngineController.moveRight()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.moveRight()).timeout(Duration.ofSeconds(3));
+			return convertOptionalToMonoBoolean(this.engineService.moveRight());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
@@ -134,10 +135,10 @@ public class EngineController {
 	public Mono<Boolean> moveLeft() {
 		this.logger.debug("===> EngineController.moveLeft()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.moveLeft()).timeout(Duration.ofSeconds(3));
+			return convertOptionalToMonoBoolean(this.engineService.moveLeft());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
@@ -145,10 +146,10 @@ public class EngineController {
 	public Mono<Boolean> rotateRight() {
 		this.logger.debug("===> EngineController.rotateRight()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.rotateRight()).timeout(Duration.ofSeconds(3));
+			return convertOptionalToMonoBoolean(this.engineService.rotateRight());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
@@ -156,10 +157,10 @@ public class EngineController {
 	public Mono<Boolean> rotateLeft() {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.rotateLeft()).timeout(Duration.ofSeconds(3));
+			return convertOptionalToMonoBoolean(this.engineService.rotateLeft());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
@@ -167,15 +168,15 @@ public class EngineController {
 	public Mono<Boolean> bottomDown() {
 		this.logger.debug("===> EngineController.bottomDown()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.bottomDown()).timeout(Duration.ofSeconds(3));
+			return convertOptionalToMonoBoolean(this.engineService.bottomDown());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
 	private Mono<Boolean> convertOptionalToMonoBoolean(Optional<Boolean> optional) {
-		return optional.isPresent() ? Mono.just(optional.get()) : Mono.just(false);
+		return optional.isPresent() ? Mono.just(optional.get()).timeout(Duration.ofSeconds(3)) : Mono.just(false).timeout(Duration.ofSeconds(3));
 	}
 
 }

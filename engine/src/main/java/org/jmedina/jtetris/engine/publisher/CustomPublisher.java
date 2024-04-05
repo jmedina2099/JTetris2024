@@ -9,7 +9,6 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 
@@ -19,11 +18,11 @@ import org.springframework.context.event.EventListener;
  */
 public class CustomPublisher<T> implements Publisher<T>, Subscription {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private boolean isRunning = false;
 	private Subscriber<? super T> subscriber;
 	private AtomicInteger requestCounter;
 	private Queue<T> queue = new ConcurrentLinkedDeque<T>();
+	protected Logger logger;
 
 	@Override
 	public void subscribe(Subscriber<? super T> subscriber) {
@@ -34,7 +33,10 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 		this.subscriber.onSubscribe(this);
 	}
 
-	public void addToQueue(T op) {
+	/** 
+	 * We need this method synchronized, because undertow and wildfly use threads.
+	 */
+	protected synchronized void addToQueue(T op) {
 		this.logger.debug("===> CustomPublisher.addToQueue() = " + op);
 		this.queue.add(op);
 		tryToSend();
@@ -51,7 +53,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 
 	@Override
 	public void request(long n) {
-		this.logger.debug("=====> CustomPublisher.request = " + n);
+		this.logger.info("=====> CustomPublisher.request = " + n);
 		this.requestCounter.addAndGet((int) n);
 		tryToSend();
 	}
@@ -71,7 +73,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 					doOnNext(this.queue.remove());
 					this.requestCounter.decrementAndGet();
 				}
-				this.logger.debug("===> END:   counter={}, queue={}", this.requestCounter.get(), this.queue.size());
+				this.logger.info("===> END:   counter={}, queue={}", this.requestCounter.get(), this.queue.size());
 			}
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);

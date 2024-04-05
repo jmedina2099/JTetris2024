@@ -6,74 +6,58 @@ import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.FigureService;
 import org.reactivestreams.Subscriber;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author Jorge Medina
  *
  */
-@RequiredArgsConstructor
 @Service
 public class FigurePublisher extends CustomPublisher<FigureOperation> {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final EngineService engineService;
-	private final FigureService figureService;
+	@Autowired
+	private EngineService engineService;
+
+	@Autowired
+	private FigureService figureService;
+
+	public FigurePublisher() {
+		super();
+		super.logger = LoggerFactory.getLogger(this.getClass());
+	}
 
 	@Override
 	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
-		getFigureConversation();
-	}
-
-	public boolean stop() {
-		super.stop();
-		this.figureService.stop().subscribe();
-		return true;
+		getNextFigure();
 	}
 
 	public void sendFigureOperation(FigureOperation figureOperation) {
 		this.logger.debug("===> EnginePublisher.sendFigureOperation() = " + figureOperation);
+		addToQueueSync(figureOperation);
+	}
+
+	public void getNextFigure() {
+		this.logger.debug("===> FigurePublisher.getNextFigure()");
+		this.figureService.getNextFigure().timeout(Duration.ofSeconds(3)).doOnNext(figure -> {
+			this.logger.debug("===> ENGINE - getNextFigure - NEXT = " + figure);
+		}).doOnCancel(() -> {
+			this.logger.debug("===> ENGINE - getNextFigure - CANCEL!");
+		}).doOnTerminate(() -> {
+			this.logger.debug("===> ENGINE - getNextFigure - TERMINATE!");
+		}).doOnError(e -> {
+			this.logger.error("==*=> ERROR =", e);
+		}).subscribe(figure -> {
+			this.logger.debug("===> engine.getNextFigure.subscribe = " + figure);
+			this.engineService.addFigureOperation(figure);
+			addToQueueSync(figure);
+		});
+	}
+
+	private synchronized void addToQueueSync(FigureOperation figureOperation) {
 		super.addToQueue(figureOperation);
 	}
-
-	public void askForNextFigure() {
-		this.logger.debug("===> FigurePublisher.askForNextFigure()");
-		this.figureService.askForNextFigure().timeout(Duration.ofSeconds(3)).doOnNext(figure -> {
-			this.logger.debug("===> ENGINE - askForNextFigure - NEXT = " + figure);
-		}).doOnCancel(() -> {
-			this.logger.debug("===> ENGINE - askForNextFigure - CANCEL!");
-		}).doOnTerminate(() -> {
-			this.logger.debug("===> ENGINE - askForNextFigure - TERMINATE!");
-		}).doOnError(e -> {
-			this.logger.error("==*=> ERROR =", e);
-		}).subscribe((Boolean value) -> {
-			this.logger.debug("===> engine.askForNextFigure.subscribe = " + value);
-		});
-	}
-
-	private void getFigureConversation() {
-		this.logger.debug("===> FigurePublisher.getFigureConversation()");
-		this.figureService.getFigureConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
-			this.logger.debug("===> ENGINE - getFigureConversation - NEXT = " + figure);
-		}).doOnComplete(() -> {
-			this.logger.debug("===> ENGINE - getFigureConversation - COMPLETE!");
-		}).doOnCancel(() -> {
-			this.logger.debug("===> ENGINE - getFigureConversation - CANCEL!");
-		}).doOnTerminate(() -> {
-			this.logger.debug("===> ENGINE - getFigureConversation - TERMINATE!");
-		}).doOnError(e -> {
-			this.logger.error("==*=> ERROR =", e);
-		}).subscribe(op -> {
-			this.logger.debug("===> engine.getFigureConversation.subscribe = " + op);
-			this.engineService.addFigureOperation(op);
-			super.addToQueue(op);
-		});
-	}
-
 }

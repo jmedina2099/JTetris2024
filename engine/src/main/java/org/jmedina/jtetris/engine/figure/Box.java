@@ -63,6 +63,6 @@ public class Box implements Cloneable {
 
 	@Override
 	public String toString() {
-		return getX() + "," + getY();
+		return "(" + getX() + "," + getY() + ")";
 	}
 }

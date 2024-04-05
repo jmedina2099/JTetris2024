@@ -18,4 +18,10 @@ public class Box {
 
 	private double x;
 	private double y;
+	
+	@Override
+	public String toString() {
+		return "(" + getX() + "," + getY() + ")";
+	}
+	
 }

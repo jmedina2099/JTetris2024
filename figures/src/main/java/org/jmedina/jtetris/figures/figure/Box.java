@@ -47,4 +47,9 @@ public class Box {
 		this.rectangle.y = y;
 	}
 
+	@Override
+	public String toString() {
+		return "(" + getX() + "," + getY() + ")";
+	}
+
 }

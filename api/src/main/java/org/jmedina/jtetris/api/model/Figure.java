@@ -15,6 +15,12 @@ import lombok.NoArgsConstructor;
 public class Figure {
 
 	private List<Box> boxes = new ArrayList<>();
-	private long initialTimeStamp;
-	private long timeStamp;
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		this.boxes.stream().forEach(b -> sb.append(b.toString()));
+		return sb.toString();
+	}
+
 }

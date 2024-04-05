@@ -95,6 +95,7 @@ export class VentanaPrincipalComponent implements OnInit {
     this.fetchService.start().subscribe({
       next: (value: boolean) => {
         this.isRunning = value;
+        this.route.snapshot.data['game'].isRunning = value;
         if (value) {
           this.fetchService.getFigureConversation().subscribe({
             next: (op: FigureOperation) =>
@@ -122,6 +123,7 @@ export class VentanaPrincipalComponent implements OnInit {
       next: () => {
         this.reset();
         this.isRunning = false;
+        this.route.snapshot.data['game'].isRunning = false;
       },
     });
   }

@@ -2,21 +2,20 @@ package org.jmedina.jtetris.engine.publisher;
 
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.reactivestreams.Subscriber;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author Jorge Medina
  *
  */
-@RequiredArgsConstructor
 @Service
 public class BoardPublisher extends CustomPublisher<BoardOperation> {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	public BoardPublisher() {
+		super();
+		super.logger = LoggerFactory.getLogger(this.getClass());
+	}
 
 	@Override
 	public void subscribe(Subscriber<? super BoardOperation> subscriber) {
@@ -24,9 +23,13 @@ public class BoardPublisher extends CustomPublisher<BoardOperation> {
 		super.subscribe(subscriber);
 	}
 
-	public void sendBoard(BoardOperation board) {
-		this.logger.debug("===> BoardPublisher.sendBoard() = " + board);
-		super.addToQueue(board);
+	public void sendBoard(BoardOperation boardOperation) {
+		this.logger.debug("===> BoardPublisher.sendBoard() = " + boardOperation);
+		addToQueueSync(boardOperation);
+	}
+
+	private synchronized void addToQueueSync(BoardOperation boardOperation) {
+		super.addToQueue(boardOperation);
 	}
 
 }

@@ -42,7 +42,11 @@
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="reactor.netty.http" additivity="false" level="info" includeLocation="true">
+        <Logger name="io.netty" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="reactor.netty" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />
         </Logger>
@@ -67,6 +71,10 @@
             <AppenderRef ref="Console" />
         </Logger>
         <Logger name="org.springframework.http.server.reactive" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.springframework.http.client.reactive" additivity="false" level="info" includeLocation="true">
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />
         </Logger>

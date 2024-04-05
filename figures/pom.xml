@@ -77,6 +77,11 @@
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<jvmArguments>
+								--add-opens=java.base/java.nio=ALL-UNNAMED
+								--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</jvmArguments>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
@@ -110,6 +115,11 @@
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<jvmArguments>
+								--add-opens=java.base/java.nio=ALL-UNNAMED
+								--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</jvmArguments>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
@@ -194,4 +204,26 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-war</id>
+						<phase>package</phase>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Add-Exports>java.base/jdk.internal.misc</Add-Exports>
+									<Add-Opens>java.base/java.nio</Add-Opens>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

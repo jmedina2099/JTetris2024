@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -23,15 +22,9 @@ public class FigureServiceImpl implements FigureService {
 	private final FiguresClient figuresClient;
 
 	@Override
-	public Flux<FigureOperation> getFigureConversation() {
-		this.logger.debug("==> FigureService.getFigureConversation()");
-		return this.figuresClient.getFigureConversation();
-	}
-
-	@Override
-	public Mono<Boolean> askForNextFigure() {
-		this.logger.debug("==> FigureService.askForNextFigure()");
-		return this.figuresClient.askForNextFigure();
+	public Mono<FigureOperation> getNextFigure() {
+		this.logger.debug("==> FigureService.getNextFigure()");
+		return this.figuresClient.getNextFigure();
 	}
 
 	@Override

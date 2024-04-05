@@ -116,6 +116,7 @@ engine:
     message: figureMessage
   figures:
     base-url: http://localhost:9083/service-figures/figures
+#    base-url: http://localhost:9082/figures # engine node
     askForNextFigureUri: /askForNextFigure
 use:
   kafka: ${use.kafka}

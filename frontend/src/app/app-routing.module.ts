@@ -26,6 +26,9 @@ const routes: Routes = [
       waitForBottomDown: {
         waiting: false,
       },
+      game: {
+        isRunning: false,
+      },
     },
   },
 ];

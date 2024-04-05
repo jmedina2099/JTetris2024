@@ -37,8 +37,9 @@ export class AppComponent implements OnInit {
     const key = event.key;
     const elapsedTime = Date.now() - this.lastCallTime;
     const child = this.route.snapshot.firstChild;
+    const isRunning = child?.data['game']?.isRunning;
     const waiting = child?.data['waitForBottomDown']?.waiting;
-    if (elapsedTime > 50 && !waiting) {
+    if (isRunning && elapsedTime > 50 && !waiting) {
       switch (key) {
         case 'ArrowRight':
           this.lastCallTime = Date.now();
@@ -74,7 +75,7 @@ export class AppComponent implements OnInit {
           break;
         case ' ':
           this.lastCallTime = Date.now();
-          if( child ) {
+          if (child) {
             child.data['waitForBottomDown'].waiting = true;
           }
           this.fetchService.bottomDown().subscribe({

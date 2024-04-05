@@ -3,6 +3,7 @@ package org.jmedina.jtetris.api.model;
 import org.jmedina.jtetris.api.enumeration.FigureOperationEnumeration;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class FigureOperation {
 
 	private FigureOperationEnumeration operation;
