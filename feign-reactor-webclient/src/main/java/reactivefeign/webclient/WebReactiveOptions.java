@@ -32,7 +32,7 @@ public class WebReactiveOptions extends ReactiveOptions {
           .setConnectionMaxLifeTimeMillis(3600000L)
           .setPendingAcquireMaxCount(3600000)
           .setPendingAcquireTimeoutMillis(3600000L)
-          .setMaxConnections(100)
+          .setMaxConnections(200)
           .build();
 
   private final Long readTimeoutMillis;
