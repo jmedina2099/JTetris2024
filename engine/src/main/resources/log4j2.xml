@@ -114,7 +114,7 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.jmedina.jtetris.engine.publisher" additivity="false" level="info" includeLocation="true">
+        <Logger name="org.jmedina.jtetris.engine.publisher" additivity="false" level="warn" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>

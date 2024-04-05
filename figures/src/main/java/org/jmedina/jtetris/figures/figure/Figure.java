@@ -41,4 +41,12 @@ public abstract class Figure {
 		}).collect(Collectors.toList()));
 		this.center = type.getCenter();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		this.boxes.stream().forEach(b -> sb.append(b.toString()));
+		return sb.toString();
+	}
+
 }

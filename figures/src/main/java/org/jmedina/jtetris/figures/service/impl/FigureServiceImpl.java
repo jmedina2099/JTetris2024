@@ -91,6 +91,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			figureOperation = FigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION)
 					.figure(figure).initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
 			sendFigureOperationToKafka(figureOperation);
+			this.logger.debug("==> FigureService.askForNextFigureOperation() = " + figureOperation);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return null;

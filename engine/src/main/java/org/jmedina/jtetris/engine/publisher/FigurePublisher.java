@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import reactor.core.publisher.Mono;
+
 /**
  * @author Jorge Medina
  *
@@ -42,14 +44,17 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 
 	public void getNextFigure() {
 		this.logger.debug("===> FigurePublisher.getNextFigure()");
-		this.figureService.getNextFigure().timeout(Duration.ofSeconds(3)).doOnNext(figure -> {
+		this.figureService.getNextFigure().timeout(Duration.ofSeconds(5)).doOnNext(figure -> {
 			this.logger.debug("===> ENGINE - getNextFigure - NEXT = " + figure);
 		}).doOnCancel(() -> {
 			this.logger.debug("===> ENGINE - getNextFigure - CANCEL!");
 		}).doOnTerminate(() -> {
 			this.logger.debug("===> ENGINE - getNextFigure - TERMINATE!");
 		}).doOnError(e -> {
-			this.logger.error("==*=> ERROR =", e);
+			this.logger.error("==*=> ERROR - getNextFigure =", e);
+		}).onErrorResume(e -> {
+			this.logger.error("==*=> ERROR - getNextFigure =", e);
+			return Mono.empty();
 		}).subscribe(figure -> {
 			this.logger.debug("===> engine.getNextFigure.subscribe = " + figure);
 			this.engineService.addFigureOperation(figure);

@@ -81,6 +81,9 @@ public class TetrisController {
 				this.logger.debug("===> API - Flux.from.figurePublisher - TERMINATE!");
 			}).doOnError(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
+			}).onErrorResume(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
+				return Mono.empty();
 			});
 			return ResponseEntity.status(HttpStatus.OK).body(fluxOfFigures.timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
@@ -104,7 +107,10 @@ public class TetrisController {
 				this.logger.debug("===> API - Flux.from.boardPublisher - TERMINATE!");
 			}).doOnError(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
-			});
+			}).onErrorResume(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
+				return Mono.empty();
+			});;
 			return ResponseEntity.status(HttpStatus.OK).body(fluxOfBoards.timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
