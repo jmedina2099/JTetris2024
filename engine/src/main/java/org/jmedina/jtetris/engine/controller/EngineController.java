@@ -80,20 +80,20 @@ public class EngineController {
 		Flux<FigureOperation> fluxOfFigures = null;
 		try {
 			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
-						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
-					}).doOnComplete(() -> {
-						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - COMPLETE!");
-					}).doOnCancel(() -> {
-						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - CANCEL!");
-					}).doOnTerminate(() -> {
-						this.logger.debug("===> ENGINE - Flux.from.figurePublisher - TERMINATE!");
-					}).doOnError(e -> {
-						this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-					}).onErrorResume(e -> {
-						this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-						return Mono.empty();
-					});
-			return fluxOfFigures.timeout(Duration.ofHours(1));
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
+			}).onErrorResume(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
+				return Mono.empty();
+			});
+			return fluxOfFigures.delayElements(Duration.ofMillis(50)).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.empty();
@@ -119,7 +119,7 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
 				return Mono.empty();
 			});
-			return fluxOfBoards.timeout(Duration.ofHours(1));
+			return fluxOfBoards.delayElements(Duration.ofMillis(50)).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.empty();
@@ -182,7 +182,8 @@ public class EngineController {
 	}
 
 	private Mono<Boolean> convertOptionalToMonoBoolean(Optional<Boolean> optional) {
-		return optional.isPresent() ? Mono.just(optional.get()).timeout(Duration.ofSeconds(3)) : Mono.just(false).timeout(Duration.ofSeconds(3));
+		return optional.isPresent() ? Mono.just(optional.get()).timeout(Duration.ofSeconds(3))
+				: Mono.just(false).timeout(Duration.ofSeconds(3));
 	}
 
 }
