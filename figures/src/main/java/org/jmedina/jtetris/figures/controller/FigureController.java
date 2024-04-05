@@ -40,6 +40,7 @@ public class FigureController {
 
 	@GetMapping(value = "/getNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<FigureOperation> getNextFigure() {
+		this.logger.debug("===> FigureController.getNextFigure()");
 		try {
 			return Mono.just(this.figureService.askForNextFigureOperation()).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
