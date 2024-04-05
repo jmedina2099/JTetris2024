@@ -39,7 +39,11 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 
 	public void sendFigureOperation(FigureOperation figureOperation) {
 		this.logger.debug("===> EnginePublisher.sendFigureOperation() = " + figureOperation);
-		addToQueueSync(figureOperation);
+		try {
+			addToQueueSync(figureOperation);
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+		}
 	}
 
 	public void getNextFigure() {
