@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -77,8 +78,10 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<FigureOperation> getFigureConversation() {
+	public Flux<FigureOperation> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getFigureConversation()");
+		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
+		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		Flux<FigureOperation> fluxFromFigures = null;
 		Flux<FigureOperation> fluxFromEngine = null;
 		try {
@@ -119,8 +122,10 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<BoardOperation> getBoardConversation() {
+	public Flux<BoardOperation> getBoardConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getBoardConversation()");
+		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
+		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		Flux<BoardOperation> fluxOfBoards = null;
 		try {
 			fluxOfBoards = Flux.from(this.boardPublisher).doOnNext(figure -> {

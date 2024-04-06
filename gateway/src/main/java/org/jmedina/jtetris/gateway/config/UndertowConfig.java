@@ -1,7 +1,6 @@
 package org.jmedina.jtetris.gateway.config;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,7 @@ public class UndertowConfig {
 
 	@Bean
 	UndertowServletWebServerFactory undertowServletWebServerFactory() {
-		Duration duration = Duration.of(1, ChronoUnit.HOURS);
+		Duration duration = Duration.ofHours(1);
 		final int timeout = (int) duration.toMillis();
 		this.logger.debug("===> GATEWAY - undertow - timeout = " + duration.toMinutes());
 		final UndertowServletWebServerFactory factory = new UndertowServletWebServerFactory();

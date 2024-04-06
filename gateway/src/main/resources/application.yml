@@ -20,6 +20,10 @@ spring:
         pool:
           max-idle-time: 1h
           max-life-time: 1h
+      filter:
+        remove-hop-by-hop.headers:
+          - Proxy-Authenticate
+          - Proxy-Authorization
       httpserver:
         wiretap: true
       globalcors:

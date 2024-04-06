@@ -24,6 +24,10 @@ export class VentanaPrincipalComponent implements OnInit {
   ];
   protected showStatistics: boolean = environment.showStatistics;
   protected isRunning = false;
+  protected startTime = 0;
+  protected minutesEllapsed = 0;
+  protected setsOfFigure = 0;
+  protected setsOfBoard = 0;
 
   constructor(
     private fetchService: FetchService,
@@ -97,6 +101,13 @@ export class VentanaPrincipalComponent implements OnInit {
         this.isRunning = value;
         this.route.snapshot.data['game'].isRunning = value;
         if (value) {
+          this.startTime = Date.now();
+          window.setInterval(() => {
+            this.minutesEllapsed =
+              this.startTime > 0
+                ? Math.floor((Date.now() - this.startTime) / (60 * 1000))
+                : 0;
+          }, 1000);
           this.fetchService.getFigureConversation().subscribe({
             next: (op: FigureOperation) =>
               this.validateFigureOperation(op, 0)
@@ -124,6 +135,10 @@ export class VentanaPrincipalComponent implements OnInit {
         this.reset();
         this.isRunning = false;
         this.route.snapshot.data['game'].isRunning = false;
+        this.minutesEllapsed = 0;
+        this.startTime = 0;
+        this.setsOfFigure = 0;
+        this.setsOfBoard = 0;
       },
     });
   }
@@ -193,6 +208,7 @@ export class VentanaPrincipalComponent implements OnInit {
     this.statistics[id][0]++;
     //console.log('--> set figure (%s)-(%d) = (%s)',this.getTube(id),this.statistics[id][0],JSON.stringify(op));
     this.route.snapshot.data['figureOperation'] = op;
+    this.setsOfFigure++;
   }
 
   private setBoardOperation(op: BoardOperation, id: number): void {
@@ -203,5 +219,6 @@ export class VentanaPrincipalComponent implements OnInit {
       this.route.snapshot.data['figureOperation'].timeStamp = op.timeStamp;
       this.route.snapshot.data['figureOperation'].figure = {};
     }
+    this.setsOfBoard++;
   }
 }

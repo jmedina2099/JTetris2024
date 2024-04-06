@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -67,8 +68,10 @@ public class TetrisController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<FigureOperation>> getFigureConversation() {
+	public ResponseEntity<Flux<FigureOperation>> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> TetrisController.getFigureConversation()");
+		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
+		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		Flux<FigureOperation> fluxOfFigures = null;
 		try {
 			fluxOfFigures = this.engineClient.getFigureConversation().doOnNext(figure -> {
@@ -86,7 +89,7 @@ public class TetrisController {
 				return Mono.empty();
 			});
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(fluxOfFigures.delayElements(Duration.ofMillis(150)).timeout(Duration.ofHours(1)));
+					.body(fluxOfFigures.delayElements(Duration.ofMillis(100)).timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Flux.empty());
@@ -94,8 +97,10 @@ public class TetrisController {
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<BoardOperation>> getBoardConversation() {
+	public ResponseEntity<Flux<BoardOperation>> getBoardConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> TetrisController.getBoardConversation()");
+		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
+		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		Flux<BoardOperation> fluxOfBoards = null;
 		try {
 			fluxOfBoards = this.engineClient.getBoardConversation().doOnNext(figure -> {
@@ -114,7 +119,7 @@ public class TetrisController {
 			});
 			;
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(fluxOfBoards.delayElements(Duration.ofMillis(150)).timeout(Duration.ofHours(1)));
+					.body(fluxOfBoards.delayElements(Duration.ofMillis(100)).timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Flux.empty());

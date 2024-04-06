@@ -38,9 +38,7 @@ public class GatewayServerApplication {
 
 	@Bean
 	Function<GatewayFilterSpec, UriSpec> corsFilters() {
-		return f -> f.stripPrefix(1).addRequestHeader("Cache-Control", "no-cache")
-				.addRequestHeader("Connection", "keep-alive").addRequestHeader("X-Accel-Buffering", "no")
-				.dedupeResponseHeader("Access-Control-Allow-Origin", "RETAIN_UNIQUE")
+		return f -> f.stripPrefix(1).dedupeResponseHeader("Access-Control-Allow-Origin", "RETAIN_UNIQUE")
 				.dedupeResponseHeader("Access-Control-Allow-Credentials", "RETAIN_UNIQUE");
 	}
 
