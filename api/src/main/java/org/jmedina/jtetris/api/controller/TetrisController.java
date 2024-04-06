@@ -114,7 +114,7 @@ public class TetrisController {
 			});
 			;
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(fluxOfBoards.delayElements(Duration.ofMillis(50)).timeout(Duration.ofHours(1)));
+					.body(fluxOfBoards.delayElements(Duration.ofMillis(100)).timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Flux.empty());

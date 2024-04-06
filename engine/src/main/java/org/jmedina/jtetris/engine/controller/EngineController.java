@@ -137,7 +137,7 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
 				return Mono.empty();
 			});
-			return fluxOfBoards.delayElements(Duration.ofMillis(50)).timeout(Duration.ofHours(1));
+			return fluxOfBoards.delayElements(Duration.ofMillis(100)).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.empty();
