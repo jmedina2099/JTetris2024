@@ -37,16 +37,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 		getNextFigure();
 	}
 
-	public void sendFigureOperation(FigureOperation figureOperation) {
-		this.logger.debug("===> EnginePublisher.sendFigureOperation() = " + figureOperation);
-		try {
-			addToQueueSync(figureOperation);
-		} catch (Exception e) {
-			this.logger.error("=*=> ERROR: ", e);
-		}
-	}
-
-	public void getNextFigure() {
+	public synchronized void getNextFigure() {
 		this.logger.debug("===> FigurePublisher.getNextFigure()");
 		this.figureService.getNextFigure().timeout(Duration.ofSeconds(5)).doOnNext(figure -> {
 			this.logger.debug("===> ENGINE - getNextFigure - NEXT = " + figure);

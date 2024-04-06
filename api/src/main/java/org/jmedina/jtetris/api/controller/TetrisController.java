@@ -86,7 +86,7 @@ public class TetrisController {
 				return Mono.empty();
 			});
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(fluxOfFigures.delayElements(Duration.ofMillis(50)).timeout(Duration.ofHours(1)));
+					.body(fluxOfFigures.delayElements(Duration.ofMillis(100)).timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Flux.empty());

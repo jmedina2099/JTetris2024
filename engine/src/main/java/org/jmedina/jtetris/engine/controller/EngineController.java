@@ -7,6 +7,7 @@ import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
+import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class EngineController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final EngineService engineService;
+	private final EnginePublisher enginePublisher;
 	private final FigurePublisher figurePublisher;
 	private final BoardPublisher boardPublisher;
 
@@ -52,7 +54,7 @@ public class EngineController {
 	public Mono<Boolean> start() {
 		this.logger.debug("===> EngineController.start()");
 		try {
-			this.engineService.start(this.figurePublisher);
+			this.engineService.start(this.figurePublisher, this.enginePublisher);
 			return Mono.just(true).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
@@ -77,9 +79,10 @@ public class EngineController {
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<FigureOperation> getFigureConversation() {
 		this.logger.debug("===> EngineController.getFigureConversation()");
-		Flux<FigureOperation> fluxOfFigures = null;
+		Flux<FigureOperation> fluxFromFigures = null;
+		Flux<FigureOperation> fluxFromEngine = null;
 		try {
-			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
+			fluxFromFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
 			}).doOnComplete(() -> {
 				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - COMPLETE!");
@@ -93,7 +96,22 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 				return Mono.empty();
 			});
-			return fluxOfFigures.delayElements(Duration.ofMillis(50)).timeout(Duration.ofHours(1));
+			fluxFromEngine = Flux.from(this.enginePublisher).doOnNext(figure -> {
+				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - NEXT = " + figure);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
+			}).onErrorResume(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
+				return Mono.empty();
+			});
+			return fluxFromFigures.mergeWith(fluxFromEngine).delayElements(Duration.ofMillis(100))
+					.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.empty();

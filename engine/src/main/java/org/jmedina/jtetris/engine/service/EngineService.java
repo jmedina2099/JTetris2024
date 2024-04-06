@@ -3,6 +3,7 @@ package org.jmedina.jtetris.engine.service;
 import java.util.Optional;
 
 import org.jmedina.jtetris.engine.model.FigureOperation;
+import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 
 /**
@@ -11,7 +12,7 @@ import org.jmedina.jtetris.engine.publisher.FigurePublisher;
  */
 public interface EngineService {
 
-	public void start(FigurePublisher figurePublisher);
+	public void start(FigurePublisher figurePublisher, EnginePublisher enginePublisher);
 
 	public void stop();
 
