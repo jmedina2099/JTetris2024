@@ -36,10 +36,10 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	/**
 	 * We need this method synchronized, because undertow and wildfly use threads.
 	 */
-	protected synchronized void addToQueue(T op) {
+	protected void addToQueue(T op) {
 		this.logger.debug("===> CustomPublisher.addToQueue() = " + op);
 		this.queue.add(op);
-		tryToSendOne();
+		tryToSend();
 	}
 
 	public boolean stop() {
@@ -55,7 +55,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	public void request(long n) {
 		this.logger.info("=====> CustomPublisher.request = " + n);
 		this.requestCounter.addAndGet((int) n);
-		tryToSendOne();
+		tryToSend();
 	}
 
 	@Override
@@ -64,12 +64,12 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 		stop();
 	}
 
-	private synchronized void tryToSendOne() {
+	private synchronized void tryToSend() {
 		this.logger.debug("===> CustomPublisher.tryToSend()");
 		try {
 			if (this.isRunning) {
 				this.logger.debug("===> START: counter={}, queue={}", this.requestCounter.get(), this.queue.size());
-				if (this.requestCounter.get() > 0 && this.queue.size() > 0) {
+				while (this.requestCounter.get() > 0 && this.queue.size() > 0) {
 					doOnNext(this.queue.remove());
 					this.requestCounter.decrementAndGet();
 				}
@@ -82,7 +82,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 		this.logger.debug("===> END - CustomPublisher.tryToSend()");
 	}
 
-	private synchronized void doOnNext(T op) {
+	private void doOnNext(T op) {
 		this.logger.debug("===> CustomPublisher.doOnNext() = " + op);
 		try {
 			this.subscriber.onNext(op);

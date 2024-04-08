@@ -20,7 +20,7 @@ public class EngineApplication {
 		System.setProperty(ReactorNetty.POOL_MAX_LIFE_TIME, "3600000");
 		System.setProperty(ReactorNetty.POOL_LEASING_STRATEGY, "fifo");
 		System.setProperty(ReactorNetty.POOL_MAX_CONNECTIONS, "200");
-		System.setProperty(ReactorNetty.POOL_ACQUIRE_TIMEOUT, "-1");
+		System.setProperty(ReactorNetty.POOL_ACQUIRE_TIMEOUT, "3600000");
 		System.setProperty("io.netty.tryReflectionSetAccessible", "true");
 		SpringApplication.run(EngineApplication.class, args);
 	}

@@ -28,6 +28,7 @@ export class VentanaPrincipalComponent implements OnInit {
   protected minutesEllapsed = 0;
   protected setsOfFigure = 0;
   protected setsOfBoard = 0;
+  protected secondsEllapsed = 0;
 
   constructor(
     private fetchService: FetchService,
@@ -103,10 +104,8 @@ export class VentanaPrincipalComponent implements OnInit {
         if (value) {
           this.startTime = Date.now();
           window.setInterval(() => {
-            this.minutesEllapsed =
-              this.startTime > 0
-                ? Math.floor((Date.now() - this.startTime) / (60 * 1000))
-                : 0;
+            this.secondsEllapsed = this.startTime > 0? Math.floor((Date.now() - this.startTime) / 1000) % 60: 0;
+            this.minutesEllapsed = this.startTime > 0? Math.floor((Date.now() - this.startTime) / (1000*60)): 0;
           }, 1000);
           this.fetchService.getFigureConversation().subscribe({
             next: (op: FigureOperation) =>
@@ -135,6 +134,7 @@ export class VentanaPrincipalComponent implements OnInit {
         this.reset();
         this.isRunning = false;
         this.route.snapshot.data['game'].isRunning = false;
+        this.secondsEllapsed = 0;
         this.minutesEllapsed = 0;
         this.startTime = 0;
         this.setsOfFigure = 0;

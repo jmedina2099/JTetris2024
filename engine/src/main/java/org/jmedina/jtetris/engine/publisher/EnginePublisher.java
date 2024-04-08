@@ -23,16 +23,12 @@ public class EnginePublisher extends CustomPublisher<FigureOperation> {
 		super.subscribe(subscriber);
 	}
 
-	public synchronized void sendFigureOperation(FigureOperation figureOperation) {
+	public void sendFigureOperation(FigureOperation figureOperation) {
 		this.logger.debug("===> EnginePublisher.sendFigureOperation() = " + figureOperation);
 		try {
-			addToQueueSync(figureOperation);
+			super.addToQueue(figureOperation);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 		}
-	}
-
-	private synchronized void addToQueueSync(FigureOperation figureOperation) {
-		super.addToQueue(figureOperation);
 	}
 }

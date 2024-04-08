@@ -1,7 +1,9 @@
 package org.jmedina.jtetris.engine.controller;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
@@ -12,6 +14,7 @@ import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,6 +85,18 @@ public class EngineController {
 		this.logger.debug("===> EngineController.getFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
+		this.logger.debug("=========> HEADERS!!!");
+		HttpHeaders headers = exchange.getRequest().getHeaders();
+		Set<String> keys = headers.keySet();
+		keys.stream().forEach(key -> {
+			List<String> values = headers.get(key);
+			if (values != null) {
+				values.stream().forEach(v -> {
+					this.logger.debug("=========> header= {}: {}", key, v);
+				});
+			}
+		});
+		this.logger.debug("=========> END HEADERS!!!");
 		Flux<FigureOperation> fluxFromFigures = null;
 		Flux<FigureOperation> fluxFromEngine = null;
 		try {
@@ -113,8 +128,7 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
 				return Mono.empty();
 			});
-			return fluxFromFigures.mergeWith(fluxFromEngine).delayElements(Duration.ofMillis(100))
-					.timeout(Duration.ofHours(1));
+			return fluxFromFigures.mergeWith(fluxFromEngine).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.empty();
@@ -142,7 +156,7 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
 				return Mono.empty();
 			});
-			return fluxOfBoards.delayElements(Duration.ofMillis(100)).timeout(Duration.ofHours(1));
+			return fluxOfBoards.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.empty();

@@ -9,23 +9,27 @@ server:
     read-timeout: 1h
     write-timeout: 1h
 spring:
+  main:
+    web-application-type: REACTIVE
   application:
     name: ${app.gateway.name}
   cloud:
     gateway:
       httpclient:
-        wiretap: true
+        wiretap: false
         connect-timeout: 3600000
         response-timeout: 1h
         pool:
           max-idle-time: 1h
           max-life-time: 1h
+          acquire-timeout: 3600000
+          type: elastic
       filter:
         remove-hop-by-hop.headers:
           - Proxy-Authenticate
           - Proxy-Authorization
       httpserver:
-        wiretap: true
+        wiretap: false
       globalcors:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
@@ -74,11 +78,3 @@ management:
     web:
       exposure:
         include: health,info,beans,env
-logging:
-  level:
-    reactor:
-      netty: INFO
-    org:
-      springframework:
-        cloud:
-          gateway: INFO

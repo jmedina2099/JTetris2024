@@ -26,14 +26,9 @@ public class BoardPublisher extends CustomPublisher<BoardOperation> {
 	public void sendBoard(BoardOperation boardOperation) {
 		this.logger.debug("===> BoardPublisher.sendBoard() = " + boardOperation);
 		try {
-			addToQueueSync(boardOperation);
+			super.addToQueue(boardOperation);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 		}
 	}
-
-	private synchronized void addToQueueSync(BoardOperation boardOperation) {
-		super.addToQueue(boardOperation);
-	}
-
 }

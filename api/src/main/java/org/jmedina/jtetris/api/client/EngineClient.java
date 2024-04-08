@@ -1,13 +1,9 @@
 package org.jmedina.jtetris.api.client;
 
-import org.jmedina.jtetris.api.model.BoardOperation;
-import org.jmedina.jtetris.api.model.FigureOperation;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import reactivefeign.spring.config.ReactiveFeignClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -22,12 +18,6 @@ public interface EngineClient {
 
 	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> stop();
-
-	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<FigureOperation> getFigureConversation();
-
-	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<BoardOperation> getBoardConversation();
 
 	@PostMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> moveRight();

@@ -45,7 +45,12 @@ public class HeaderFilter implements WebFilter {
 		response.getHeaders().add("Access-Control-Allow-Methods", "HEAD, GET, PUT, POST, DELETE, PATCH, OPTIONS");
 		response.getHeaders().add("Access-Control-Max-Age", "3600");
 		response.getHeaders().add("Access-Control-Allow-Headers", "*");
-		return chain.filter(exchange);
+		try {
+			return chain.filter(exchange);
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.<Void>empty();
+		}
 	}
 
 }

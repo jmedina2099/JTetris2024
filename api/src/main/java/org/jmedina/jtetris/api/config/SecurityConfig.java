@@ -67,12 +67,14 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+		//return http.cors(cors -> cors.disable()).csrf(csrf -> csrf.disable()).build();
 		return http.cors(withDefaults()).formLogin(formLogin -> formLogin.disable())
 				.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
 				.authorizeExchange(exchanges -> exchanges.matchers(this::blockUnsecured).permitAll())
 				.authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
-				.httpBasic( httpBasic -> httpBasic.authenticationEntryPoint(new NoPopupBasicAuthenticationEntryPoint()) )
-				.exceptionHandling(eh -> eh.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.FORBIDDEN)))
+				.httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(new NoPopupBasicAuthenticationEntryPoint()))
+				.exceptionHandling(
+						eh -> eh.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.FORBIDDEN)))
 				.logout(logout -> logout.logoutUrl("/logout")
 						.logoutSuccessHandler(new HttpStatusReturningServerLogoutSuccessHandler(HttpStatus.OK)))
 				.csrf(csrf -> csrf.disable()).build();
@@ -89,7 +91,7 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", configuration);
 		return new CorsWebFilter(source);
 	}
-	
+
 	private Mono<MatchResult> blockUnsecured(final ServerWebExchange exchange) {
 		URI uri = exchange.getRequest().getURI();
 
@@ -108,47 +110,35 @@ public class SecurityConfig {
 			return new AuthFailureHandler().formatResponse(response);
 		}
 	}
-	
+
 	@NoArgsConstructor
 	public class AuthFailureHandler {
-	    public Mono<Void> formatResponse(ServerHttpResponse response) {
-	        response.getHeaders()
-	                .add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-	        ObjectMapper mapper = new ObjectMapper();
-	        ApiResponse apiResponse = new ApiResponse(response.getStatusCode()
-	                .value(), "Access Denied !!!");
-	        StringBuilder json = new StringBuilder();
-	        try {
-	            json.append(mapper.writeValueAsString(apiResponse));
-	        } catch (JsonProcessingException jsonProcessingException) {
-	        }
+		public Mono<Void> formatResponse(ServerHttpResponse response) {
+			response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			ObjectMapper mapper = new ObjectMapper();
+			ApiResponse apiResponse = new ApiResponse(response.getStatusCode().value(), "Access Denied !!!");
+			StringBuilder json = new StringBuilder();
+			try {
+				json.append(mapper.writeValueAsString(apiResponse));
+			} catch (JsonProcessingException jsonProcessingException) {
+			}
 
-	        String responseBody = json.toString();
-	        byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
-	        DataBuffer buffer = response.bufferFactory()
-	                .wrap(bytes);
-	        return response.writeWith(Mono.just(buffer));
-	    }
+			String responseBody = json.toString();
+			byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
+			DataBuffer buffer = response.bufferFactory().wrap(bytes);
+			return response.writeWith(Mono.just(buffer));
+		}
 	}
-	
+
 	public class ApiResponse {
-		
+
 		int statusCode;
 		String message;
 
-		public ApiResponse(int statusCode, String message ) {
+		public ApiResponse(int statusCode, String message) {
 			this.statusCode = statusCode;
 			this.message = message;
 		}
-		
+
 	}
 }
-
-
-
-
-
-
-
-
-

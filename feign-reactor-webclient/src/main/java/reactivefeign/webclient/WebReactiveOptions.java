@@ -23,17 +23,11 @@ import reactor.netty.resources.ConnectionProvider;
  */
 public class WebReactiveOptions extends ReactiveOptions {
 
-  public static final WebReactiveOptions DEFAULT_OPTIONS = (WebReactiveOptions)new WebReactiveOptions.Builder()
-          .setReadTimeoutMillis(3600000)
-          .setWriteTimeoutMillis(3600000)
-          .setResponseTimeoutMillis(3600000)
-          .setConnectTimeoutMillis(3600000)
-          .setConnectionMaxIdleTimeMillis(3600000L)
-          .setConnectionMaxLifeTimeMillis(3600000L)
-          .setPendingAcquireMaxCount(3600000)
-          .setPendingAcquireTimeoutMillis(3600000L)
-          .setMaxConnections(200)
-          .build();
+	public static final WebReactiveOptions DEFAULT_OPTIONS = (WebReactiveOptions)new WebReactiveOptions.Builder()
+	          .setReadTimeoutMillis(10000)
+	          .setWriteTimeoutMillis(10000)
+	          .setConnectTimeoutMillis(5000)
+	          .build();
 
   private final Long readTimeoutMillis;
   private final Long writeTimeoutMillis;

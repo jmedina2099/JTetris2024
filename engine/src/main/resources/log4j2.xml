@@ -122,6 +122,10 @@
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="org.jmedina.jtetris.engine.config" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogEngine" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Root level="info" includeLocation="true">
             <AppenderRef ref="appLogEngine" />
             <AppenderRef ref="Console" />

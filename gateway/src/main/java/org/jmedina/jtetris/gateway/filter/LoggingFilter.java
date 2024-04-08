@@ -35,6 +35,11 @@ public class LoggingFilter implements GlobalFilter {
 		URI routeUri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
 		this.logger
 				.debug("Incoming request " + originalUri + " is routed to id: " + route.getId() + ", uri:" + routeUri);
-		return chain.filter(exchange);
+		try {
+			return chain.filter(exchange);
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.<Void>empty();
+		}
 	}
 }

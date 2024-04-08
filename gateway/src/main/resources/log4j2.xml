@@ -98,6 +98,10 @@
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />
         </Logger>
+        <Logger name="org.jmedina.jtetris.gateway.config" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogGateway" />
+            <AppenderRef ref="Console" />
+        </Logger>
         <Root level="info" includeLocation="true">
             <AppenderRef ref="appLogGateway" />
             <AppenderRef ref="Console" />

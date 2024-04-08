@@ -88,7 +88,7 @@ public class EngineServiceImpl implements EngineService {
 
 	@Override
 	public void addFigureOperation(FigureOperation figureOperation) {
-		this.logger.debug("==> Engine.addFallingFigure() = " + figureOperation);
+		this.logger.debug("==> Engine.addFigureOperation() = " + figureOperation);
 		if (this.isRunning
 				&& (this.fallingFigure == null || this.initialTimeStamp < figureOperation.getInitialTimeStamp())) {
 			this.logger.debug("==> Engine.addFallingFigure.adding.. " + figureOperation.getInitialTimeStamp());
@@ -139,22 +139,23 @@ public class EngineServiceImpl implements EngineService {
 		if (!isLockAcquired) {
 			return Optional.of(false);
 		}
+		Figure figureRef = this.fallingFigure;
+		this.fallingFigure = null;
 		try {
-			while (canMoveDown(this.fallingFigure) && this.gridSupport.noHit(this.fallingFigure, 0, 1)) {
-				this.fallingFigure.moveDown();
-				//sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure.clone()));
+			while (canMoveDown(figureRef) && this.gridSupport.noHit(figureRef, 0, 1)) {
+				figureRef.moveDown();
+				sendAsyncEventsForFigureOperation(getFigureOperationForMovement(figureRef.clone()));
 			}
-			this.gridSupport.addToGrid(this.fallingFigure);
-			this.falledBoxes.addAll(this.fallingFigure.getBoxes());
-			//sendAsyncEventsForBoardOperation(
-					//getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
+			this.gridSupport.addToGrid(figureRef);
+			this.falledBoxes.addAll(figureRef.getBoxes());
+			sendAsyncEventsForBoardOperation(
+					getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
 
 			int numLinesMaded = 0;
-			if ((numLinesMaded = checkMakeLines(this.fallingFigure)) > 0) {
+			if ((numLinesMaded = checkMakeLines(figureRef)) > 0) {
+				sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
+						BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 			}
-			sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
-					BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
-			this.fallingFigure = null;
 			this.figurePublisher.getNextFigure();
 			return Optional.of(true);
 		} catch (Exception e) {
