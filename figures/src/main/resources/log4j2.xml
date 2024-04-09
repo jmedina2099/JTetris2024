@@ -110,7 +110,7 @@
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.jmedina.jtetris.figures.publisher" additivity="false" level="info" includeLocation="true">
+        <Logger name="org.jmedina.jtetris.figures.publisher" additivity="false" level="warn" includeLocation="true">
             <AppenderRef ref="appLogFigures" />
             <AppenderRef ref="Console" />
         </Logger>        

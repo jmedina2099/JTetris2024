@@ -1,6 +1,5 @@
 package org.jmedina.jtetris.engine.client;
 
-import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,8 +14,8 @@ import reactor.core.publisher.Mono;
 @ReactiveFeignClient(value = "figuresClient", url = "${engine.figures.base-url}", fallback = FiguresFallback.class)
 public interface FiguresClient {
 
-	@GetMapping(value = "/getNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<FigureOperation> getNextFigure();
+	@GetMapping(value = "/askForNextFigureOperation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Boolean> askForNextFigureOperation();
 
 	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> stop();

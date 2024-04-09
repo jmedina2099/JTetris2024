@@ -43,7 +43,7 @@ public class EngineController {
 	private final FigurePublisher figurePublisher;
 	private final BoardPublisher boardPublisher;
 
-	@GetMapping("/hello")
+	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Message> hello() {
 		this.logger.debug("===> EngineController.hello()");
 		try {
@@ -80,7 +80,7 @@ public class EngineController {
 		}
 	}
 
-	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<FigureOperation> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
@@ -131,11 +131,11 @@ public class EngineController {
 			return fluxFromFigures.mergeWith(fluxFromEngine).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Flux.empty();
+			return Flux.<FigureOperation>empty();
 		}
 	}
 
-	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<BoardOperation> getBoardConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getBoardConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
@@ -159,7 +159,7 @@ public class EngineController {
 			return fluxOfBoards.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Flux.empty();
+			return Flux.<BoardOperation>empty();
 		}
 	}
 

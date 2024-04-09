@@ -1,4 +1,4 @@
-package org.jmedina.jtetris.engine.publisher;
+package org.jmedina.jtetris.api.publisher;
 
 import java.util.Objects;
 import java.util.Queue;

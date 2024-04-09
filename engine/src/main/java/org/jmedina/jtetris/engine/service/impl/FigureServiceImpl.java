@@ -22,9 +22,9 @@ public class FigureServiceImpl implements FigureService {
 	private final FiguresClient figuresClient;
 
 	@Override
-	public Mono<FigureOperation> getNextFigure() {
-		this.logger.debug("==> FigureService.getNextFigure()");
-		return this.figuresClient.getNextFigure();
+	public Mono<Boolean> askForNextFigureOperation() {
+		this.logger.debug("==> FigureService.askForNextFigureOperation()");
+		return this.figuresClient.askForNextFigureOperation();
 	}
 
 	@Override

@@ -1,18 +1,23 @@
 package org.jmedina.jtetris.figures.controller;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.model.Message;
-import org.jmedina.jtetris.figures.service.FigureService;
+import org.jmedina.jtetris.figures.publisher.FigurePublisher;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -25,7 +30,7 @@ import reactor.core.publisher.Mono;
 public class FigureController {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
-	private final FigureService figureService;
+	private final FigurePublisher figurePublisher;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -38,14 +43,55 @@ public class FigureController {
 		}
 	}
 
-	@GetMapping(value = "/getNextFigure", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<FigureOperation> getNextFigure() {
-		this.logger.debug("===> FigureController.getNextFigure()");
+	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<FigureOperation> getFigureConversation(ServerWebExchange exchange) {
+		this.logger.debug("===> FigureController.getFigureConversation()");
+		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
+		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
+		this.logger.debug("=========> HEADERS!!!");
+		HttpHeaders headers = exchange.getRequest().getHeaders();
+		Set<String> keys = headers.keySet();
+		keys.stream().forEach(key -> {
+			List<String> values = headers.get(key);
+			if (values != null) {
+				values.stream().forEach(v -> {
+					this.logger.debug("=========> header= {}: {}", key, v);
+				});
+			}
+		});
+		this.logger.debug("=========> END HEADERS!!!");
+		Flux<FigureOperation> fluxOfFigures = null;
 		try {
-			return Mono.just(this.figureService.askForNextFigureOperation()).timeout(Duration.ofSeconds(3));
+			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
+				this.logger.debug("===> FIGURES - Flux.from.figurePublisher - NEXT = " + figure);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> FIGURES - Flux.from.figurePublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> FIGURES - Flux.from.figurePublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> FIGURES - Flux.from.figurePublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
+			}).onErrorResume(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
+				return Mono.empty();
+			});
+			return fluxOfFigures.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Mono.empty();
+			return Flux.<FigureOperation>empty();
+		}
+	}
+
+	@GetMapping(value = "/askForNextFigureOperation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Boolean> askForNextFigureOperation() {
+		this.logger.debug("===> FigureController.getNextFigure()");
+		try {
+			this.figurePublisher.askForNextFigureOperation();
+			return Mono.just(true).timeout(Duration.ofSeconds(3));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.<Boolean>empty();
 		}
 	}
 

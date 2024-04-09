@@ -156,7 +156,7 @@ public class EngineServiceImpl implements EngineService {
 				sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
 						BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 			}
-			this.figurePublisher.getNextFigure();
+			this.figurePublisher.askForNextFigureOperation();
 			return Optional.of(true);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);

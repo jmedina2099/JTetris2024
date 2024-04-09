@@ -102,7 +102,11 @@
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
         </Logger>
-        <Logger name="org.jmedina.jtetris.api.publisher" additivity="false" level="info" includeLocation="true">
+        <Logger name="org.jmedina.jtetris.api.service" additivity="false" level="info" includeLocation="true">
+            <AppenderRef ref="appLogApi" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="org.jmedina.jtetris.api.publisher" additivity="false" level="warn" includeLocation="true">
             <AppenderRef ref="appLogApi" />
             <AppenderRef ref="Console" />
         </Logger>

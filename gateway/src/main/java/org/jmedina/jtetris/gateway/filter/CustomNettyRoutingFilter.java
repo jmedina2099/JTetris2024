@@ -31,7 +31,8 @@ public class CustomNettyRoutingFilter extends NettyRoutingFilter {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private String[] conversationPaths = new String[] { "/api/game/getFigureConversation",
-			"/api/game/getBoardConversation", "/engine/getFigureConversation", "/engine/getBoardConversation" };
+			"/api/game/getBoardConversation", "/engine/getFigureConversation", "/engine/getBoardConversation",
+			"/figures/getFigureConversation" };
 	private List<String> conversationPathsList = Arrays.asList(conversationPaths);
 
 	private HttpClient httpClientForConversations;
@@ -41,7 +42,7 @@ public class CustomNettyRoutingFilter extends NettyRoutingFilter {
 		super(httpClient, headersFiltersProvider, properties);
 		int timeout = 3600000;
 		ConnectionProvider connProvider = ConnectionProvider.builder("connectionProviderForConversationsGateway")
-				.maxConnections(4).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
+				.maxConnections(5).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
 				.maxIdleTime(Duration.ofHours(1)).maxLifeTime(Duration.ofHours(1)).build();
 		this.httpClientForConversations = HttpClient.create(connProvider).option(ChannelOption.AUTO_CLOSE, false)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout).option(ChannelOption.SO_KEEPALIVE, true)

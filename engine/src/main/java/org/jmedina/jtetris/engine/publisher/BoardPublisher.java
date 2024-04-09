@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 public class BoardPublisher extends CustomPublisher<BoardOperation> {
 
 	public BoardPublisher() {
-		super();
-		super.logger = LoggerFactory.getLogger(this.getClass());
+		super(LoggerFactory.getLogger(BoardPublisher.class));
 	}
 
 	@Override

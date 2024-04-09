@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 public class EnginePublisher extends CustomPublisher<FigureOperation> {
 
 	public EnginePublisher() {
-		super();
-		super.logger = LoggerFactory.getLogger(this.getClass());
+		super(LoggerFactory.getLogger(EnginePublisher.class));
 	}
 
 	@Override
