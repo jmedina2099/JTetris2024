@@ -40,9 +40,6 @@
 		</profile>
 		<profile>
 			<id>tomcat</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<properties>
 				<app.eureka.server>http://localhost:9080/eurekaserver/eureka</app.eureka.server>
 			</properties>
@@ -68,6 +65,9 @@
 		</profile>
 		<profile>
 			<id>undertow</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<properties>
 				<app.eureka.server>http://localhost:9080/eurekaserver/eureka</app.eureka.server>
 			</properties>
@@ -85,6 +85,12 @@
 				<dependency>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-undertow</artifactId>
+					<exclusions>
+						<exclusion>
+							<artifactId>undertow-websockets-jsr</artifactId>
+							<groupId>io.undertow</groupId>
+						</exclusion>
+					</exclusions>
 				</dependency>
 			</dependencies>
 			<build>

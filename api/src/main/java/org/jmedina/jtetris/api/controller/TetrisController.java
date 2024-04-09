@@ -67,6 +67,8 @@ public class TetrisController {
 	public ResponseEntity<Mono<Boolean>> stop() {
 		this.logger.debug("===> TetrisController.stop()");
 		try {
+			this.figurePublisher.stop();
+			this.boardPublisher.stop();
 			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.stop().timeout(Duration.ofSeconds(3)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);

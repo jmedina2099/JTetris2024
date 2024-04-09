@@ -2,8 +2,6 @@ package org.jmedina.jtetris.gateway;
 
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.metrics.jersey.JerseyServerMetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,11 +22,8 @@ import reactor.netty.ReactorNetty;
 @SpringBootApplication(exclude = JerseyServerMetricsAutoConfiguration.class)
 public class GatewayServerApplication {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
 	@Bean
 	RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-		this.logger.debug("===> GatewayServerApplication.customRouteLocator");
 		return builder.routes()
 				.route("serviceApi", r -> r.path("/service-api/**").filters(corsFilters()).uri("lb://API"))
 				.route("serviceEngine", r -> r.path("/service-engine/**").filters(corsFilters()).uri("lb://ENGINE"))

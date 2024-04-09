@@ -12,6 +12,7 @@ import org.jmedina.jtetris.figures.publisher.FigurePublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
@@ -40,6 +41,18 @@ public class FigureController {
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.empty();
+		}
+	}
+
+	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Boolean> stop() {
+		this.logger.debug("===> FigureController.stop()");
+		try {
+			this.figurePublisher.stop();
+			return Mono.just(true).timeout(Duration.ofSeconds(3));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 

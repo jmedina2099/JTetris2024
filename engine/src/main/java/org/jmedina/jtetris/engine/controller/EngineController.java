@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jmedina.jtetris.engine.client.FiguresClient;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.model.Message;
@@ -42,6 +43,7 @@ public class EngineController {
 	private final EnginePublisher enginePublisher;
 	private final FigurePublisher figurePublisher;
 	private final BoardPublisher boardPublisher;
+	private final FiguresClient figuresClient;
 
 	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Message> hello() {
@@ -71,9 +73,7 @@ public class EngineController {
 		this.logger.debug("===> EngineController.stop()");
 		try {
 			this.engineService.stop();
-			this.figurePublisher.stop();
-			this.boardPublisher.stop();
-			return Mono.just(true).timeout(Duration.ofSeconds(3));
+			return this.figuresClient.stop().timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false).timeout(Duration.ofSeconds(3));
