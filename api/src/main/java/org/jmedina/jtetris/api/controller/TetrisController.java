@@ -60,12 +60,11 @@ public class TetrisController {
 				.headers(headers -> headers.set("Content-Type", "text/event-stream").set("Cache-Control", "no-cache")
 						.set("Connection", "keep-alive").set("Keep-Alive", "timeout=3600"))
 				.doOnConnected(conn -> {
-					this.logger.debug("===============================> doOnConnected");
-					conn.markPersistent(true);
+					this.logger.debug("===============================> httpClient.doOnConnected - conn.isPersistent ="
+							+ conn.isPersistent());
 				}).doOnDisconnected(conn -> {
-					this.logger.debug("===============================> doOnDisconnected");
+					this.logger.debug("===============================> httpClient.doOnDisconnected");
 				});
-
 		this.clientForConversations = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient))
 				.build();
 	}

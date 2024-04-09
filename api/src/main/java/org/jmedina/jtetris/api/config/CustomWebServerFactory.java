@@ -50,27 +50,26 @@ public class CustomWebServerFactory extends NettyReactiveWebServerFactory {
 		this.logger.debug("===> API - readTimeout = " + readTimeout.toMinutes());
 		this.logger.debug("===> API - writeTimeout = " + writeTimeout.toMinutes());
 
-		addServerCustomizers(
-				server -> server.option(ChannelOption.AUTO_CLOSE, false).option(ChannelOption.SO_KEEPALIVE, true)
-						.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) connectionTimeout.toMillis())
-						.maxKeepAliveRequests(-1).idleTimeout(idleTimeout).readTimeout(readTimeout)
-						.requestTimeout(readTimeout).doOnChannelInit((connectionObserver, channel, remoteAddress) -> {
-							channel.pipeline().addFirst(new IdleStateHandler((int) readTimeout.toSeconds(),
-									(int) writeTimeout.toSeconds(), (int) idleTimeout.toSeconds()) {
-								private final AtomicBoolean closed = new AtomicBoolean();
+		addServerCustomizers(httpServer -> httpServer.option(ChannelOption.AUTO_CLOSE, false)
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) connectionTimeout.toMillis())
+				.maxKeepAliveRequests(-1).idleTimeout(idleTimeout).readTimeout(readTimeout).requestTimeout(readTimeout)
+				.doOnChannelInit((connectionObserver, channel, remoteAddress) -> {
+					channel.pipeline().addFirst(new IdleStateHandler((int) readTimeout.toSeconds(),
+							(int) writeTimeout.toSeconds(), (int) idleTimeout.toSeconds()) {
+						private final AtomicBoolean closed = new AtomicBoolean();
 
-								@Override
-								protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) {
-									if (closed.compareAndSet(false, true)) {
-										ctx.close();
-									}
-								}
-							});
-						}).doOnConnection(conn -> {
-							this.logger.debug("===============================> doOnConnected in API");
-							conn.markPersistent(true).channel().pipeline()
-									.addLast(new WriteTimeoutHandler((int) writeTimeout.toSeconds()))
-									.addLast(new ReadTimeoutHandler((int) readTimeout.toSeconds()));
-						}));
+						@Override
+						protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) {
+							if (closed.compareAndSet(false, true)) {
+								ctx.close();
+							}
+						}
+					});
+				}).doOnConnection(conn -> {
+					this.logger.debug("===============================> doOnConnected in API - conn.isPersistent ="
+							+ conn.isPersistent());
+					conn.channel().pipeline().addLast(new WriteTimeoutHandler((int) writeTimeout.toSeconds()))
+							.addLast(new ReadTimeoutHandler((int) readTimeout.toSeconds()));
+				}));
 	}
 }
