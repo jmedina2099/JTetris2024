@@ -24,12 +24,28 @@ export class AppComponent implements OnInit {
     }
   }
 
-  logout() {
+  protected logout() {
     this.app.logout();
   }
 
-  authenticated() {
+  protected authenticated() {
     return this.app.authenticated;
+  }
+
+  private sleep(num: number): void {
+    let now = new Date();
+    const stop = now.getTime() + num;
+    const running = true;
+    while (running) {
+      now = new Date();
+      if (now.getTime() > stop) return;
+    }
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadApp(): void {
+    this.fetchService.stop().subscribe();
+    this.sleep(1000);
   }
 
   @HostListener('document:keydown', ['$event'])

@@ -67,7 +67,7 @@ export class EventSourceService {
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
             Connection: 'keep-alive',
-            'Keep-Alive': 'timeout=3600',            
+            'Keep-Alive': 'timeout=3600',
             'X-Accel-Buffering': 'no',
           },
           heartbeatTimeout: 60 * 60 * 1000,

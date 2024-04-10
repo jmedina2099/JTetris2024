@@ -8,7 +8,5 @@ import reactor.core.publisher.Mono;
  */
 public interface FigureService {
 
-	public Mono<Boolean> askForNextFigureOperation();
-
 	public Mono<Boolean> stop();
 }

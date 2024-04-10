@@ -3,7 +3,7 @@ package org.jmedina.jtetris.figures.publisher;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -21,7 +21,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	protected final Logger logger;
 	private boolean isRunning = false;
 	private Subscriber<? super T> subscriber;
-	private AtomicInteger requestCounter;
+	private AtomicLong requestCounter;
 	private Queue<T> queue = new ConcurrentLinkedDeque<T>();
 
 	public CustomPublisher(Logger logger) {
@@ -32,7 +32,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	public void subscribe(Subscriber<? super T> subscriber) {
 		this.logger.debug("===> CustomPublisher.subscribe()");
 		this.isRunning = true;
-		this.requestCounter = new AtomicInteger();
+		this.requestCounter = new AtomicLong();
 		this.subscriber = subscriber;
 		this.subscriber.onSubscribe(this);
 	}
@@ -55,7 +55,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	@Override
 	public void request(long n) {
 		this.logger.info("=====> CustomPublisher.request = " + n);
-		this.requestCounter.addAndGet((int) n);
+		this.requestCounter.addAndGet(n);
 		tryToSend();
 	}
 

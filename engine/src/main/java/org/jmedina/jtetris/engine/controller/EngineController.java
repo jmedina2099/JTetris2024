@@ -12,6 +12,7 @@ import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
+import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ import reactor.core.publisher.Mono;
  *
  */
 @RequiredArgsConstructor
-@CrossOrigin(origins = { "http://localhost:9081", "http://localhost:9083" })
+@CrossOrigin(origins = { "http://localhost:9081", "http://localhost:9082", "http://localhost:9083" })
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class EngineController {
@@ -43,6 +44,7 @@ public class EngineController {
 	private final EnginePublisher enginePublisher;
 	private final FigurePublisher figurePublisher;
 	private final BoardPublisher boardPublisher;
+	private final NextFigurePublisher nextFigurePublisher;
 	private final FiguresClient figuresClient;
 
 	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,7 +62,8 @@ public class EngineController {
 	public Mono<Boolean> start() {
 		this.logger.debug("===> EngineController.start()");
 		try {
-			this.engineService.start(this.figurePublisher, this.enginePublisher);
+			this.engineService.start(this.nextFigurePublisher, this.enginePublisher);
+			this.nextFigurePublisher.sendNextFigurePetition(new Message("OK"));
 			return Mono.just(true).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
@@ -72,6 +75,10 @@ public class EngineController {
 	public Mono<Boolean> stop() {
 		this.logger.debug("===> EngineController.stop()");
 		try {
+			this.figurePublisher.stop();
+			this.enginePublisher.stop();
+			this.boardPublisher.stop();
+			this.nextFigurePublisher.stop();
 			this.engineService.stop();
 			return this.figuresClient.stop().timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
@@ -112,7 +119,7 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Mono.empty();
+				return Flux.<FigureOperation>empty();
 			});
 			fluxFromEngine = Flux.from(this.enginePublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - NEXT = " + figure);
@@ -126,7 +133,7 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
-				return Mono.empty();
+				return Flux.<FigureOperation>empty();
 			});
 			return fluxFromFigures.mergeWith(fluxFromEngine).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
@@ -154,12 +161,52 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
-				return Mono.empty();
+				return Flux.<BoardOperation>empty();
 			});
 			return fluxOfBoards.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.<BoardOperation>empty();
+		}
+	}
+
+	@GetMapping(value = "/getNextFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Flux<Message> getNextFigureConversation(ServerWebExchange exchange) {
+		this.logger.debug("===> EngineController.getNextFigureConversation()");
+		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
+		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
+		this.logger.debug("=========> HEADERS!!!");
+		HttpHeaders headers = exchange.getRequest().getHeaders();
+		Set<String> keys = headers.keySet();
+		keys.stream().forEach(key -> {
+			List<String> values = headers.get(key);
+			if (values != null) {
+				values.stream().forEach(v -> {
+					this.logger.debug("=========> header= {}: {}", key, v);
+				});
+			}
+		});
+		this.logger.debug("=========> END HEADERS!!!");
+		Flux<Message> fluxOfNextFigure = null;
+		try {
+			fluxOfNextFigure = Flux.from(this.nextFigurePublisher).doOnNext(value -> {
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - NEXT = " + value);
+			}).doOnComplete(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - COMPLETE!");
+			}).doOnCancel(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - CANCEL!");
+			}).doOnTerminate(() -> {
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - TERMINATE!");
+			}).doOnError(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.nextFigurePublisher =", e);
+			}).onErrorResume(e -> {
+				this.logger.error("==*=> ERROR - Flux.from.nextFigurePublisher =", e);
+				return Flux.<Message>empty();
+			});
+			return fluxOfNextFigure.timeout(Duration.ofHours(1));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Flux.<Message>empty();
 		}
 	}
 

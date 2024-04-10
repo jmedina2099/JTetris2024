@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
-import org.jmedina.jtetris.engine.publisher.FigurePublisher;
+import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
 
 /**
  * @author Jorge Medina
@@ -12,7 +12,7 @@ import org.jmedina.jtetris.engine.publisher.FigurePublisher;
  */
 public interface EngineService {
 
-	public void start(FigurePublisher figurePublisher, EnginePublisher enginePublisher);
+	public void start(NextFigurePublisher nextFigurePublisher, EnginePublisher enginePublisher);
 
 	public void stop();
 

@@ -16,9 +16,10 @@ import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
+import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
-import org.jmedina.jtetris.engine.publisher.FigurePublisher;
+import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.service.GridSupportService;
 import org.jmedina.jtetris.engine.service.KafkaService;
@@ -49,7 +50,7 @@ public class EngineServiceImpl implements EngineService {
 	private long initialTimeStamp;
 	private List<Box> falledBoxes;
 	private ReentrantLock lock = new ReentrantLock();
-	private FigurePublisher figurePublisher;
+	private NextFigurePublisher nextFigurePublisher;
 	private EnginePublisher enginePublisher;
 
 	@Autowired(required = false)
@@ -64,10 +65,10 @@ public class EngineServiceImpl implements EngineService {
 	public static final int HEIGHT = 20;
 
 	@Override
-	public void start(FigurePublisher figurePublisher, EnginePublisher enginePublisher) {
+	public void start(NextFigurePublisher nextFigurePublisher, EnginePublisher enginePublisher) {
 		this.logger.debug("==> Engine.start()");
 		this.isRunning = true;
-		this.figurePublisher = figurePublisher;
+		this.nextFigurePublisher = nextFigurePublisher;
 		this.enginePublisher = enginePublisher;
 		reset();
 	}
@@ -76,13 +77,6 @@ public class EngineServiceImpl implements EngineService {
 	public void stop() {
 		this.logger.debug("==> Engine.stop()");
 		this.isRunning = false;
-		if (Objects.nonNull(this.figurePublisher)) {
-			this.figurePublisher.stop();
-		}
-		if (Objects.nonNull(this.enginePublisher)) {
-			this.enginePublisher.stop();
-		}
-		this.boardPublisher.stop();
 		reset();
 	}
 
@@ -156,7 +150,7 @@ public class EngineServiceImpl implements EngineService {
 				sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
 						BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 			}
-			this.figurePublisher.askForNextFigureOperation();
+			this.nextFigurePublisher.sendNextFigurePetition(new Message("OK"));
 			return Optional.of(true);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);

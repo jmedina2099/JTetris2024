@@ -1,5 +1,7 @@
 package org.jmedina.jtetris.api.publisher;
 
+import java.time.Duration;
+
 import org.jmedina.jtetris.api.model.FigureOperation;
 import org.jmedina.jtetris.api.service.ConversationService;
 import org.reactivestreams.Subscriber;
@@ -33,7 +35,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 	private void getFigureConversation() {
 		this.logger.debug("===> FigurePublisher.getFigureConversation()");
 		try {
-			this.conversationService.getFigureConversation().doOnNext(figure -> {
+			this.conversationService.getFigureConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
 				this.logger.debug("===> API - getFigureConversation - NEXT = " + figure);
 			}).doOnComplete(() -> {
 				this.logger.debug("===> API - getFigureConversation - COMPLETE!");

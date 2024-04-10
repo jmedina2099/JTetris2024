@@ -96,16 +96,4 @@ public class FigureController {
 		}
 	}
 
-	@GetMapping(value = "/askForNextFigureOperation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> askForNextFigureOperation() {
-		this.logger.debug("===> FigureController.getNextFigure()");
-		try {
-			this.figurePublisher.askForNextFigureOperation();
-			return Mono.just(true).timeout(Duration.ofSeconds(3));
-		} catch (Exception e) {
-			this.logger.error("=*=> ERROR: ", e);
-			return Mono.<Boolean>empty();
-		}
-	}
-
 }

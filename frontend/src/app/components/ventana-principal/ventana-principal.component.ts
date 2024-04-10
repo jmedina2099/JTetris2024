@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Socket } from 'socket.io-client';
 import { BoardOperation } from 'src/app/model/board/boardOperation';
@@ -16,7 +16,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './ventana-principal.component.html',
   styleUrls: ['./ventana-principal.component.css'],
 })
-export class VentanaPrincipalComponent implements OnInit {
+export class VentanaPrincipalComponent implements OnInit, OnDestroy {
   private socket: Socket | undefined;
   protected statistics: number[][] = [
     [0, 0],
@@ -35,9 +35,32 @@ export class VentanaPrincipalComponent implements OnInit {
     private webSocketService: WebSocketService,
     private route: ActivatedRoute
   ) {}
-
   ngOnInit(): void {
     this.initSocket();
+    this.getConversations();
+  }
+
+  ngOnDestroy(): void {
+    this.stop(false);
+  }
+
+  private getConversations(): void {
+    this.fetchService.getFigureConversation().subscribe({
+      next: (op: FigureOperation) =>
+        this.validateFigureOperation(op, 0)
+          ? this.setFigureOperation(op, 0)
+          : false,
+      //error: err => console.log('--> getFigureConversation.error = '+err),
+      //complete: () => console.log('--> getFigureConversation.complete!'),
+    });
+    this.fetchService.getBoardConversation().subscribe({
+      next: (op: BoardOperation) =>
+        this.validateBoardOperation(op, 0)
+          ? this.setBoardOperation(op, 0)
+          : false,
+      //error: err => console.log('--> getBoardConversation.error = '+err),
+      //complete: () => console.log('--> getBoardConversation.complete!'),
+    });
   }
 
   protected getFallingBoxes(): Box[] {
@@ -104,31 +127,21 @@ export class VentanaPrincipalComponent implements OnInit {
         if (value) {
           this.startTime = Date.now();
           window.setInterval(() => {
-            this.secondsEllapsed = this.startTime > 0? Math.floor((Date.now() - this.startTime) / 1000) % 60: 0;
-            this.minutesEllapsed = this.startTime > 0? Math.floor((Date.now() - this.startTime) / (1000*60)): 0;
+            this.secondsEllapsed =
+              this.startTime > 0
+                ? Math.floor((Date.now() - this.startTime) / 1000) % 60
+                : 0;
+            this.minutesEllapsed =
+              this.startTime > 0
+                ? Math.floor((Date.now() - this.startTime) / (1000 * 60))
+                : 0;
           }, 1000);
-          this.fetchService.getFigureConversation().subscribe({
-            next: (op: FigureOperation) =>
-              this.validateFigureOperation(op, 0)
-                ? this.setFigureOperation(op, 0)
-                : false,
-            //error: err => console.log('--> getFigureConversation.error = '+err),
-            //complete: () => console.log('--> getFigureConversation.complete!'),
-          });
-          this.fetchService.getBoardConversation().subscribe({
-            next: (op: BoardOperation) =>
-              this.validateBoardOperation(op, 0)
-                ? this.setBoardOperation(op, 0)
-                : false,
-            //error: err => console.log('--> getBoardConversation.error = '+err),
-            //complete: () => console.log('--> getBoardConversation.complete!'),
-          });
         }
       },
     });
   }
 
-  protected stop(): void {
+  protected stop(withConversations: boolean): void {
     this.fetchService.stop().subscribe({
       next: () => {
         this.reset();
@@ -139,6 +152,9 @@ export class VentanaPrincipalComponent implements OnInit {
         this.startTime = 0;
         this.setsOfFigure = 0;
         this.setsOfBoard = 0;
+        if (withConversations) {
+          this.getConversations();
+        }
       },
     });
   }
