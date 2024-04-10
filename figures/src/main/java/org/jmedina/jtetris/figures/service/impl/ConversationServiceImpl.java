@@ -2,7 +2,7 @@ package org.jmedina.jtetris.figures.service.impl;
 
 import java.time.Duration;
 
-import org.jmedina.jtetris.figures.model.Message;
+import org.jmedina.jtetris.figures.model.NextFigureOperation;
 import org.jmedina.jtetris.figures.service.ConversationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +52,9 @@ public class ConversationServiceImpl implements ConversationService {
 				.build();
 	}
 
-	public Flux<Message> getNextFigureConversation() {
-		return this.clientForConversations.get().uri("/getNextFigureConversation").retrieve().bodyToFlux(Message.class);
+	public Flux<NextFigureOperation> getNextFigureConversation() {
+		return this.clientForConversations.get().uri("/getNextFigureConversation").retrieve()
+				.bodyToFlux(NextFigureOperation.class);
 	}
 
 }

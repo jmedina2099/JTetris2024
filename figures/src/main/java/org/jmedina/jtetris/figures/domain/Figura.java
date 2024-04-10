@@ -25,4 +25,12 @@ public class Figura {
 	private String boxes;
 	private String center;
 	private int numRotations;
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("id=").append(id).append(",name=").append(name).append(",boxes=").append(boxes).append(",center=")
+				.append(center).append(",numRotations=").append(numRotations);
+		return sb.toString();
+	}
 }

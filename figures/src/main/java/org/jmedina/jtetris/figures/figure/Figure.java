@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
+import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Jorge Medina
@@ -21,6 +25,9 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 public abstract class Figure {
+
+	@JsonIgnore
+	private final Logger logger = LogManager.getLogger(this.getClass());
 
 	@JsonIgnore
 	@EqualsAndHashCode.Exclude
@@ -35,11 +42,20 @@ public abstract class Figure {
 	protected void init(FiguraEnumeration type) {
 		this.type = type;
 		this.id = type.getId();
-		this.numRotations = type.getNumRotations();
-		this.boxes = new ArrayList<>(this.type.getTuplas().stream().map(t -> {
-			return new Box(t);
-		}).collect(Collectors.toList()));
-		this.center = type.getCenter();
+	}
+
+	public Mono<Figure> load(FigureTemplateOperations template) {
+		this.logger.debug("==> load = " + this.type.name());
+		return template.findByName(this.type.name()).map(fig -> {
+			this.logger.debug("==> loading... " + fig);
+			this.type.loadFigura(fig);
+			this.boxes = new ArrayList<>(
+					this.type.getTuplas().stream().map(t -> new Box(t)).collect(Collectors.toList()));
+			this.logger.debug("==> boxes... " + this.boxes);
+			this.center = type.getCenter();
+			this.numRotations = type.getNumRotations();
+			return this;
+		});
 	}
 
 	@Override

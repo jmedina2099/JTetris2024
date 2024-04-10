@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Jorge Medina
@@ -65,9 +66,9 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	}
 
 	@Override
-	public FigureOperation askForNextFigureOperation() throws ServiceException {
+	public Mono<FigureOperation> askForNextFigureOperation() throws ServiceException {
 		this.logger.debug("==> FigureService.askForNextFigureOperation()");
-		FigureOperation figureOperation = null;
+		Mono<FigureOperation> monoOperation = null;
 		try {
 			Figure figure = null;
 			int value = this.random.nextInt(FiguraEnumeration.values().length);
@@ -87,23 +88,28 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			default:
 				throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 			}
-			long nanos;
-			figureOperation = FigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION)
-					.figure(figure).initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
-			sendFigureOperationToKafka(figureOperation);
-			this.logger.debug("==> FigureService.askForNextFigureOperation() = " + figureOperation);
+			Mono<Figure> mono = figure.load(this.figureTemplateOperations);
+			monoOperation = mono.map(fig -> {
+				long nanos;
+				FigureOperation figureOperation = FigureOperation.builder()
+						.operation(FigureOperationEnumeration.NEW_OPERATION).figure(fig)
+						.initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
+				sendFigureOperationToKafka(figureOperation);
+				return figureOperation;
+			});
+			this.logger.debug("==> FigureService.askForNextFigureOperation() = " + monoOperation);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return null;
 		}
-		return figureOperation;
+		return monoOperation;
 	}
 
 	@Override
 	public void loadFigurasFromDB() {
 		this.logger.debug("==> FigureService.loadFigurasFromDB()");
 		Flux<Figura> listFigures = this.figureTemplateOperations.findAll();
-		listFigures.subscribe(f -> loadFigureCoordinates(f, 1));
+		listFigures.subscribe();
 		if (Objects.isNull(listFigures.blockFirst())) {
 			this.logger.debug("=======> loading initial data...");
 			saveFiguras(generateFigurasFromString(linesFromResource(this.initialDataResource)));
@@ -112,20 +118,14 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	}
 
 	private void sendFigureOperationToKafka(FigureOperation op) {
-		this.logger.debug("==> FigureService.sendFigureOperationToKafka() = " + this.kafkaService);
+		this.logger.debug("==> FigureService.sendFigureOperationToKafka() = " + op);
 		if (this.useKafka) {
 			this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(op), this.nextFigureTopic);
 		}
 	}
 
 	private void saveFiguras(List<Figura> figuras) {
-		this.figureRepository.saveAll(Flux.just(figuras.toArray(new Figura[0])))
-				.subscribe(f -> loadFigureCoordinates(f, 2));
-	}
-
-	private void loadFigureCoordinates(Figura f, int id) {
-		this.logger.debug("====> loading Figuras ({}) ==> {}", id, f);
-		FiguraEnumeration.valueOf(f.getName()).loadFigura(f);
+		this.figureRepository.saveAll(Flux.just(figuras.toArray(new Figura[0]))).subscribe();
 	}
 
 	private List<String> linesFromResource(Resource input) {

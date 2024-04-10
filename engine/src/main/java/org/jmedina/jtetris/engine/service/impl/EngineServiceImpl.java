@@ -16,7 +16,7 @@ import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
-import org.jmedina.jtetris.engine.model.Message;
+import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
@@ -150,7 +150,8 @@ public class EngineServiceImpl implements EngineService {
 				sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
 						BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 			}
-			this.nextFigurePublisher.sendNextFigurePetition(new Message("OK"));
+			this.nextFigurePublisher.sendNextFigurePetition(
+					NextFigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION).build());
 			return Optional.of(true);
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);

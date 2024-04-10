@@ -6,9 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jmedina.jtetris.engine.client.FiguresClient;
+import org.jmedina.jtetris.engine.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.model.Message;
+import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
@@ -63,7 +65,8 @@ public class EngineController {
 		this.logger.debug("===> EngineController.start()");
 		try {
 			this.engineService.start(this.nextFigurePublisher, this.enginePublisher);
-			this.nextFigurePublisher.sendNextFigurePetition(new Message("OK"));
+			this.nextFigurePublisher.sendNextFigurePetition(
+					NextFigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION).build());
 			return Mono.just(true).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
@@ -171,7 +174,7 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getNextFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Message> getNextFigureConversation(ServerWebExchange exchange) {
+	public Flux<NextFigureOperation> getNextFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getNextFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
@@ -187,7 +190,7 @@ public class EngineController {
 			}
 		});
 		this.logger.debug("=========> END HEADERS!!!");
-		Flux<Message> fluxOfNextFigure = null;
+		Flux<NextFigureOperation> fluxOfNextFigure = null;
 		try {
 			fluxOfNextFigure = Flux.from(this.nextFigurePublisher).doOnNext(value -> {
 				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - NEXT = " + value);
@@ -201,12 +204,12 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.nextFigurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.nextFigurePublisher =", e);
-				return Flux.<Message>empty();
+				return Flux.<NextFigureOperation>empty();
 			});
 			return fluxOfNextFigure.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Flux.<Message>empty();
+			return Flux.<NextFigureOperation>empty();
 		}
 	}
 
