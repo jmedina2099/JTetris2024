@@ -123,12 +123,12 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
       startButtonElement.blur();
     }
     this.reset();
+    this.getConversations();
     this.fetchService.start().subscribe({
       next: (value: boolean) => {
         this.isRunning = value;
         this.route.snapshot.data['game'].isRunning = value;
         if (value) {
-          this.getConversations();
           this.startTime = Date.now();
           window.setInterval(() => {
             this.secondsEllapsed =
