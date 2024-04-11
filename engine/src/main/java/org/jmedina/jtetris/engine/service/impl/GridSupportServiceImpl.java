@@ -11,8 +11,11 @@ import java.util.stream.Stream;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.service.GridSupportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
 
 /**
@@ -23,7 +26,14 @@ import lombok.NoArgsConstructor;
 @Service
 public class GridSupportServiceImpl implements GridSupportService {
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Map<Integer, boolean[]> gridBoxes = new HashMap<>();
+
+	@PostConstruct
+	private void init() {
+		this.logger.debug("==> GridSupportService.init()");
+		initializeGrid();
+	}
 
 	@Override
 	public void initializeGrid() {

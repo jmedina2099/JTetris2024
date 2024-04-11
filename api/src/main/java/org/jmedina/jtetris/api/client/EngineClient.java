@@ -13,9 +13,6 @@ import reactor.core.publisher.Mono;
 @ReactiveFeignClient(value = "engineClient", url = "${api.engine.base-url}", fallback = EngineFallback.class)
 public interface EngineClient {
 
-	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> start();
-
 	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> stop();
 

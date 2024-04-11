@@ -17,10 +17,6 @@ export class FetchService {
     private http: HttpClient
   ) {}
 
-  public start(): Observable<boolean> {
-    return this.http.post<boolean>(this.fetchUrl + '/start', null);
-  }
-
   public stop(): Observable<boolean> {
     return this.http.post<boolean>(this.fetchUrl + '/stop', null);
   }

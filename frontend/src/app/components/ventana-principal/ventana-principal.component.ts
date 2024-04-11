@@ -123,26 +123,20 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
       startButtonElement.blur();
     }
     this.reset();
+    this.isRunning = true;
+    this.route.snapshot.data['game'].isRunning = true;
     this.getConversations();
-    this.fetchService.start().subscribe({
-      next: (value: boolean) => {
-        this.isRunning = value;
-        this.route.snapshot.data['game'].isRunning = value;
-        if (value) {
-          this.startTime = Date.now();
-          window.setInterval(() => {
-            this.secondsEllapsed =
-              this.startTime > 0
-                ? Math.floor((Date.now() - this.startTime) / 1000) % 60
-                : 0;
-            this.minutesEllapsed =
-              this.startTime > 0
-                ? Math.floor((Date.now() - this.startTime) / (1000 * 60))
-                : 0;
-          }, 1000);
-        }
-      },
-    });
+    this.startTime = Date.now();
+    window.setInterval(() => {
+      this.secondsEllapsed =
+        this.startTime > 0
+          ? Math.floor((Date.now() - this.startTime) / 1000) % 60
+          : 0;
+      this.minutesEllapsed =
+        this.startTime > 0
+          ? Math.floor((Date.now() - this.startTime) / (1000 * 60))
+          : 0;
+    }, 1000);
   }
 
   protected stop(): void {

@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jmedina.jtetris.engine.client.FiguresClient;
-import org.jmedina.jtetris.engine.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.model.Message;
@@ -48,6 +47,7 @@ public class EngineController {
 	private final BoardPublisher boardPublisher;
 	private final NextFigurePublisher nextFigurePublisher;
 	private final FiguresClient figuresClient;
+	private final boolean showHeaders = false;
 
 	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Message> hello() {
@@ -57,20 +57,6 @@ public class EngineController {
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.empty();
-		}
-	}
-
-	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> start() {
-		this.logger.debug("===> EngineController.start()");
-		try {
-			this.engineService.start(this.nextFigurePublisher, this.enginePublisher);
-			this.nextFigurePublisher.sendNextFigurePetition(
-					NextFigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION).build());
-			return Mono.just(true).timeout(Duration.ofSeconds(3));
-		} catch (Exception e) {
-			this.logger.error("=*=> ERROR: ", e);
-			return Mono.just(false).timeout(Duration.ofSeconds(3));
 		}
 	}
 
@@ -93,20 +79,12 @@ public class EngineController {
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Flux<FigureOperation> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getFigureConversation()");
+		this.engineService.start(this.nextFigurePublisher, this.enginePublisher);
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
-		this.logger.debug("=========> HEADERS!!!");
-		HttpHeaders headers = exchange.getRequest().getHeaders();
-		Set<String> keys = headers.keySet();
-		keys.stream().forEach(key -> {
-			List<String> values = headers.get(key);
-			if (values != null) {
-				values.stream().forEach(v -> {
-					this.logger.debug("=========> header= {}: {}", key, v);
-				});
-			}
-		});
-		this.logger.debug("=========> END HEADERS!!!");
+		if (this.showHeaders) {
+			printHeaders(exchange);
+		}
 		Flux<FigureOperation> fluxFromFigures = null;
 		Flux<FigureOperation> fluxFromEngine = null;
 		try {
@@ -178,18 +156,9 @@ public class EngineController {
 		this.logger.debug("===> EngineController.getNextFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
-		this.logger.debug("=========> HEADERS!!!");
-		HttpHeaders headers = exchange.getRequest().getHeaders();
-		Set<String> keys = headers.keySet();
-		keys.stream().forEach(key -> {
-			List<String> values = headers.get(key);
-			if (values != null) {
-				values.stream().forEach(v -> {
-					this.logger.debug("=========> header= {}: {}", key, v);
-				});
-			}
-		});
-		this.logger.debug("=========> END HEADERS!!!");
+		if (this.showHeaders) {
+			printHeaders(exchange);
+		}
 		Flux<NextFigureOperation> fluxOfNextFigure = null;
 		try {
 			fluxOfNextFigure = Flux.from(this.nextFigurePublisher).doOnNext(value -> {
@@ -273,4 +242,18 @@ public class EngineController {
 				: Mono.just(false).timeout(Duration.ofSeconds(3));
 	}
 
+	private void printHeaders(ServerWebExchange exchange) {
+		this.logger.debug("=========> HEADERS!!!");
+		HttpHeaders headers = exchange.getRequest().getHeaders();
+		Set<String> keys = headers.keySet();
+		keys.stream().forEach(key -> {
+			List<String> values = headers.get(key);
+			if (values != null) {
+				values.stream().forEach(v -> {
+					this.logger.debug("=========> header= {}: {}", key, v);
+				});
+			}
+		});
+		this.logger.debug("=========> END HEADERS!!!");
+	}
 }

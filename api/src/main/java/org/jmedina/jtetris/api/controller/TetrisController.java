@@ -39,6 +39,7 @@ public class TetrisController {
 	private final FigurePublisher figurePublisher;
 	private final BoardPublisher boardPublisher;
 	private final EngineClient engineClient;
+	private final boolean showHeaders = false;
 
 	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Message>> hello() {
@@ -49,17 +50,6 @@ public class TetrisController {
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return ResponseEntity.internalServerError().body(Mono.empty());
-		}
-	}
-
-	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Mono<Boolean>> start() {
-		this.logger.debug("===> TetrisController.start()");
-		try {
-			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.start().timeout(Duration.ofSeconds(3)));
-		} catch (Exception e) {
-			this.logger.error("=*=> ERROR: ", e);
-			return ResponseEntity.internalServerError().body(Mono.just(false).timeout(Duration.ofSeconds(3)));
 		}
 	}
 
@@ -81,18 +71,9 @@ public class TetrisController {
 		this.logger.debug("===> TetrisController.getFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
-		this.logger.debug("=========> HEADERS!!!");
-		HttpHeaders headers = exchange.getRequest().getHeaders();
-		Set<String> keys = headers.keySet();
-		keys.stream().forEach(key -> {
-			List<String> values = headers.get(key);
-			if (values != null) {
-				values.stream().forEach(v -> {
-					this.logger.debug("=========> header= {}: {}", key, v);
-				});
-			}
-		});
-		this.logger.debug("=========> END HEADERS!!!");
+		if (this.showHeaders) {
+			printHeaders(exchange);
+		}
 		Flux<FigureOperation> fluxOfFigures = null;
 		try {
 			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
@@ -204,4 +185,20 @@ public class TetrisController {
 			return ResponseEntity.internalServerError().body(Mono.just(false).timeout(Duration.ofSeconds(3)));
 		}
 	}
+
+	private void printHeaders(ServerWebExchange exchange) {
+		this.logger.debug("=========> HEADERS!!!");
+		HttpHeaders headers = exchange.getRequest().getHeaders();
+		Set<String> keys = headers.keySet();
+		keys.stream().forEach(key -> {
+			List<String> values = headers.get(key);
+			if (values != null) {
+				values.stream().forEach(v -> {
+					this.logger.debug("=========> header= {}: {}", key, v);
+				});
+			}
+		});
+		this.logger.debug("=========> END HEADERS!!!");
+	}
+
 }

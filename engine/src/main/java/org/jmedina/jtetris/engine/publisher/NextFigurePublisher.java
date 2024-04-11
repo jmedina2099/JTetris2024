@@ -1,5 +1,6 @@
 package org.jmedina.jtetris.engine.publisher;
 
+import org.jmedina.jtetris.engine.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.reactivestreams.Subscriber;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ public class NextFigurePublisher extends CustomPublisher<NextFigureOperation> {
 	public void subscribe(Subscriber<? super NextFigureOperation> subscriber) {
 		this.logger.debug("===> NextFigurePublisher.subscribe()");
 		super.subscribe(subscriber);
+		sendNextFigurePetition(
+				NextFigureOperation.builder().operation(FigureOperationEnumeration.NEW_OPERATION).build());
 	}
 
 	public void sendNextFigurePetition(NextFigureOperation op) {

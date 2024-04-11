@@ -5,7 +5,6 @@ import java.time.Duration;
 import org.jmedina.jtetris.figures.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.model.NextFigureOperation;
-import org.jmedina.jtetris.figures.service.ConversationService;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.reactivestreams.Subscriber;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 	private FigureService figureService;
 
 	@Autowired
-	private ConversationService conversationService;
+	private NextFigurePublisher nextFigurePublisher;
 
 	public FigurePublisher() {
 		super(LoggerFactory.getLogger(FigurePublisher.class));
@@ -38,21 +37,27 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 		getNextFigureConversation();
 	}
 
+	@Override
+	public boolean stop() {
+		this.nextFigurePublisher.stop();
+		return super.stop();
+	}
+
 	private void getNextFigureConversation() {
 		this.logger.debug("===> FigurePublisher.getNextFigureConversation()");
 		try {
-			this.conversationService.getNextFigureConversation().timeout(Duration.ofHours(1)).doOnNext(op -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - NEXT = " + op);
+			Flux.from(this.nextFigurePublisher).timeout(Duration.ofHours(1)).doOnNext(op -> {
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - NEXT = " + op);
 			}).doOnComplete(() -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - COMPLETE!");
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - COMPLETE!");
 			}).doOnCancel(() -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - CANCEL!");
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - CANCEL!");
 			}).doOnTerminate(() -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - TERMINATE!");
+				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - TERMINATE!");
 			}).doOnError(e -> {
-				this.logger.error("==*=> ERROR - getNextFigureConversation =", e);
+				this.logger.error("==*=> ERROR - Flux.from.nextFigurePublisher =", e);
 			}).onErrorResume(e -> {
-				this.logger.error("==*=> ERROR - getNextFigureConversation =", e);
+				this.logger.error("==*=> ERROR - Flux.from.nextFigurePublisher =", e);
 				return Flux.<NextFigureOperation>empty();
 			}).subscribe(op -> {
 				this.logger.debug("===> getNextFigureConversation.subscribe = " + op);

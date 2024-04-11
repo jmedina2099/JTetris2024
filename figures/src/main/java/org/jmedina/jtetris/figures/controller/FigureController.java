@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.model.Message;
 import org.jmedina.jtetris.figures.publisher.FigurePublisher;
+import org.jmedina.jtetris.figures.publisher.NextFigurePublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +33,8 @@ public class FigureController {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final FigurePublisher figurePublisher;
+	private final NextFigurePublisher nextFigurePublisher;
+	private final boolean showHeaders = false;
 
 	@GetMapping("/hello")
 	public Mono<Message> hello() {
@@ -49,6 +52,7 @@ public class FigureController {
 		this.logger.debug("===> FigureController.stop()");
 		try {
 			this.figurePublisher.stop();
+			this.nextFigurePublisher.stop();
 			return Mono.just(true).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
@@ -61,18 +65,9 @@ public class FigureController {
 		this.logger.debug("===> FigureController.getFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
-		this.logger.debug("=========> HEADERS!!!");
-		HttpHeaders headers = exchange.getRequest().getHeaders();
-		Set<String> keys = headers.keySet();
-		keys.stream().forEach(key -> {
-			List<String> values = headers.get(key);
-			if (values != null) {
-				values.stream().forEach(v -> {
-					this.logger.debug("=========> header= {}: {}", key, v);
-				});
-			}
-		});
-		this.logger.debug("=========> END HEADERS!!!");
+		if (this.showHeaders) {
+			printHeaders(exchange);
+		}
 		Flux<FigureOperation> fluxOfFigures = null;
 		try {
 			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
@@ -87,13 +82,28 @@ public class FigureController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Mono.empty();
+				return Flux.<FigureOperation>empty();
 			});
 			return fluxOfFigures.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Flux.<FigureOperation>empty();
 		}
+	}
+
+	private void printHeaders(ServerWebExchange exchange) {
+		this.logger.debug("=========> HEADERS!!!");
+		HttpHeaders headers = exchange.getRequest().getHeaders();
+		Set<String> keys = headers.keySet();
+		keys.stream().forEach(key -> {
+			List<String> values = headers.get(key);
+			if (values != null) {
+				values.stream().forEach(v -> {
+					this.logger.debug("=========> header= {}: {}", key, v);
+				});
+			}
+		});
+		this.logger.debug("=========> END HEADERS!!!");
 	}
 
 }

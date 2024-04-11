@@ -77,6 +77,7 @@ public class EngineServiceImpl implements EngineService {
 	public void stop() {
 		this.logger.debug("==> Engine.stop()");
 		this.isRunning = false;
+		this.gridSupport.initializeGrid();
 		reset();
 	}
 
@@ -164,7 +165,6 @@ public class EngineServiceImpl implements EngineService {
 	private void reset() {
 		this.fallingFigure = null;
 		this.falledBoxes = new ArrayList<>();
-		this.gridSupport.initializeGrid();
 	}
 
 	private void sendFigureOperationToKafka(FigureOperation op) {
