@@ -99,5 +99,3 @@ api:
 #    base-url: http://localhost:9084/engine # engine node
   cors:
     origin: http://localhost:8080,http://localhost:9081,http://localhost:4200
-use:
-  weblux: ${use.webflux}

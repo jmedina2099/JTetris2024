@@ -120,4 +120,3 @@ engine:
     askForNextFigureUri: /askForNextFigure
 use:
   kafka: ${use.kafka}
-  weblux: ${use.webflux}

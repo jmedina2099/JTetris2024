@@ -23,6 +23,7 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
     [0, 0],
   ];
   protected showStatistics: boolean = environment.showStatistics;
+  protected useKafka: boolean = environment.useKafka;
   protected isRunning = false;
   protected startTime = 0;
   protected minutesEllapsed = 0;
@@ -35,13 +36,15 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
     private webSocketService: WebSocketService,
     private route: ActivatedRoute
   ) {}
+
   ngOnInit(): void {
-    this.initSocket();
-    this.getConversations();
+    if (this.useKafka) {
+      this.initSocket();
+    }
   }
 
   ngOnDestroy(): void {
-    this.stop(false);
+    this.stop();
   }
 
   private getConversations(): void {
@@ -125,6 +128,7 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
         this.isRunning = value;
         this.route.snapshot.data['game'].isRunning = value;
         if (value) {
+          this.getConversations();
           this.startTime = Date.now();
           window.setInterval(() => {
             this.secondsEllapsed =
@@ -141,7 +145,7 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
     });
   }
 
-  protected stop(withConversations: boolean): void {
+  protected stop(): void {
     this.fetchService.stop().subscribe({
       next: () => {
         this.reset();
@@ -152,9 +156,6 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
         this.startTime = 0;
         this.setsOfFigure = 0;
         this.setsOfBoard = 0;
-        if (withConversations) {
-          this.getConversations();
-        }
       },
     });
   }

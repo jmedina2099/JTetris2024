@@ -7,13 +7,14 @@ import { Socket, io } from 'socket.io-client';
 export class WebSocketService {
   private socket: Socket | undefined = undefined;
 
-  constructor() {
-    if (!this.socket) {
-      this.socket = io('http://localhost:4444/');
-    }
+  public getSocket(): Socket {
+    return this.createSocket();
   }
 
-  public getSocket(): Socket | undefined {
+  private createSocket(): Socket {
+    if (this.socket === undefined) {
+      this.socket = io('http://localhost:4444/');
+    }
     return this.socket;
   }
 }

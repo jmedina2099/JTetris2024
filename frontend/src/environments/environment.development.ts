@@ -5,4 +5,5 @@ export const environment = {
   userUri: '/user',
   gameUri: '/game',
   showStatistics: false,
+  useKafka: false,
 };
