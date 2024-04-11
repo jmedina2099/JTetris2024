@@ -35,23 +35,24 @@ public class NextFigurePublisher extends CustomPublisher<NextFigureOperation> {
 	private void getNextFigureConversation() {
 		this.logger.debug("===> FigurePublisher.getNextFigureConversation()");
 		try {
-			this.conversationService.getNextFigureConversation().timeout(Duration.ofHours(1)).doOnNext(op -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - NEXT = " + op);
-			}).doOnComplete(() -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - COMPLETE!");
-			}).doOnCancel(() -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - CANCEL!");
-			}).doOnTerminate(() -> {
-				this.logger.debug("===> ENGINE - getNextFigureConversation - TERMINATE!");
-			}).doOnError(e -> {
-				this.logger.error("==*=> ERROR - getNextFigureConversation =", e);
-			}).onErrorResume(e -> {
-				this.logger.error("==*=> ERROR - getNextFigureConversation =", e);
-				return Flux.<NextFigureOperation>empty();
-			}).subscribe(op -> {
-				this.logger.debug("===> getNextFigureConversation.subscribe = " + op);
-				super.addToQueue(op);
-			});
+			super.disposable = this.conversationService.getNextFigureConversation().timeout(Duration.ofHours(1))
+					.doOnNext(op -> {
+						this.logger.debug("===> ENGINE - getNextFigureConversation - NEXT = " + op);
+					}).doOnComplete(() -> {
+						this.logger.debug("===> ENGINE - getNextFigureConversation - COMPLETE!");
+					}).doOnCancel(() -> {
+						this.logger.debug("===> ENGINE - getNextFigureConversation - CANCEL!");
+					}).doOnTerminate(() -> {
+						this.logger.debug("===> ENGINE - getNextFigureConversation - TERMINATE!");
+					}).doOnError(e -> {
+						this.logger.error("==*=> ERROR - getNextFigureConversation =", e);
+					}).onErrorResume(e -> {
+						this.logger.error("==*=> ERROR - getNextFigureConversation =", e);
+						return Flux.<NextFigureOperation>empty();
+					}).subscribe(op -> {
+						this.logger.debug("===> getNextFigureConversation.subscribe = " + op);
+						super.addToQueue(op);
+					});
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 		}

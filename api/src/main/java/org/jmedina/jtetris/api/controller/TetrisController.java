@@ -99,7 +99,7 @@ public class TetrisController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Mono.empty();
+				return Flux.<FigureOperation>empty();
 			});
 			return ResponseEntity.status(HttpStatus.OK).body(fluxOfFigures.timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
@@ -127,7 +127,7 @@ public class TetrisController {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
-				return Mono.empty();
+				return Flux.<BoardOperation>empty();
 			});
 			;
 			return ResponseEntity.status(HttpStatus.OK).body(fluxOfBoards.timeout(Duration.ofHours(1)));

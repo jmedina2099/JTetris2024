@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 
+import reactor.core.Disposable;
+
 /**
  * @author Jorge Medina
  *
@@ -19,7 +21,8 @@ import org.springframework.context.event.EventListener;
 public class CustomPublisher<T> implements Publisher<T>, Subscription {
 
 	protected final Logger logger;
-	private boolean isRunning = false;
+	protected boolean isRunning = false;
+	protected Disposable disposable;
 	private Subscriber<? super T> subscriber;
 	private AtomicLong requestCounter;
 	private Queue<T> queue = new ConcurrentLinkedDeque<T>();
@@ -46,6 +49,9 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	public boolean stop() {
 		this.logger.debug("===> CustomPublisher.stop()");
 		this.isRunning = false;
+		if (Objects.nonNull(this.disposable)) {
+			this.disposable.dispose();
+		}
 		if (Objects.nonNull(this.subscriber)) {
 			this.subscriber.onComplete();
 		}

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Jorge Medina
@@ -35,23 +35,24 @@ public class BoardPublisher extends CustomPublisher<BoardOperation> {
 	private void getBoardConversation() {
 		this.logger.debug("===> FigurePublisher.getBoardConversation()");
 		try {
-			this.conversationService.getBoardConversation().timeout(Duration.ofHours(1)).doOnNext(figure -> {
-				this.logger.debug("===> API - getBoardConversation - NEXT = " + figure);
-			}).doOnComplete(() -> {
-				this.logger.debug("===> API - getBoardConversation - COMPLETE!");
-			}).doOnCancel(() -> {
-				this.logger.debug("===> API - getBoardConversation - CANCEL!");
-			}).doOnTerminate(() -> {
-				this.logger.debug("===> API - getBoardConversation - TERMINATE!");
-			}).doOnError(e -> {
-				this.logger.error("==*=> ERROR - getBoardConversation =", e);
-			}).onErrorResume(e -> {
-				this.logger.error("==*=> ERROR - getBoardConversation =", e);
-				return Mono.empty();
-			}).subscribe(board -> {
-				this.logger.debug("===> getBoardConversation.subscribe = " + board);
-				super.addToQueue(board);
-			});
+			super.disposable = this.conversationService.getBoardConversation().timeout(Duration.ofHours(1))
+					.doOnNext(figure -> {
+						this.logger.debug("===> API - getBoardConversation - NEXT = " + figure);
+					}).doOnComplete(() -> {
+						this.logger.debug("===> API - getBoardConversation - COMPLETE!");
+					}).doOnCancel(() -> {
+						this.logger.debug("===> API - getBoardConversation - CANCEL!");
+					}).doOnTerminate(() -> {
+						this.logger.debug("===> API - getBoardConversation - TERMINATE!");
+					}).doOnError(e -> {
+						this.logger.error("==*=> ERROR - getBoardConversation =", e);
+					}).onErrorResume(e -> {
+						this.logger.error("==*=> ERROR - getBoardConversation =", e);
+						return Flux.<BoardOperation>empty();
+					}).subscribe(board -> {
+						this.logger.debug("===> getBoardConversation.subscribe = " + board);
+						super.addToQueue(board);
+					});
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 		}
