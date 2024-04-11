@@ -38,6 +38,7 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.fetchService.isUp().subscribe();
     if (this.useKafka) {
       this.initSocket();
     }

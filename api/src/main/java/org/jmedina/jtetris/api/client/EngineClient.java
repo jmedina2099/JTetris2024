@@ -1,6 +1,7 @@
 package org.jmedina.jtetris.api.client;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import reactivefeign.spring.config.ReactiveFeignClient;
@@ -12,6 +13,9 @@ import reactor.core.publisher.Mono;
  */
 @ReactiveFeignClient(value = "engineClient", url = "${api.engine.base-url}", fallback = EngineFallback.class)
 public interface EngineClient {
+
+	@GetMapping(value = "/isUp", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Boolean> isUp();
 
 	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> stop();

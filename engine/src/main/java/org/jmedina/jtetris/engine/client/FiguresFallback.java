@@ -11,6 +11,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class FiguresFallback implements FiguresClient {
 
+	public Mono<Boolean> isUp() {
+		return Mono.just(false);
+	}
+
 	public Mono<Boolean> stop() {
 		return Mono.just(false);
 	}

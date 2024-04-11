@@ -60,6 +60,17 @@ public class EngineController {
 		}
 	}
 
+	@GetMapping(value = "/isUp", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Boolean> isUp() {
+		this.logger.debug("===> TetrisController.isUp()");
+		try {
+			return this.figuresClient.isUp().timeout(Duration.ofSeconds(3));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.empty();
+		}
+	}
+
 	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Boolean> stop() {
 		this.logger.debug("===> EngineController.stop()");

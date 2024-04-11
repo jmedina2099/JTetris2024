@@ -53,6 +53,17 @@ public class TetrisController {
 		}
 	}
 
+	@GetMapping(value = "/isUp", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Mono<Boolean>> isUp() {
+		this.logger.debug("===> TetrisController.isUp()");
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(this.engineClient.isUp().timeout(Duration.ofSeconds(3)));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return ResponseEntity.internalServerError().body(Mono.empty());
+		}
+	}
+
 	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Mono<Boolean>> stop() {
 		this.logger.debug("===> TetrisController.stop()");
