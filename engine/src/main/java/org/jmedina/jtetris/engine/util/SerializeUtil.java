@@ -2,10 +2,10 @@ package org.jmedina.jtetris.engine.util;
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class SerializeUtil {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	public Optional<FigureOperation> convertStringToFigureOperation(String message) {

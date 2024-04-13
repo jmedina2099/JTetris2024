@@ -39,6 +39,7 @@
 		<module>frontend</module>
 		<module>feign-reactor-webclient</module>
 		<module>feign-reactor-spring-configuration</module>
+		<module>common</module>
 		<module>eureka</module>
 		<module>gateway</module>
 		<module>api</module>

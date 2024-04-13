@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.engine.client.FiguresClient;
 import org.jmedina.jtetris.engine.model.BoardOperation;
 import org.jmedina.jtetris.engine.model.FigureOperation;
@@ -15,8 +17,6 @@ import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
 import org.jmedina.jtetris.engine.service.EngineService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class EngineController {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final EngineService engineService;
 	private final EnginePublisher enginePublisher;
 	private final FigurePublisher figurePublisher;

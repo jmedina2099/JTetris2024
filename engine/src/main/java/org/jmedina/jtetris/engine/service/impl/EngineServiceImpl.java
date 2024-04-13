@@ -9,6 +9,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.engine.enumeration.BoardOperationEnumeration;
 import org.jmedina.jtetris.engine.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
@@ -25,8 +27,6 @@ import org.jmedina.jtetris.engine.service.GridSupportService;
 import org.jmedina.jtetris.engine.service.KafkaService;
 import org.jmedina.jtetris.engine.util.RotationUtil;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class EngineServiceImpl implements EngineService {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final BoardPublisher boardPublisher;
 	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;

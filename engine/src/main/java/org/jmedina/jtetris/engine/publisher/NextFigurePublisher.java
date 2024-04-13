@@ -1,9 +1,10 @@
 package org.jmedina.jtetris.engine.publisher;
 
+import org.apache.logging.log4j.LogManager;
+import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.jmedina.jtetris.engine.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.reactivestreams.Subscriber;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class NextFigurePublisher extends CustomPublisher<NextFigureOperation> {
 
 	public NextFigurePublisher() {
-		super(LoggerFactory.getLogger(NextFigurePublisher.class));
+		super(LogManager.getLogger(NextFigurePublisher.class));
 	}
 
 	@Override

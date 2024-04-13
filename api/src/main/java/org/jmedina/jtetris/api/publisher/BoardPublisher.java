@@ -2,10 +2,11 @@ package org.jmedina.jtetris.api.publisher;
 
 import java.time.Duration;
 
+import org.apache.logging.log4j.LogManager;
 import org.jmedina.jtetris.api.model.BoardOperation;
 import org.jmedina.jtetris.api.service.ConversationService;
+import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.reactivestreams.Subscriber;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class BoardPublisher extends CustomPublisher<BoardOperation> {
 	private ConversationService conversationService;
 
 	public BoardPublisher() {
-		super(LoggerFactory.getLogger(BoardPublisher.class));
+		super(LogManager.getLogger(BoardPublisher.class));
 	}
 
 	@Override

@@ -4,6 +4,7 @@ feign-reactor-spring-configuration/target/*
 feign-reactor-webclient/target/*
 eureka/target/*
 gateway/target/*
+common/target/*
 api/target/*
 engine/target/*
 figures/target/*

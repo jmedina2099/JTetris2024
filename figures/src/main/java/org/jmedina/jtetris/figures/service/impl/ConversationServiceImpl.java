@@ -2,10 +2,10 @@ package org.jmedina.jtetris.figures.service.impl;
 
 import java.time.Duration;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.figures.model.NextFigureOperation;
 import org.jmedina.jtetris.figures.service.ConversationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import reactor.netty.resources.ConnectionProvider;
 @Service
 public class ConversationServiceImpl implements ConversationService {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 
 	@Value("${figures.engine.base-url}")
 	private String engineBaseUrl;

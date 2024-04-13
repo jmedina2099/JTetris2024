@@ -2,9 +2,9 @@ package org.jmedina.jtetris.engine.service.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.engine.service.KafkaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @ConditionalOnProperty(name = "use.kafka", havingValue = "true")
 public class KafkaServiceImpl implements KafkaService {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final KafkaTemplate<String, String> kafkaTemplate;
 
 	@Override

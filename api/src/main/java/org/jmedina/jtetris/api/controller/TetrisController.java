@@ -4,14 +4,14 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.api.client.EngineClient;
 import org.jmedina.jtetris.api.model.BoardOperation;
 import org.jmedina.jtetris.api.model.FigureOperation;
 import org.jmedina.jtetris.api.model.Message;
 import org.jmedina.jtetris.api.publisher.BoardPublisher;
 import org.jmedina.jtetris.api.publisher.FigurePublisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,7 +35,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "/game")
 public class TetrisController {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private final FigurePublisher figurePublisher;
 	private final BoardPublisher boardPublisher;
 	private final EngineClient engineClient;

@@ -1,14 +1,15 @@
-package org.jmedina.jtetris.api.publisher;
+package org.jmedina.jtetris.common.publisher;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.logging.log4j.Logger;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import org.slf4j.Logger;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 
@@ -21,7 +22,7 @@ import reactor.core.Disposable;
 public class CustomPublisher<T> implements Publisher<T>, Subscription {
 
 	protected final Logger logger;
-	protected boolean isRunning = false;
+	private boolean isRunning = false;
 	protected Disposable disposable;
 	private Subscriber<? super T> subscriber;
 	private AtomicLong requestCounter;
@@ -43,7 +44,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	protected void addToQueue(T op) {
 		this.logger.debug("===> CustomPublisher.addToQueue() = " + op);
 		this.queue.add(op);
-		tryToSend();
+		tryToSend(true);
 	}
 
 	public boolean stop() {
@@ -62,7 +63,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	public void request(long n) {
 		this.logger.info("=====> CustomPublisher.request = " + n);
 		this.requestCounter.addAndGet(n);
-		tryToSend();
+		tryToSend(false);
 	}
 
 	@Override
@@ -71,15 +72,16 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 		stop();
 	}
 
-	private synchronized void tryToSend() {
-		this.logger.debug("===> CustomPublisher.tryToSend()");
+	private void tryToSend(boolean isOnlyOne) {
+		this.logger.debug("===> CustomPublisher.tryToSend({})", isOnlyOne);
 		try {
+			Optional<T> element;
 			if (this.isRunning) {
-				this.logger.debug("===> START: counter={}, queue={}", this.requestCounter.get(), this.queue.size());
-				while (this.requestCounter.get() > 0 && this.queue.size() > 0) {
-					doOnNext(this.queue.remove());
-					this.requestCounter.decrementAndGet();
-				}
+				this.logger.info("===> START: counter={}, queue={}", this.requestCounter.get(), this.queue.size());
+				do {
+					element = checkConditionForSendAndGet();
+					element.ifPresent(op -> doOnNext(op));
+				} while (!isOnlyOne && element.isPresent());
 				this.logger.info("===> END:   counter={}, queue={}", this.requestCounter.get(), this.queue.size());
 			}
 		} catch (Exception e) {
@@ -87,6 +89,14 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 			return;
 		}
 		this.logger.debug("===> END - CustomPublisher.tryToSend()");
+	}
+
+	private synchronized Optional<T> checkConditionForSendAndGet() {
+		if (this.requestCounter.get() > 0 && this.queue.size() > 0) {
+			this.requestCounter.decrementAndGet();
+			return Optional.of(this.queue.remove());
+		}
+		return Optional.<T>empty();
 	}
 
 	private void doOnNext(T op) {

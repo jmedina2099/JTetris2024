@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.engine.figure.Box;
 import org.jmedina.jtetris.engine.figure.Figure;
 import org.jmedina.jtetris.engine.service.GridSupportService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Service
 public class GridSupportServiceImpl implements GridSupportService {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 	private Map<Integer, boolean[]> gridBoxes = new HashMap<>();
 
 	@PostConstruct

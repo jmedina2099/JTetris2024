@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class HeaderFilter implements WebFilter {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LogManager.getLogger(this.getClass());
 
 	@Value("${api.cors.origin}")
 	private String[] corsOrigin;

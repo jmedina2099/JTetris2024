@@ -2,10 +2,11 @@ package org.jmedina.jtetris.figures.publisher;
 
 import java.time.Duration;
 
+import org.apache.logging.log4j.LogManager;
+import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.jmedina.jtetris.figures.model.NextFigureOperation;
 import org.jmedina.jtetris.figures.service.ConversationService;
 import org.reactivestreams.Subscriber;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class NextFigurePublisher extends CustomPublisher<NextFigureOperation> {
 	private ConversationService conversationService;
 
 	public NextFigurePublisher() {
-		super(LoggerFactory.getLogger(NextFigurePublisher.class));
+		super(LogManager.getLogger(NextFigurePublisher.class));
 	}
 
 	@Override
