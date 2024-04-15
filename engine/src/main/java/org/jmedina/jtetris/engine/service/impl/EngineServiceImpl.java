@@ -144,11 +144,11 @@ public class EngineServiceImpl implements EngineService {
 			this.gridSupport.addToGrid(figureRef);
 			this.falledBoxes.addAll(figureRef.getBoxes());
 			sendAsyncEventsForBoardOperation(
-					getBoardOperation(this.falledBoxes, BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
+					getBoardOperation(cloneBoxes(this.falledBoxes), BoardOperationEnumeration.BOARD_WITH_ADDED_FIGURE));
 
 			int numLinesMaded = 0;
 			if ((numLinesMaded = checkMakeLines(figureRef)) > 0) {
-				sendAsyncEventsForBoardOperation(getBoardOperation(this.falledBoxes,
+				sendAsyncEventsForBoardOperation(getBoardOperation(cloneBoxes(this.falledBoxes),
 						BoardOperationEnumeration.getByNumLinesMaded(numLinesMaded)));
 			}
 			this.nextFigurePublisher.sendNextFigurePetition(
@@ -160,6 +160,10 @@ public class EngineServiceImpl implements EngineService {
 			lock.unlock();
 		}
 		return Optional.of(false);
+	}
+
+	private List<Box> cloneBoxes(List<Box> falledBoxes) {
+		return falledBoxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 	}
 
 	private void reset() {
@@ -198,7 +202,7 @@ public class EngineServiceImpl implements EngineService {
 				} else if (direction.equals(MoveDirectionEnumeration.RIGHT)) {
 					this.fallingFigure.moveRight();
 				}
-				sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure));
+				sendAsyncEventsForFigureOperation(getFigureOperationForMovement(this.fallingFigure.clone()));
 				return Optional.of(true);
 			}
 		} catch (Exception e) {
@@ -266,7 +270,7 @@ public class EngineServiceImpl implements EngineService {
 			Figure figureTmp = this.fallingFigure.clone();
 			if (rotateHelper(figureTmp, direction)) {
 				this.fallingFigure = figureTmp;
-				sendAsyncEventsForFigureOperation(getFigureOperationForRotation(this.fallingFigure));
+				sendAsyncEventsForFigureOperation(getFigureOperationForRotation(this.fallingFigure.clone()));
 				return Optional.of(true);
 			}
 		} catch (Exception e) {

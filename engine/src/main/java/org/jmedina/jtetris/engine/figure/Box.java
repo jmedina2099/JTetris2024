@@ -57,7 +57,7 @@ public class Box implements Cloneable {
 	}
 
 	@Override
-	protected Box clone() {
+	public Box clone() {
 		return new Box(this.rectangle.x, this.rectangle.y);
 	}
 

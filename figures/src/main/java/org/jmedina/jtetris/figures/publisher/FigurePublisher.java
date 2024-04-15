@@ -35,6 +35,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
+		askAndSendForNextFigureOperation(); // first figure.
 		getNextFigureConversation();
 	}
 
@@ -64,14 +65,18 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 				this.logger.debug("===> getNextFigureConversation.subscribe = " + op);
 				if (FigureOperationEnumeration.NEW_OPERATION.equals(op.getOperation())) {
 					this.logger.debug("===> NEW_OPERATION!!!");
-					this.figureService.askForNextFigureOperation().subscribe(figure -> {
-						super.addToQueue(figure);
-					});
+					askAndSendForNextFigureOperation();
 				}
 			});
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 		}
+	}
+	
+	private void askAndSendForNextFigureOperation() {
+		this.figureService.askForNextFigureOperation().subscribe(figure -> {
+			super.addToQueue(figure);
+		});
 	}
 
 }
