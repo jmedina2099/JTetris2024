@@ -25,7 +25,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	private boolean isRunning = false;
 	protected Disposable disposable;
 	private Subscriber<? super T> subscriber;
-	private AtomicLong requestCounter;
+	private AtomicLong requestCounter = new AtomicLong();
 	private Queue<T> queue = new ConcurrentLinkedDeque<T>();
 
 	public CustomPublisher(Logger logger) {
@@ -36,7 +36,6 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	public void subscribe(Subscriber<? super T> subscriber) {
 		this.logger.debug("===> CustomPublisher.subscribe()");
 		this.isRunning = true;
-		this.requestCounter = new AtomicLong();
 		this.subscriber = subscriber;
 		this.subscriber.onSubscribe(this);
 	}
@@ -50,6 +49,8 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	public boolean stop() {
 		this.logger.debug("===> CustomPublisher.stop()");
 		this.isRunning = false;
+		this.requestCounter.set(0L);
+		this.queue.clear();
 		if (Objects.nonNull(this.disposable)) {
 			this.disposable.dispose();
 		}
