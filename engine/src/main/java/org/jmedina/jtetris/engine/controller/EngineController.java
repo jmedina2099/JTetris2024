@@ -7,9 +7,9 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.common.model.BoardOperation;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.client.FiguresClient;
-import org.jmedina.jtetris.engine.model.BoardOperation;
-import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;

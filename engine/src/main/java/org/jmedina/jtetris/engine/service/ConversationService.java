@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.engine.service;
 
-import org.jmedina.jtetris.engine.model.FigureOperation;
+import org.jmedina.jtetris.common.model.FigureOperation;
 
 import reactor.core.publisher.Flux;
 

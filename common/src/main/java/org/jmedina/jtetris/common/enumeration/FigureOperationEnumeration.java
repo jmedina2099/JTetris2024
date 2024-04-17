@@ -1,4 +1,4 @@
-package org.jmedina.jtetris.figures.enumeration;
+package org.jmedina.jtetris.common.enumeration;
 
 public enum FigureOperationEnumeration {
 

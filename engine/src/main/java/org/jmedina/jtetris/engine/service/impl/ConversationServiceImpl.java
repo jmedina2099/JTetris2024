@@ -4,12 +4,18 @@ import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmedina.jtetris.engine.model.FigureOperation;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.ConversationService;
+import org.jmedina.jtetris.engine.util.FigureDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import io.netty.channel.ChannelOption;
 import jakarta.annotation.PostConstruct;
@@ -25,6 +31,8 @@ import reactor.netty.resources.ConnectionProvider;
 public class ConversationServiceImpl implements ConversationService {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
+	private final ObjectMapper mapper = new ObjectMapper();
+	private final SimpleModule module = new SimpleModule();
 
 	@Value("${engine.figures.base-url}")
 	private String figuresBaseUrl;
@@ -33,6 +41,12 @@ public class ConversationServiceImpl implements ConversationService {
 
 	@PostConstruct
 	private void init() {
+		module.addDeserializer(FigureOperation.class, new FigureDeserializer());
+		mapper.registerModule(module);
+		ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
+				.codecs(configurer -> configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(mapper)))
+				.build();
+
 		int timeout = 3600000;
 		ConnectionProvider connProvider = ConnectionProvider.builder("connectionProviderForConversationsEngine")
 				.maxConnections(1).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
@@ -49,7 +63,7 @@ public class ConversationServiceImpl implements ConversationService {
 					this.logger.debug("===============================> httpClient.doOnDisconnected");
 				});
 		this.clientForConversations = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient))
-				.build();
+				.exchangeStrategies(exchangeStrategies).build();
 	}
 
 	public Flux<FigureOperation> getFigureConversation() {

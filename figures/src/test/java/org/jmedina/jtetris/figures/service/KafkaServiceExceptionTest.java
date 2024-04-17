@@ -9,9 +9,9 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
-import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.service.impl.KafkaServiceImpl;
 import org.jmedina.jtetris.figures.util.AssertUtilTesting;
 import org.jmedina.jtetris.figures.util.SerializeUtil;
@@ -70,7 +70,8 @@ class KafkaServiceExceptionTest extends KafkaHelperTesting {
 			throw new NullPointerException();
 		});
 		when(this.kafkaTemplate.send(anyString(), anyString())).thenReturn(future);
-		this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(new FigureOperation()), nextFigureTopic);
+		this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(new FigureOperation()),
+				nextFigureTopic);
 		AssertUtilTesting.assertLatch(this.kafkaService.getLatchForTesting());
 	}
 

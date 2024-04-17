@@ -3,8 +3,8 @@ package org.jmedina.jtetris.engine.publisher;
 import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
-import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.ConversationService;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.reactivestreams.Subscriber;

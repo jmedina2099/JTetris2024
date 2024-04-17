@@ -1,8 +1,8 @@
 package org.jmedina.jtetris.engine.publisher;
 
 import org.apache.logging.log4j.LogManager;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
-import org.jmedina.jtetris.engine.model.FigureOperation;
 import org.reactivestreams.Subscriber;
 import org.springframework.stereotype.Service;
 

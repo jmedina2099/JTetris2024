@@ -1,4 +1,4 @@
-package org.jmedina.jtetris.api.model;
+package org.jmedina.jtetris.common.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -14,14 +14,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @JsonPropertyOrder({ "x", "y" })
-public class Box {
+public class BoxDTO implements Box {
 
 	private double x;
 	private double y;
-	
+
 	@Override
 	public String toString() {
 		return "(" + getX() + "," + getY() + ")";
 	}
-	
+
 }

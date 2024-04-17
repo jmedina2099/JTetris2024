@@ -1,7 +1,7 @@
 package org.jmedina.jtetris.figures.service;
 
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.exception.ServiceException;
-import org.jmedina.jtetris.figures.model.FigureOperation;
 
 import reactor.core.publisher.Mono;
 

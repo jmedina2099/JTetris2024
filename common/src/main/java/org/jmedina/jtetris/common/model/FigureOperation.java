@@ -1,6 +1,6 @@
-package org.jmedina.jtetris.api.model;
+package org.jmedina.jtetris.common.model;
 
-import org.jmedina.jtetris.api.enumeration.FigureOperationEnumeration;
+import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

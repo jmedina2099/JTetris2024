@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class Point extends Point2D.Double {
 
 	private static final long serialVersionUID = -5445737127696074062L;
-	
-	public Point( double x, double y ) {
+
+	public Point(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -26,7 +26,7 @@ public class Point extends Point2D.Double {
 	}
 
 	public void setX(double x) {
-		this.x = x*Box.SIZE;
+		this.x = x * BoxForEngine.SIZE;
 	}
 
 	public double getY() {
@@ -34,7 +34,7 @@ public class Point extends Point2D.Double {
 	}
 
 	public void setY(double y) {
-		this.y = y*Box.SIZE;
+		this.y = y * BoxForEngine.SIZE;
 	}
-	
+
 }

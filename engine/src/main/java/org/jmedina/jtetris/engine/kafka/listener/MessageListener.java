@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmedina.jtetris.engine.model.FigureOperation;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

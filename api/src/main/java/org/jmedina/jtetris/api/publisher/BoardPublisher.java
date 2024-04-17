@@ -3,8 +3,8 @@ package org.jmedina.jtetris.api.publisher;
 import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
-import org.jmedina.jtetris.api.model.BoardOperation;
 import org.jmedina.jtetris.api.service.ConversationService;
+import org.jmedina.jtetris.common.model.BoardOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.reactivestreams.Subscriber;
 import org.springframework.beans.factory.annotation.Autowired;

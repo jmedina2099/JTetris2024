@@ -9,7 +9,7 @@ import lombok.Builder;
  *
  */
 @Builder
-public class Vertical extends Figure {
+public class Vertical extends FigureForFigures {
 
 	public Vertical() {
 		super.init(VERTICAL);

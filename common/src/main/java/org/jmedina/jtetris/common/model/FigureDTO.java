@@ -1,8 +1,9 @@
-package org.jmedina.jtetris.api.model;
+package org.jmedina.jtetris.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +12,11 @@ import lombok.NoArgsConstructor;
  *
  */
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class Figure {
+public class FigureDTO implements Figure {
 
-	private List<Box> boxes = new ArrayList<>();
+	private List<BoxDTO> boxes = new ArrayList<>();
 
 	@Override
 	public String toString() {

@@ -11,13 +11,13 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmedina.jtetris.engine.enumeration.BoardOperationEnumeration;
-import org.jmedina.jtetris.engine.enumeration.FigureOperationEnumeration;
+import org.jmedina.jtetris.common.enumeration.BoardOperationEnumeration;
+import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
+import org.jmedina.jtetris.common.model.BoardOperation;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
-import org.jmedina.jtetris.engine.figure.Box;
-import org.jmedina.jtetris.engine.figure.Figure;
-import org.jmedina.jtetris.engine.model.BoardOperation;
-import org.jmedina.jtetris.engine.model.FigureOperation;
+import org.jmedina.jtetris.engine.figure.BoxForEngine;
+import org.jmedina.jtetris.engine.figure.FigureForEngine;
 import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
@@ -46,9 +46,9 @@ public class EngineServiceImpl implements EngineService {
 	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;
 	private final SerializeUtil serializeUtil;
-	private Figure fallingFigure;
+	private FigureForEngine fallingFigure;
 	private long initialTimeStamp;
-	private List<Box> falledBoxes;
+	private List<BoxForEngine> falledBoxes;
 	private ReentrantLock lock = new ReentrantLock();
 	private NextFigurePublisher nextFigurePublisher;
 	private EnginePublisher enginePublisher;
@@ -87,7 +87,7 @@ public class EngineServiceImpl implements EngineService {
 		if (this.isRunning
 				&& (this.fallingFigure == null || this.initialTimeStamp < figureOperation.getInitialTimeStamp())) {
 			this.logger.debug("==> Engine.addFallingFigure.adding.. " + figureOperation.getInitialTimeStamp());
-			this.fallingFigure = figureOperation.getFigure();
+			this.fallingFigure = (FigureForEngine) figureOperation.getFigure();
 			this.initialTimeStamp = figureOperation.getInitialTimeStamp();
 		}
 	}
@@ -134,7 +134,7 @@ public class EngineServiceImpl implements EngineService {
 		if (!isLockAcquired) {
 			return Optional.of(false);
 		}
-		Figure figureRef = this.fallingFigure;
+		FigureForEngine figureRef = this.fallingFigure;
 		this.fallingFigure = null;
 		try {
 			while (canMoveDown(figureRef) && this.gridSupport.noHit(figureRef, 0, 1)) {
@@ -162,7 +162,7 @@ public class EngineServiceImpl implements EngineService {
 		return Optional.of(false);
 	}
 
-	private List<Box> cloneBoxes(List<Box> falledBoxes) {
+	private List<BoxForEngine> cloneBoxes(List<BoxForEngine> falledBoxes) {
 		return falledBoxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 	}
 
@@ -223,36 +223,39 @@ public class EngineServiceImpl implements EngineService {
 		sendBoardToKafka(board);
 	}
 
-	private FigureOperation getFigureOperationForMovement(Figure figure) {
+	private FigureOperation getFigureOperationForMovement(FigureForEngine figure) {
 		return FigureOperation.builder().operation(FigureOperationEnumeration.MOVEMENT_OPERATION).figure(figure)
 				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
 	}
 
-	private FigureOperation getFigureOperationForRotation(Figure figure) {
+	private FigureOperation getFigureOperationForRotation(FigureForEngine figure) {
 		return FigureOperation.builder().operation(FigureOperationEnumeration.ROTATION_OPERATION).figure(figure)
 				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
 	}
 
-	private BoardOperation getBoardOperation(List<Box> boxes, BoardOperationEnumeration op) {
+	private BoardOperation getBoardOperation(List<BoxForEngine> boxes, BoardOperationEnumeration op) {
 		return BoardOperation.builder().operation(op).boxes(boxes).timeStamp(System.nanoTime()).build();
 	}
 
-	private boolean canMoveRight(Figure figure) {
-		int maxX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / Box.SIZE)).max().orElse(0);
+	private boolean canMoveRight(FigureForEngine figure) {
+		int maxX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / BoxForEngine.SIZE)).max()
+				.orElse(0);
 		if (maxX + 1 == WIDTH)
 			return false;
 		return true;
 	}
 
-	private boolean canMoveLeft(Figure figure) {
-		int minX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / Box.SIZE)).min().orElse(0);
+	private boolean canMoveLeft(FigureForEngine figure) {
+		int minX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / BoxForEngine.SIZE)).min()
+				.orElse(0);
 		if (minX == 0)
 			return false;
 		return true;
 	}
 
-	private boolean canMoveDown(Figure figure) {
-		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / Box.SIZE)).max().orElse(0);
+	private boolean canMoveDown(FigureForEngine figure) {
+		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE)).max()
+				.orElse(0);
 		if (maxY + 1 == HEIGHT)
 			return false;
 		return true;
@@ -267,7 +270,7 @@ public class EngineServiceImpl implements EngineService {
 			return Optional.of(false);
 		}
 		try {
-			Figure figureTmp = this.fallingFigure.clone();
+			FigureForEngine figureTmp = this.fallingFigure.clone();
 			if (rotateHelper(figureTmp, direction)) {
 				this.fallingFigure = figureTmp;
 				sendAsyncEventsForFigureOperation(getFigureOperationForRotation(this.fallingFigure.clone()));
@@ -281,7 +284,7 @@ public class EngineServiceImpl implements EngineService {
 		return Optional.of(false);
 	}
 
-	private boolean rotateHelper(Figure figure, int direction) {
+	private boolean rotateHelper(FigureForEngine figure, int direction) {
 		this.logger.debug("==> Engine.rotate()");
 
 		int rotation = 0;
@@ -309,9 +312,9 @@ public class EngineServiceImpl implements EngineService {
 		return false;
 	}
 
-	private void tryToFit(Figure figure) {
+	private void tryToFit(FigureForEngine figure) {
 		double max = figure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
-		double size = Box.SIZE;
+		double size = BoxForEngine.SIZE;
 		int numOps = 0;
 		while ((max + size) > size * 10 && numOps < 3) {
 			figure.moveLeft();
@@ -327,15 +330,17 @@ public class EngineServiceImpl implements EngineService {
 		}
 	}
 
-	private int checkMakeLines(Figure figure) {
-		int minY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / Box.SIZE)).min().orElse(0);
-		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / Box.SIZE)).max().orElse(0);
+	private int checkMakeLines(FigureForEngine figure) {
+		int minY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE)).min()
+				.orElse(0);
+		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE)).max()
+				.orElse(0);
 
 		int[] numLinesCompleted = new int[] { 0 };
 
 		AtomicReference<Stream<Boolean>> stream = new AtomicReference<Stream<Boolean>>();
 		AtomicReference<Boolean> isLineCompleted = new AtomicReference<Boolean>();
-		AtomicReference<List<Box>> boxesOnLine = new AtomicReference<List<Box>>();
+		AtomicReference<List<BoxForEngine>> boxesOnLine = new AtomicReference<List<BoxForEngine>>();
 
 		int[] indexY = new int[] { maxY };
 		Stream.iterate(0, x -> x + 1).limit(maxY - minY + 1).forEach(i -> {
@@ -344,7 +349,8 @@ public class EngineServiceImpl implements EngineService {
 			if (isLineCompleted.get()) {
 				numLinesCompleted[0]++;
 				boxesOnLine.set(this.falledBoxes.stream()
-						.filter(b -> (int) Math.round(b.getY() / Box.SIZE) == indexY[0]).collect(Collectors.toList()));
+						.filter(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE) == indexY[0])
+						.collect(Collectors.toList()));
 				this.falledBoxes.removeAll(boxesOnLine.get());
 				this.gridSupport.removeGridRow(indexY[0]);
 				moveDownFalledBoxes(indexY[0]);
@@ -358,7 +364,7 @@ public class EngineServiceImpl implements EngineService {
 	private void moveDownFalledBoxes(int indexY) {
 		this.logger.debug("==> Engine.rotate() indexY={}", indexY);
 		this.falledBoxes.stream().forEach(b -> {
-			if ((int) Math.round(b.getY() / Box.SIZE) < indexY) {
+			if ((int) Math.round(b.getY() / BoxForEngine.SIZE) < indexY) {
 				b.moveDown();
 			}
 		});

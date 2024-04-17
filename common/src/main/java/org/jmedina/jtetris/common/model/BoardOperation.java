@@ -1,10 +1,11 @@
-package org.jmedina.jtetris.api.model;
+package org.jmedina.jtetris.common.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.jmedina.jtetris.api.enumeration.BoardOperationEnumeration;
+import org.jmedina.jtetris.common.enumeration.BoardOperationEnumeration;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,11 +14,12 @@ import lombok.NoArgsConstructor;
  *
  */
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
+@Builder
 public class BoardOperation {
 
 	private BoardOperationEnumeration operation;
-	private List<Box> boxes = new ArrayList<>();
+	private List<? extends Box> boxes;
 	private long timeStamp;
-
 }

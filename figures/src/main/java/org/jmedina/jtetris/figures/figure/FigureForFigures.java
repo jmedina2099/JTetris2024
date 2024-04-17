@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.common.model.Box;
+import org.jmedina.jtetris.common.model.Figure;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
 
@@ -24,7 +26,7 @@ import reactor.core.publisher.Mono;
 @Getter
 @Setter
 @EqualsAndHashCode
-public abstract class Figure {
+public abstract class FigureForFigures implements Figure {
 
 	@JsonIgnore
 	private final Logger logger = LogManager.getLogger(this.getClass());
@@ -35,7 +37,7 @@ public abstract class Figure {
 
 	@JsonIgnore
 	protected int id;
-	protected List<Box> boxes;
+	protected List<? extends Box> boxes;
 	protected Point2D.Double center = new Point2D.Double();
 	public int numRotations;
 
@@ -44,13 +46,13 @@ public abstract class Figure {
 		this.id = type.getId();
 	}
 
-	public Mono<Figure> load(FigureTemplateOperations template) {
+	public Mono<FigureForFigures> load(FigureTemplateOperations template) {
 		this.logger.debug("==> load = " + this.type.name());
 		return template.findByName(this.type.name()).map(fig -> {
 			this.logger.debug("==> loading... " + fig);
 			this.type.loadFigura(fig);
 			this.boxes = new ArrayList<>(
-					this.type.getTuplas().stream().map(t -> new Box(t)).collect(Collectors.toList()));
+					this.type.getTuplas().stream().map(t -> new BoxForFigures(t)).collect(Collectors.toList()));
 			this.logger.debug("==> boxes... " + this.boxes);
 			this.center = type.getCenter();
 			this.numRotations = type.getNumRotations();

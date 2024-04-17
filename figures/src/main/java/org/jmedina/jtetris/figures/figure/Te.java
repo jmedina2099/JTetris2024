@@ -9,7 +9,7 @@ import lombok.Builder;
  *
  */
 @Builder
-public class Te extends Figure {
+public class Te extends FigureForFigures {
 
 	public Te() {
 		super.init(TE);

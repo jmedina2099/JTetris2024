@@ -2,6 +2,8 @@ package org.jmedina.jtetris.engine.figure;
 
 import java.awt.geom.Rectangle2D;
 
+import org.jmedina.jtetris.common.model.Box;
+
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.NoArgsConstructor;
@@ -12,13 +14,13 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @JsonPropertyOrder({ "x", "y", "initialTimeStamp", "timeStamp" })
-public class Box implements Cloneable {
+public class BoxForEngine implements Box, Cloneable {
 
 	public static final double SIZE = 20d;
 
 	private final Rectangle2D.Double rectangle = new Rectangle2D.Double();
 
-	public Box(double x, double y) {
+	public BoxForEngine(double x, double y) {
 		this.rectangle.x = x;
 		this.rectangle.y = y;
 	}
@@ -57,8 +59,8 @@ public class Box implements Cloneable {
 	}
 
 	@Override
-	public Box clone() {
-		return new Box(this.rectangle.x, this.rectangle.y);
+	public BoxForEngine clone() {
+		return new BoxForEngine(this.rectangle.x, this.rectangle.y);
 	}
 
 	@Override

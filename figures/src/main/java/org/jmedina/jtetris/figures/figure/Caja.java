@@ -9,7 +9,7 @@ import lombok.Builder;
  *
  */
 @Builder
-public class Caja extends Figure {
+public class Caja extends FigureForFigures {
 
 	public Caja() {
 		super.init(CAJA);

@@ -1,7 +1,7 @@
 package org.jmedina.jtetris.figures.util;
 
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.exception.ServiceException;
-import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -7,16 +7,16 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.domain.Figura;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
-import org.jmedina.jtetris.figures.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
-import org.jmedina.jtetris.figures.figure.Figure;
+import org.jmedina.jtetris.figures.figure.FigureForFigures;
 import org.jmedina.jtetris.figures.figure.Te;
 import org.jmedina.jtetris.figures.figure.Vertical;
-import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.repository.FigureRepository;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
@@ -70,7 +70,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 		this.logger.debug("==> FigureService.askForNextFigureOperation()");
 		Mono<FigureOperation> monoOperation = null;
 		try {
-			Figure figure = null;
+			FigureForFigures figure = null;
 			int value = this.random.nextInt(FiguraEnumeration.values().length);
 			switch (value) {
 			case 0:
@@ -88,7 +88,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			default:
 				throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 			}
-			Mono<Figure> mono = figure.load(this.figureTemplateOperations);
+			Mono<FigureForFigures> mono = figure.load(this.figureTemplateOperations);
 			monoOperation = mono.map(fig -> {
 				long nanos;
 				FigureOperation figureOperation = FigureOperation.builder()

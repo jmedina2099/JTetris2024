@@ -1,6 +1,6 @@
 package org.jmedina.jtetris.figures.model;
 
-import org.jmedina.jtetris.figures.enumeration.FigureOperationEnumeration;
+import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

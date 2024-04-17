@@ -1,4 +1,4 @@
-package org.jmedina.jtetris.engine.enumeration;
+package org.jmedina.jtetris.common.enumeration;
 
 import java.util.Arrays;
 import java.util.List;

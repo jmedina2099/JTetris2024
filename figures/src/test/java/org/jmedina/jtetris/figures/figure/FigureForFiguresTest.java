@@ -25,7 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(OrderAnnotation.class)
-class FigureTest {
+class FigureForFiguresTest {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
@@ -150,11 +150,11 @@ class FigureTest {
 	@Order(5)
 	@DisplayName("Test for Box Equals")
 	void testCajaHashCode() {
-		Box box1 = new Box();
-		Box box2 = new Box();
-		Box box3 = new BoxTest();
-		Box box4 = new BoxTest2();
-		Box box5 = new BoxTest2();
+		BoxForFigures box1 = new BoxForFigures();
+		BoxForFigures box2 = new BoxForFigures();
+		BoxForFigures box3 = new BoxTest();
+		BoxForFigures box4 = new BoxTest2();
+		BoxForFigures box5 = new BoxTest2();
 		box1.setX(1.2);
 		box1.setY(1.3);
 		box2.setX(1.2);
@@ -241,17 +241,17 @@ class FigureTest {
 		}
 	}
 
-	class BoxTest extends Box {
+	class BoxTest extends BoxForFigures {
 		@Override
 		protected boolean canEqual(Object other) {
 			return other instanceof BoxTest;
 		}
 	}
 
-	class BoxTest2 extends Box {
+	class BoxTest2 extends BoxForFigures {
 		@Override
 		protected boolean canEqual(Object other) {
-			return other instanceof Box;
+			return other instanceof BoxForFigures;
 		}
 	}
 }

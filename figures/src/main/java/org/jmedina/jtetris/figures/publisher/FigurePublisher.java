@@ -3,9 +3,9 @@ package org.jmedina.jtetris.figures.publisher;
 import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
+import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
+import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
-import org.jmedina.jtetris.figures.enumeration.FigureOperationEnumeration;
-import org.jmedina.jtetris.figures.model.FigureOperation;
 import org.jmedina.jtetris.figures.model.NextFigureOperation;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.reactivestreams.Subscriber;
@@ -72,7 +72,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 			this.logger.error("=*=> ERROR: ", e);
 		}
 	}
-	
+
 	private void askAndSendForNextFigureOperation() {
 		this.figureService.askForNextFigureOperation().subscribe(figure -> {
 			super.addToQueue(figure);

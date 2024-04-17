@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmedina.jtetris.common.model.Figure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -18,19 +19,19 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class Figure implements Cloneable {
+public class FigureForEngine implements Figure, Cloneable {
 
 	@JsonIgnore
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
-	private List<Box> boxes = new ArrayList<>();
+	private List<BoxForEngine> boxes = new ArrayList<>();
 	public Point center;
 	public int numRotations;
 
 	@JsonIgnore
 	public int rotation = 0;
 
-	public Figure(List<Box> boxes, Point center, int numRotations, int rotation) {
+	public FigureForEngine(List<BoxForEngine> boxes, Point center, int numRotations, int rotation) {
 		this.boxes = boxes;
 		this.center = center;
 		this.numRotations = numRotations;
@@ -39,27 +40,27 @@ public class Figure implements Cloneable {
 
 	public boolean moveRight() {
 		this.logger.debug("==> moveRight = {}", boxes);
-		this.center.x += Box.SIZE;
-		return this.boxes.stream().allMatch(Box::moveRight);
+		this.center.x += BoxForEngine.SIZE;
+		return this.boxes.stream().allMatch(BoxForEngine::moveRight);
 	}
 
 	public boolean moveLeft() {
 		this.logger.debug("==> moveLeft = {}", boxes);
-		this.center.x -= Box.SIZE;
-		return this.boxes.stream().allMatch(Box::moveLeft);
+		this.center.x -= BoxForEngine.SIZE;
+		return this.boxes.stream().allMatch(BoxForEngine::moveLeft);
 	}
 
 	public boolean moveDown() {
 		this.logger.debug("==> moveDown = {}", boxes);
-		this.center.y += Box.SIZE;
-		return this.boxes.stream().allMatch(Box::moveDown);
+		this.center.y += BoxForEngine.SIZE;
+		return this.boxes.stream().allMatch(BoxForEngine::moveDown);
 	}
 
 	@Override
-	public Figure clone() {
-		List<Box> list = this.boxes.stream().map(b -> b.clone()).collect(Collectors.toList());
+	public FigureForEngine clone() {
+		List<BoxForEngine> list = this.boxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 		Point center = new Point(this.center.x, this.center.y);
-		return new Figure(list, center, numRotations, rotation);
+		return new FigureForEngine(list, center, numRotations, rotation);
 	}
 
 	@Override
