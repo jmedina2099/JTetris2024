@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.engine.figure.BoxForEngine;
-import org.jmedina.jtetris.engine.figure.FigureForEngine;
+import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.service.GridSupportService;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +43,7 @@ public class GridSupportServiceImpl implements GridSupportService {
 	}
 
 	@Override
-	public void addToGrid(FigureForEngine figure) {
+	public void addToGrid(FigureMotion figure) {
 		figure.getBoxes().stream().forEach(b -> {
 			int x = (int) Math.round(b.getX() / BoxForEngine.SIZE);
 			int y = (int) Math.round(b.getY() / BoxForEngine.SIZE);
@@ -52,7 +52,7 @@ public class GridSupportServiceImpl implements GridSupportService {
 	}
 
 	@Override
-	public void removeFromGrid(FigureForEngine figure) {
+	public void removeFromGrid(FigureMotion figure) {
 		figure.getBoxes().stream().forEach(b -> {
 			int x = (int) Math.round(b.getX() / BoxForEngine.SIZE);
 			int y = (int) Math.round(b.getY() / BoxForEngine.SIZE);
@@ -72,7 +72,7 @@ public class GridSupportServiceImpl implements GridSupportService {
 	}
 
 	@Override
-	public boolean noHit(FigureForEngine figure, int offsetX, int offsetY) {
+	public boolean noHit(FigureMotion figure, int offsetX, int offsetY) {
 		return figure.getBoxes().stream().allMatch(b -> {
 			int x = (int) Math.round(b.getX() / BoxForEngine.SIZE);
 			int y = (int) Math.round(b.getY() / BoxForEngine.SIZE);

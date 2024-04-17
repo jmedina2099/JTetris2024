@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jmedina.jtetris.engine.figure.BoxForEngine;
-import org.jmedina.jtetris.engine.figure.FigureForEngine;
+import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RotationUtil {
 
-	public void rotateFigure(FigureForEngine figure, int direction) {
+	public void rotateFigure(FigureMotion figure, int direction) {
 		List<BoxForEngine> boxes = figure.getBoxes();
 
 		List<Point2D.Double> listCoords = boxes.stream().map(box -> new Point2D.Double(box.getX(), box.getY()))

@@ -3,6 +3,7 @@ package org.jmedina.jtetris.figures.service.impl;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +15,7 @@ import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 import org.jmedina.jtetris.figures.exception.ServiceException;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
-import org.jmedina.jtetris.figures.figure.FigureForFigures;
+import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.figure.Te;
 import org.jmedina.jtetris.figures.figure.Vertical;
 import org.jmedina.jtetris.figures.repository.FigureRepository;
@@ -70,7 +71,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 		this.logger.debug("==> FigureService.askForNextFigureOperation()");
 		Mono<FigureOperation> monoOperation = null;
 		try {
-			FigureForFigures figure = null;
+			FigureDB figure = null;
 			int value = this.random.nextInt(FiguraEnumeration.values().length);
 			switch (value) {
 			case 0:
@@ -88,11 +89,12 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			default:
 				throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 			}
-			Mono<FigureForFigures> mono = figure.load(this.figureTemplateOperations);
+			Mono<FigureDB> mono = figure.load(this.figureTemplateOperations);
 			monoOperation = mono.map(fig -> {
 				long nanos;
+				AtomicReference<FigureDB> ref = new AtomicReference<>(fig);
 				FigureOperation figureOperation = FigureOperation.builder()
-						.operation(FigureOperationEnumeration.NEW_OPERATION).figure(fig)
+						.operation(FigureOperationEnumeration.NEW_OPERATION).figure(ref)
 						.initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
 				sendFigureOperationToKafka(figureOperation);
 				return figureOperation;

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import reactor.core.publisher.Mono;
 
 /**
@@ -25,18 +26,23 @@ import reactor.core.publisher.Mono;
  */
 @Getter
 @Setter
+@ToString
 @EqualsAndHashCode
-public abstract class FigureForFigures implements Figure {
+public abstract class FigureDB implements Figure {
 
 	@JsonIgnore
+	@ToString.Exclude
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
 	@JsonIgnore
 	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
 	protected FiguraEnumeration type;
 
 	@JsonIgnore
+	@ToString.Exclude
 	protected int id;
+
 	protected List<? extends Box> boxes;
 	protected Point2D.Double center = new Point2D.Double();
 	public int numRotations;
@@ -46,7 +52,7 @@ public abstract class FigureForFigures implements Figure {
 		this.id = type.getId();
 	}
 
-	public Mono<FigureForFigures> load(FigureTemplateOperations template) {
+	public Mono<FigureDB> load(FigureTemplateOperations template) {
 		this.logger.debug("==> load = " + this.type.name());
 		return template.findByName(this.type.name()).map(fig -> {
 			this.logger.debug("==> loading... " + fig);
@@ -58,13 +64,6 @@ public abstract class FigureForFigures implements Figure {
 			this.numRotations = type.getNumRotations();
 			return this;
 		});
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		this.boxes.stream().forEach(b -> sb.append(b.toString()));
-		return sb.toString();
 	}
 
 }

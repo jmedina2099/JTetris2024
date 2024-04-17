@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author Jorge Medina
@@ -14,15 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@ToString
 public class FigureDTO implements Figure {
 
 	private List<BoxDTO> boxes = new ArrayList<>();
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		this.boxes.stream().forEach(b -> sb.append(b.toString()));
-		return sb.toString();
-	}
 
 }

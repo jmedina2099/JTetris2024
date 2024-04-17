@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author Jorge Medina
@@ -19,9 +20,11 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @Data
-public class FigureForEngine implements Figure, Cloneable {
+@ToString
+public class FigureMotion implements Figure, Cloneable {
 
 	@JsonIgnore
+	@ToString.Exclude
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
 	private List<BoxForEngine> boxes = new ArrayList<>();
@@ -31,7 +34,7 @@ public class FigureForEngine implements Figure, Cloneable {
 	@JsonIgnore
 	public int rotation = 0;
 
-	public FigureForEngine(List<BoxForEngine> boxes, Point center, int numRotations, int rotation) {
+	public FigureMotion(List<BoxForEngine> boxes, Point center, int numRotations, int rotation) {
 		this.boxes = boxes;
 		this.center = center;
 		this.numRotations = numRotations;
@@ -57,17 +60,10 @@ public class FigureForEngine implements Figure, Cloneable {
 	}
 
 	@Override
-	public FigureForEngine clone() {
+	public FigureMotion clone() {
 		List<BoxForEngine> list = this.boxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 		Point center = new Point(this.center.x, this.center.y);
-		return new FigureForEngine(list, center, numRotations, rotation);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		this.boxes.stream().forEach(b -> sb.append(b.toString()));
-		return sb.toString();
+		return new FigureMotion(list, center, numRotations, rotation);
 	}
 
 }
