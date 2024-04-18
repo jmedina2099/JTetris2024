@@ -19,9 +19,9 @@ import lombok.ToString;
 @Data
 @Builder
 @ToString
-public class BoardOperation {
+public class BoardOperation<T extends Box> {
 
 	private BoardOperationEnumeration operation;
-	private List<? extends Box> boxes;
+	private List<T> boxes;
 	private long timeStamp;
 }

@@ -27,14 +27,14 @@ public class FigureMotion implements Figure, Cloneable {
 	@ToString.Exclude
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
-	private List<BoxForEngine> boxes = new ArrayList<>();
+	private List<BoxMotion> boxes = new ArrayList<>();
 	public Point center;
 	public int numRotations;
 
 	@JsonIgnore
 	public int rotation = 0;
 
-	public FigureMotion(List<BoxForEngine> boxes, Point center, int numRotations, int rotation) {
+	public FigureMotion(List<BoxMotion> boxes, Point center, int numRotations, int rotation) {
 		this.boxes = boxes;
 		this.center = center;
 		this.numRotations = numRotations;
@@ -43,25 +43,25 @@ public class FigureMotion implements Figure, Cloneable {
 
 	public boolean moveRight() {
 		this.logger.debug("==> moveRight = {}", boxes);
-		this.center.x += BoxForEngine.SIZE;
-		return this.boxes.stream().allMatch(BoxForEngine::moveRight);
+		this.center.x += BoxMotion.SIZE;
+		return this.boxes.stream().allMatch(BoxMotion::moveRight);
 	}
 
 	public boolean moveLeft() {
 		this.logger.debug("==> moveLeft = {}", boxes);
-		this.center.x -= BoxForEngine.SIZE;
-		return this.boxes.stream().allMatch(BoxForEngine::moveLeft);
+		this.center.x -= BoxMotion.SIZE;
+		return this.boxes.stream().allMatch(BoxMotion::moveLeft);
 	}
 
 	public boolean moveDown() {
 		this.logger.debug("==> moveDown = {}", boxes);
-		this.center.y += BoxForEngine.SIZE;
-		return this.boxes.stream().allMatch(BoxForEngine::moveDown);
+		this.center.y += BoxMotion.SIZE;
+		return this.boxes.stream().allMatch(BoxMotion::moveDown);
 	}
 
 	@Override
 	public FigureMotion clone() {
-		List<BoxForEngine> list = this.boxes.stream().map(b -> b.clone()).collect(Collectors.toList());
+		List<BoxMotion> list = this.boxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 		Point center = new Point(this.center.x, this.center.y);
 		return new FigureMotion(list, center, numRotations, rotation);
 	}

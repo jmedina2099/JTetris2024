@@ -26,7 +26,7 @@ public class Point extends Point2D.Double {
 	}
 
 	public void setX(double x) {
-		this.x = x * BoxForEngine.SIZE;
+		this.x = x * BoxMotion.SIZE;
 	}
 
 	public double getY() {
@@ -34,7 +34,7 @@ public class Point extends Point2D.Double {
 	}
 
 	public void setY(double y) {
-		this.y = y * BoxForEngine.SIZE;
+		this.y = y * BoxMotion.SIZE;
 	}
 
 }

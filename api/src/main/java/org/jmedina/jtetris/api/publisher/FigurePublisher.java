@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
 import org.jmedina.jtetris.api.service.ConversationService;
+import org.jmedina.jtetris.common.model.FigureDTO;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.reactivestreams.Subscriber;
@@ -17,7 +18,7 @@ import reactor.core.publisher.Flux;
  *
  */
 @Service
-public class FigurePublisher extends CustomPublisher<FigureOperation> {
+public class FigurePublisher extends CustomPublisher<FigureOperation<FigureDTO>> {
 
 	@Autowired
 	private ConversationService conversationService;
@@ -27,7 +28,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 	}
 
 	@Override
-	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
+	public void subscribe(Subscriber<? super FigureOperation<FigureDTO>> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
 		getFigureConversation();
@@ -49,7 +50,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
 					}).onErrorResume(e -> {
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
-						return Flux.<FigureOperation>empty();
+						return Flux.<FigureOperation<FigureDTO>>empty();
 					}).subscribe(figure -> {
 						this.logger.debug("===> getFigureConversation.subscribe = " + figure);
 						super.addToQueue(figure);

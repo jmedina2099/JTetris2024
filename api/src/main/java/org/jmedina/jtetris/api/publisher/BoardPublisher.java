@@ -5,6 +5,7 @@ import java.time.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.jmedina.jtetris.api.service.ConversationService;
 import org.jmedina.jtetris.common.model.BoardOperation;
+import org.jmedina.jtetris.common.model.BoxDTO;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.reactivestreams.Subscriber;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import reactor.core.publisher.Flux;
  *
  */
 @Service
-public class BoardPublisher extends CustomPublisher<BoardOperation> {
+public class BoardPublisher extends CustomPublisher<BoardOperation<BoxDTO>> {
 
 	@Autowired
 	private ConversationService conversationService;
@@ -27,7 +28,7 @@ public class BoardPublisher extends CustomPublisher<BoardOperation> {
 	}
 
 	@Override
-	public void subscribe(Subscriber<? super BoardOperation> subscriber) {
+	public void subscribe(Subscriber<? super BoardOperation<BoxDTO>> subscriber) {
 		this.logger.debug("===> BoardPublisher.subscribe()");
 		super.subscribe(subscriber);
 		getBoardConversation();
@@ -49,7 +50,7 @@ public class BoardPublisher extends CustomPublisher<BoardOperation> {
 						this.logger.error("==*=> ERROR - getBoardConversation =", e);
 					}).onErrorResume(e -> {
 						this.logger.error("==*=> ERROR - getBoardConversation =", e);
-						return Flux.<BoardOperation>empty();
+						return Flux.<BoardOperation<BoxDTO>>empty();
 					}).subscribe(board -> {
 						this.logger.debug("===> getBoardConversation.subscribe = " + board);
 						super.addToQueue(board);

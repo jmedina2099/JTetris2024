@@ -11,6 +11,8 @@ import org.jmedina.jtetris.api.model.Message;
 import org.jmedina.jtetris.api.publisher.BoardPublisher;
 import org.jmedina.jtetris.api.publisher.FigurePublisher;
 import org.jmedina.jtetris.common.model.BoardOperation;
+import org.jmedina.jtetris.common.model.BoxDTO;
+import org.jmedina.jtetris.common.model.FigureDTO;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -78,14 +80,14 @@ public class TetrisController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<FigureOperation>> getFigureConversation(ServerWebExchange exchange) {
+	public ResponseEntity<Flux<FigureOperation<FigureDTO>>> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> TetrisController.getFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		if (this.showHeaders) {
 			printHeaders(exchange);
 		}
-		Flux<FigureOperation> fluxOfFigures = null;
+		Flux<FigureOperation<FigureDTO>> fluxOfFigures = null;
 		try {
 			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
 				this.logger.debug("===> API - Flux.from.figurePublisher - NEXT = " + figure);
@@ -99,21 +101,21 @@ public class TetrisController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Flux.<FigureOperation>empty();
+				return Flux.<FigureOperation<FigureDTO>>empty();
 			});
 			return ResponseEntity.status(HttpStatus.OK).body(fluxOfFigures.timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return ResponseEntity.internalServerError().body(Flux.<FigureOperation>empty());
+			return ResponseEntity.internalServerError().body(Flux.<FigureOperation<FigureDTO>>empty());
 		}
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<BoardOperation>> getBoardConversation(ServerWebExchange exchange) {
+	public ResponseEntity<Flux<BoardOperation<BoxDTO>>> getBoardConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> TetrisController.getBoardConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
-		Flux<BoardOperation> fluxOfBoards = null;
+		Flux<BoardOperation<BoxDTO>> fluxOfBoards = null;
 		try {
 			fluxOfBoards = Flux.from(this.boardPublisher).doOnNext(board -> {
 				this.logger.debug("===> API - Flux.from.boardPublisher - NEXT = " + board);
@@ -127,13 +129,13 @@ public class TetrisController {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
-				return Flux.<BoardOperation>empty();
+				return Flux.<BoardOperation<BoxDTO>>empty();
 			});
 			;
 			return ResponseEntity.status(HttpStatus.OK).body(fluxOfBoards.timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return ResponseEntity.internalServerError().body(Flux.<BoardOperation>empty());
+			return ResponseEntity.internalServerError().body(Flux.<BoardOperation<BoxDTO>>empty());
 		}
 	}
 

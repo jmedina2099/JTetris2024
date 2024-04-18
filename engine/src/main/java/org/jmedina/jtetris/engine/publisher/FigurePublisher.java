@@ -5,6 +5,7 @@ import java.time.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
+import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.service.ConversationService;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.reactivestreams.Subscriber;
@@ -18,7 +19,7 @@ import reactor.core.publisher.Flux;
  *
  */
 @Service
-public class FigurePublisher extends CustomPublisher<FigureOperation> {
+public class FigurePublisher extends CustomPublisher<FigureOperation<FigureMotion>> {
 
 	@Autowired
 	private EngineService engineService;
@@ -31,7 +32,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 	}
 
 	@Override
-	public void subscribe(Subscriber<? super FigureOperation> subscriber) {
+	public void subscribe(Subscriber<? super FigureOperation<FigureMotion>> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
 		getFigureConversation();
@@ -53,7 +54,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation> {
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
 					}).onErrorResume(e -> {
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
-						return Flux.<FigureOperation>empty();
+						return Flux.<FigureOperation<FigureMotion>>empty();
 					}).subscribe(figure -> {
 						this.logger.debug("===> getFigureConversation.subscribe = " + figure);
 						this.engineService.addFigureOperation(figure);

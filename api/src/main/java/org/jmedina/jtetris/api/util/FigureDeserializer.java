@@ -1,7 +1,6 @@
 package org.jmedina.jtetris.api.util;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.common.model.FigureDTO;
@@ -19,7 +18,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
  * @author Jorge Medina
  *
  */
-public class FigureDeserializer extends StdDeserializer<FigureOperation> {
+public class FigureDeserializer extends StdDeserializer<FigureOperation<FigureDTO>> {
 
 	private static final long serialVersionUID = 680931338299672474L;
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -34,7 +33,7 @@ public class FigureDeserializer extends StdDeserializer<FigureOperation> {
 	}
 
 	@Override
-	public FigureOperation deserialize(JsonParser jp, DeserializationContext ctxt)
+	public FigureOperation<FigureDTO> deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JacksonException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		FigureOperationEnumeration operation = FigureOperationEnumeration.valueOf(node.get("operation").asText());
@@ -42,9 +41,8 @@ public class FigureDeserializer extends StdDeserializer<FigureOperation> {
 		FigureDTO figure = this.mapper.readValue(figuresNode.toString(), FigureDTO.class);
 		long initialTimeStamp = node.get("initialTimeStamp").asLong();
 		long timeStamp = node.get("timeStamp").asLong();
-		AtomicReference<FigureDTO> ref = new AtomicReference<>(figure);
-		return FigureOperation.builder().operation(operation).figure(ref).initialTimeStamp(initialTimeStamp)
-				.timeStamp(timeStamp).build();
+		return FigureOperation.<FigureDTO>builder().operation(operation).figure(figure)
+				.initialTimeStamp(initialTimeStamp).timeStamp(timeStamp).build();
 	}
 
 }

@@ -10,6 +10,8 @@ import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.common.model.BoardOperation;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.client.FiguresClient;
+import org.jmedina.jtetris.engine.figure.BoxMotion;
+import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.model.Message;
 import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
@@ -88,7 +90,7 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<FigureOperation> getFigureConversation(ServerWebExchange exchange) {
+	public Flux<FigureOperation<FigureMotion>> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getFigureConversation()");
 		this.engineService.start(this.nextFigurePublisher, this.enginePublisher);
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
@@ -96,8 +98,8 @@ public class EngineController {
 		if (this.showHeaders) {
 			printHeaders(exchange);
 		}
-		Flux<FigureOperation> fluxFromFigures = null;
-		Flux<FigureOperation> fluxFromEngine = null;
+		Flux<FigureOperation<FigureMotion>> fluxFromFigures = null;
+		Flux<FigureOperation<FigureMotion>> fluxFromEngine = null;
 		try {
 			fluxFromFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
@@ -111,7 +113,7 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Flux.<FigureOperation>empty();
+				return Flux.<FigureOperation<FigureMotion>>empty();
 			});
 			fluxFromEngine = Flux.from(this.enginePublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - NEXT = " + figure);
@@ -125,21 +127,21 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
-				return Flux.<FigureOperation>empty();
+				return Flux.<FigureOperation<FigureMotion>>empty();
 			});
 			return fluxFromFigures.mergeWith(fluxFromEngine).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Flux.<FigureOperation>empty();
+			return Flux.<FigureOperation<FigureMotion>>empty();
 		}
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<BoardOperation> getBoardConversation(ServerWebExchange exchange) {
+	public Flux<BoardOperation<BoxMotion>> getBoardConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getBoardConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
-		Flux<BoardOperation> fluxOfBoards = null;
+		Flux<BoardOperation<BoxMotion>> fluxOfBoards = null;
 		try {
 			fluxOfBoards = Flux.from(this.boardPublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.boardPublisher - NEXT = " + figure);
@@ -153,12 +155,12 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.boardPublisher =", e);
-				return Flux.<BoardOperation>empty();
+				return Flux.<BoardOperation<BoxMotion>>empty();
 			});
 			return fluxOfBoards.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Flux.<BoardOperation>empty();
+			return Flux.<BoardOperation<BoxMotion>>empty();
 		}
 	}
 

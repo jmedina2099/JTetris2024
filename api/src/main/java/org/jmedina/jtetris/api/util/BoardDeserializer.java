@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
  * @author Jorge Medina
  *
  */
-public class BoardDeserializer extends StdDeserializer<BoardOperation> {
+public class BoardDeserializer extends StdDeserializer<BoardOperation<BoxDTO>> {
 
 	private static final long serialVersionUID = 680931338299672474L;
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -35,7 +35,8 @@ public class BoardDeserializer extends StdDeserializer<BoardOperation> {
 	}
 
 	@Override
-	public BoardOperation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
+	public BoardOperation<BoxDTO> deserialize(JsonParser jp, DeserializationContext ctxt)
+			throws IOException, JacksonException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		BoardOperationEnumeration operation = BoardOperationEnumeration.valueOf(node.get("operation").asText());
 		JsonNode boxesNode = node.get("boxes");
@@ -47,7 +48,7 @@ public class BoardDeserializer extends StdDeserializer<BoardOperation> {
 			}
 		}
 		long timeStamp = node.get("timeStamp").asLong();
-		return BoardOperation.builder().operation(operation).boxes(boxes).timeStamp(timeStamp).build();
+		return BoardOperation.<BoxDTO>builder().operation(operation).boxes(boxes).timeStamp(timeStamp).build();
 	}
 
 }

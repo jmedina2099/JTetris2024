@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
+import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -38,7 +39,7 @@ class SerializeUtilTest extends KafkaHelperTesting {
 	@DisplayName("Test for convertFigureToString (CAJA)")
 	void testConvertFigureToStringCaja() throws Exception {
 		assertEquals(AssertUtilTesting.JSON_CAJA,
-				this.serializeUtil.convertFigureOperationToString(new FigureOperation()));
+				this.serializeUtil.convertFigureOperationToString(new FigureOperation<FigureDB>()));
 	}
 
 	@Test
@@ -53,6 +54,6 @@ class SerializeUtilTest extends KafkaHelperTesting {
 	@DisplayName("Test for convertFigureToString (Ele)")
 	void testConvertFigureToStringEle() throws Exception {
 		assertEquals(AssertUtilTesting.JSON_ELE,
-				this.serializeUtil.convertFigureOperationToString(new FigureOperation()));
+				this.serializeUtil.convertFigureOperationToString(new FigureOperation<FigureDB>()));
 	}
 }

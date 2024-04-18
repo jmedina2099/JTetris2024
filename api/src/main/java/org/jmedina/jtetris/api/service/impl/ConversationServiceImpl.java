@@ -8,8 +8,11 @@ import org.jmedina.jtetris.api.service.ConversationService;
 import org.jmedina.jtetris.api.util.BoardDeserializer;
 import org.jmedina.jtetris.api.util.FigureDeserializer;
 import org.jmedina.jtetris.common.model.BoardOperation;
+import org.jmedina.jtetris.common.model.BoxDTO;
+import org.jmedina.jtetris.common.model.FigureDTO;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.stereotype.Service;
@@ -69,13 +72,15 @@ public class ConversationServiceImpl implements ConversationService {
 				.exchangeStrategies(exchangeStrategies).build();
 	}
 
-	public Flux<FigureOperation> getFigureConversation() {
-		return this.clientForConversations.get().uri("/getFigureConversation").retrieve()
-				.bodyToFlux(FigureOperation.class);
+	public Flux<FigureOperation<FigureDTO>> getFigureConversation() {
+		ParameterizedTypeReference<FigureOperation<FigureDTO>> ref = new ParameterizedTypeReference<>() {
+		};
+		return this.clientForConversations.get().uri("/getFigureConversation").retrieve().bodyToFlux(ref);
 	}
 
-	public Flux<BoardOperation> getBoardConversation() {
-		return this.clientForConversations.get().uri("/getBoardConversation").retrieve()
-				.bodyToFlux(BoardOperation.class);
+	public Flux<BoardOperation<BoxDTO>> getBoardConversation() {
+		ParameterizedTypeReference<BoardOperation<BoxDTO>> ref = new ParameterizedTypeReference<>() {
+		};
+		return this.clientForConversations.get().uri("/getBoardConversation").retrieve().bodyToFlux(ref);
 	}
 }

@@ -3,7 +3,6 @@ package org.jmedina.jtetris.figures.service.impl;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -67,9 +66,9 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	}
 
 	@Override
-	public Mono<FigureOperation> askForNextFigureOperation() throws ServiceException {
+	public Mono<FigureOperation<FigureDB>> askForNextFigureOperation() throws ServiceException {
 		this.logger.debug("==> FigureService.askForNextFigureOperation()");
-		Mono<FigureOperation> monoOperation = null;
+		Mono<FigureOperation<FigureDB>> monoOperation = null;
 		try {
 			FigureDB figure = null;
 			int value = this.random.nextInt(FiguraEnumeration.values().length);
@@ -92,9 +91,8 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			Mono<FigureDB> mono = figure.load(this.figureTemplateOperations);
 			monoOperation = mono.map(fig -> {
 				long nanos;
-				AtomicReference<FigureDB> ref = new AtomicReference<>(fig);
-				FigureOperation figureOperation = FigureOperation.builder()
-						.operation(FigureOperationEnumeration.NEW_OPERATION).figure(ref)
+				FigureOperation<FigureDB> figureOperation = FigureOperation.<FigureDB>builder()
+						.operation(FigureOperationEnumeration.NEW_OPERATION).figure(fig)
 						.initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
 				sendFigureOperationToKafka(figureOperation);
 				return figureOperation;
@@ -119,7 +117,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 		this.logger.debug("==> FigureService.loadFigurasFromDB() ==> DONE");
 	}
 
-	private void sendFigureOperationToKafka(FigureOperation op) {
+	private void sendFigureOperationToKafka(FigureOperation<FigureDB> op) {
 		this.logger.debug("==> FigureService.sendFigureOperationToKafka() = " + op);
 		if (this.useKafka) {
 			this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(op), this.nextFigureTopic);

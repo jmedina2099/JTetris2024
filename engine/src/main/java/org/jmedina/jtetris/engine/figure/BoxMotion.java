@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @JsonPropertyOrder({ "x", "y", "initialTimeStamp", "timeStamp" })
-public class BoxForEngine implements Box, Cloneable {
+public class BoxMotion implements Box, Cloneable {
 
 	public static final double SIZE = 20d;
 
 	private final Rectangle2D.Double rectangle = new Rectangle2D.Double();
 
-	public BoxForEngine(double x, double y) {
+	public BoxMotion(double x, double y) {
 		this.rectangle.x = x;
 		this.rectangle.y = y;
 	}
@@ -59,8 +59,8 @@ public class BoxForEngine implements Box, Cloneable {
 	}
 
 	@Override
-	public BoxForEngine clone() {
-		return new BoxForEngine(this.rectangle.x, this.rectangle.y);
+	public BoxMotion clone() {
+		return new BoxMotion(this.rectangle.x, this.rectangle.y);
 	}
 
 	@Override

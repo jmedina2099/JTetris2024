@@ -1,7 +1,6 @@
 package org.jmedina.jtetris.engine.util;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.common.model.FigureOperation;
@@ -18,7 +17,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
  * @author Jorge Medina
  *
  */
-public class FigureDeserializer extends StdDeserializer<FigureOperation> {
+public class FigureDeserializer extends StdDeserializer<FigureOperation<FigureMotion>> {
 
 	private static final long serialVersionUID = 4200604337919878918L;
 
@@ -33,16 +32,15 @@ public class FigureDeserializer extends StdDeserializer<FigureOperation> {
 	}
 
 	@Override
-	public FigureOperation deserialize(JsonParser jp, DeserializationContext ctxt)
+	public FigureOperation<FigureMotion> deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JacksonException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		FigureOperationEnumeration operation = FigureOperationEnumeration.valueOf(node.get("operation").asText());
 		FigureMotion figure = this.mapper.readValue(node.get("figure").toString(), FigureMotion.class);
 		long initialTimeStamp = node.get("initialTimeStamp").asLong();
 		long timeStamp = node.get("timeStamp").asLong();
-		AtomicReference<FigureMotion> ref = new AtomicReference<>(figure);
-		return FigureOperation.builder().operation(operation).figure(ref).initialTimeStamp(initialTimeStamp)
-				.timeStamp(timeStamp).build();
+		return FigureOperation.<FigureMotion>builder().operation(operation).figure(figure)
+				.initialTimeStamp(initialTimeStamp).timeStamp(timeStamp).build();
 	}
 
 }

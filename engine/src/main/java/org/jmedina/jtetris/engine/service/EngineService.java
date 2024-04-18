@@ -3,6 +3,7 @@ package org.jmedina.jtetris.engine.service;
 import java.util.Optional;
 
 import org.jmedina.jtetris.common.model.FigureOperation;
+import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
 
@@ -16,7 +17,7 @@ public interface EngineService {
 
 	public void stop();
 
-	public void addFigureOperation(FigureOperation figureOperation);
+	public void addFigureOperation(FigureOperation<FigureMotion> figureOperation);
 
 	public Optional<Boolean> moveRight();
 

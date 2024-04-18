@@ -5,9 +5,11 @@ import java.time.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.common.model.FigureOperation;
+import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.service.ConversationService;
 import org.jmedina.jtetris.engine.util.FigureDeserializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.stereotype.Service;
@@ -66,9 +68,10 @@ public class ConversationServiceImpl implements ConversationService {
 				.exchangeStrategies(exchangeStrategies).build();
 	}
 
-	public Flux<FigureOperation> getFigureConversation() {
-		return this.clientForConversations.get().uri("/getFigureConversation").retrieve()
-				.bodyToFlux(FigureOperation.class);
+	public Flux<FigureOperation<FigureMotion>> getFigureConversation() {
+		ParameterizedTypeReference<FigureOperation<FigureMotion>> ref = new ParameterizedTypeReference<>() {
+		};
+		return this.clientForConversations.get().uri("/getFigureConversation").retrieve().bodyToFlux(ref);
 	}
 
 }

@@ -16,7 +16,7 @@ import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.common.model.BoardOperation;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.enumeration.MoveDirectionEnumeration;
-import org.jmedina.jtetris.engine.figure.BoxForEngine;
+import org.jmedina.jtetris.engine.figure.BoxMotion;
 import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.jmedina.jtetris.engine.publisher.BoardPublisher;
@@ -48,7 +48,7 @@ public class EngineServiceImpl implements EngineService {
 	private final SerializeUtil serializeUtil;
 	private FigureMotion fallingFigure;
 	private long initialTimeStamp;
-	private List<BoxForEngine> falledBoxes;
+	private List<BoxMotion> falledBoxes;
 	private ReentrantLock lock = new ReentrantLock();
 	private NextFigurePublisher nextFigurePublisher;
 	private EnginePublisher enginePublisher;
@@ -82,7 +82,7 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	@Override
-	public void addFigureOperation(FigureOperation figureOperation) {
+	public void addFigureOperation(FigureOperation<FigureMotion> figureOperation) {
 		this.logger.debug("==> Engine.addFigureOperation() = " + figureOperation);
 		if (this.isRunning
 				&& (this.fallingFigure == null || this.initialTimeStamp < figureOperation.getInitialTimeStamp())) {
@@ -162,7 +162,7 @@ public class EngineServiceImpl implements EngineService {
 		return Optional.of(false);
 	}
 
-	private List<BoxForEngine> cloneBoxes(List<BoxForEngine> falledBoxes) {
+	private List<BoxMotion> cloneBoxes(List<BoxMotion> falledBoxes) {
 		return falledBoxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 	}
 
@@ -171,14 +171,14 @@ public class EngineServiceImpl implements EngineService {
 		this.falledBoxes = new ArrayList<>();
 	}
 
-	private void sendFigureOperationToKafka(FigureOperation op) {
+	private void sendFigureOperationToKafka(FigureOperation<FigureMotion> op) {
 		this.logger.debug("==> Engine.sendFigureOperationToKafka() = " + this.kafkaService);
 		if (this.useKafka) {
 			this.serializeUtil.convertFigureOperationToString(op).ifPresent(this.kafkaService::sendMessageFigure);
 		}
 	}
 
-	private void sendBoardToKafka(BoardOperation board) {
+	private void sendBoardToKafka(BoardOperation<BoxMotion> board) {
 		this.logger.debug("==> Engine.sendBoardToKafka() = " + this.kafkaService);
 		if (this.useKafka) {
 			this.serializeUtil.convertBoardToString(board).ifPresent(this.kafkaService::sendMessageBoard);
@@ -213,34 +213,32 @@ public class EngineServiceImpl implements EngineService {
 		return Optional.of(false);
 	}
 
-	private void sendAsyncEventsForFigureOperation(FigureOperation figureOperation) {
+	private void sendAsyncEventsForFigureOperation(FigureOperation<FigureMotion> figureOperation) {
 		this.enginePublisher.sendFigureOperation(figureOperation);
 		sendFigureOperationToKafka(figureOperation);
 	}
 
-	private void sendAsyncEventsForBoardOperation(BoardOperation board) {
+	private void sendAsyncEventsForBoardOperation(BoardOperation<BoxMotion> board) {
 		this.boardPublisher.sendBoard(board);
 		sendBoardToKafka(board);
 	}
 
-	private FigureOperation getFigureOperationForMovement(FigureMotion figure) {
-		AtomicReference<FigureMotion> ref = new AtomicReference<>(figure);
-		return FigureOperation.builder().operation(FigureOperationEnumeration.MOVEMENT_OPERATION).figure(ref)
-				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
+	private FigureOperation<FigureMotion> getFigureOperationForMovement(FigureMotion figure) {
+		return FigureOperation.<FigureMotion>builder().operation(FigureOperationEnumeration.MOVEMENT_OPERATION)
+				.figure(figure).initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
 	}
 
-	private FigureOperation getFigureOperationForRotation(FigureMotion figure) {
-		AtomicReference<FigureMotion> ref = new AtomicReference<>(figure);
-		return FigureOperation.builder().operation(FigureOperationEnumeration.ROTATION_OPERATION).figure(ref)
-				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
+	private FigureOperation<FigureMotion> getFigureOperationForRotation(FigureMotion figure) {
+		return FigureOperation.<FigureMotion>builder().operation(FigureOperationEnumeration.ROTATION_OPERATION)
+				.figure(figure).initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
 	}
 
-	private BoardOperation getBoardOperation(List<BoxForEngine> boxes, BoardOperationEnumeration op) {
-		return BoardOperation.builder().operation(op).boxes(boxes).timeStamp(System.nanoTime()).build();
+	private BoardOperation<BoxMotion> getBoardOperation(List<BoxMotion> boxes, BoardOperationEnumeration op) {
+		return BoardOperation.<BoxMotion>builder().operation(op).boxes(boxes).timeStamp(System.nanoTime()).build();
 	}
 
 	private boolean canMoveRight(FigureMotion figure) {
-		int maxX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / BoxForEngine.SIZE)).max()
+		int maxX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / BoxMotion.SIZE)).max()
 				.orElse(0);
 		if (maxX + 1 == WIDTH)
 			return false;
@@ -248,7 +246,7 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	private boolean canMoveLeft(FigureMotion figure) {
-		int minX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / BoxForEngine.SIZE)).min()
+		int minX = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getX() / BoxMotion.SIZE)).min()
 				.orElse(0);
 		if (minX == 0)
 			return false;
@@ -256,7 +254,7 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	private boolean canMoveDown(FigureMotion figure) {
-		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE)).max()
+		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxMotion.SIZE)).max()
 				.orElse(0);
 		if (maxY + 1 == HEIGHT)
 			return false;
@@ -316,7 +314,7 @@ public class EngineServiceImpl implements EngineService {
 
 	private void tryToFit(FigureMotion figure) {
 		double max = figure.getBoxes().stream().mapToDouble(b -> b.getX()).max().getAsDouble();
-		double size = BoxForEngine.SIZE;
+		double size = BoxMotion.SIZE;
 		int numOps = 0;
 		while ((max + size) > size * 10 && numOps < 3) {
 			figure.moveLeft();
@@ -333,16 +331,16 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	private int checkMakeLines(FigureMotion figure) {
-		int minY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE)).min()
+		int minY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxMotion.SIZE)).min()
 				.orElse(0);
-		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE)).max()
+		int maxY = figure.getBoxes().stream().mapToInt(b -> (int) Math.round(b.getY() / BoxMotion.SIZE)).max()
 				.orElse(0);
 
 		int[] numLinesCompleted = new int[] { 0 };
 
 		AtomicReference<Stream<Boolean>> stream = new AtomicReference<Stream<Boolean>>();
 		AtomicReference<Boolean> isLineCompleted = new AtomicReference<Boolean>();
-		AtomicReference<List<BoxForEngine>> boxesOnLine = new AtomicReference<List<BoxForEngine>>();
+		AtomicReference<List<BoxMotion>> boxesOnLine = new AtomicReference<List<BoxMotion>>();
 
 		int[] indexY = new int[] { maxY };
 		Stream.iterate(0, x -> x + 1).limit(maxY - minY + 1).forEach(i -> {
@@ -350,9 +348,9 @@ public class EngineServiceImpl implements EngineService {
 			isLineCompleted.set(stream.get().allMatch(c -> c));
 			if (isLineCompleted.get()) {
 				numLinesCompleted[0]++;
-				boxesOnLine.set(this.falledBoxes.stream()
-						.filter(b -> (int) Math.round(b.getY() / BoxForEngine.SIZE) == indexY[0])
-						.collect(Collectors.toList()));
+				boxesOnLine.set(
+						this.falledBoxes.stream().filter(b -> (int) Math.round(b.getY() / BoxMotion.SIZE) == indexY[0])
+								.collect(Collectors.toList()));
 				this.falledBoxes.removeAll(boxesOnLine.get());
 				this.gridSupport.removeGridRow(indexY[0]);
 				moveDownFalledBoxes(indexY[0]);
@@ -366,7 +364,7 @@ public class EngineServiceImpl implements EngineService {
 	private void moveDownFalledBoxes(int indexY) {
 		this.logger.debug("==> Engine.rotate() indexY={}", indexY);
 		this.falledBoxes.stream().forEach(b -> {
-			if ((int) Math.round(b.getY() / BoxForEngine.SIZE) < indexY) {
+			if ((int) Math.round(b.getY() / BoxMotion.SIZE) < indexY) {
 				b.moveDown();
 			}
 		});
