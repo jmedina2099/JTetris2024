@@ -58,7 +58,7 @@ public abstract class FigureDB implements Figure {
 			this.logger.debug("==> loading... " + fig);
 			this.type.loadFigura(fig);
 			this.boxes = new ArrayList<>(
-					this.type.getTuplas().stream().map(t -> new BoxForFigures(t)).collect(Collectors.toList()));
+					this.type.getTuplas().stream().map(t -> new BoxDB(t)).collect(Collectors.toList()));
 			this.logger.debug("==> boxes... " + this.boxes);
 			this.center = type.getCenter();
 			this.numRotations = type.getNumRotations();

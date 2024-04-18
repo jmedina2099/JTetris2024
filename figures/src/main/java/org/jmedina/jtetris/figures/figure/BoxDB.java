@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonPropertyOrder({ "x", "y" })
 @EqualsAndHashCode
-public class BoxForFigures implements Box {
+public class BoxDB implements Box {
 
 	private static final double WIDTH = 20d;
 	private static final double HEIGHT = 20d;
@@ -25,7 +25,7 @@ public class BoxForFigures implements Box {
 	@EqualsAndHashCode.Exclude
 	private final Rectangle2D.Double rectangle = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
 
-	public BoxForFigures(Pair<Integer, Integer> tupla) {
+	public BoxDB(Pair<Integer, Integer> tupla) {
 		this.rectangle.x = tupla.getLeft() * WIDTH;
 		this.rectangle.y = tupla.getRight() * HEIGHT;
 	}

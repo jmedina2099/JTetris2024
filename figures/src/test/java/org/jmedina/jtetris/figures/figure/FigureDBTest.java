@@ -150,11 +150,11 @@ class FigureDBTest {
 	@Order(5)
 	@DisplayName("Test for Box Equals")
 	void testCajaHashCode() {
-		BoxForFigures box1 = new BoxForFigures();
-		BoxForFigures box2 = new BoxForFigures();
-		BoxForFigures box3 = new BoxTest();
-		BoxForFigures box4 = new BoxTest2();
-		BoxForFigures box5 = new BoxTest2();
+		BoxDB box1 = new BoxDB();
+		BoxDB box2 = new BoxDB();
+		BoxDB box3 = new BoxTest();
+		BoxDB box4 = new BoxTest2();
+		BoxDB box5 = new BoxTest2();
 		box1.setX(1.2);
 		box1.setY(1.3);
 		box2.setX(1.2);
@@ -241,17 +241,17 @@ class FigureDBTest {
 		}
 	}
 
-	class BoxTest extends BoxForFigures {
+	class BoxTest extends BoxDB {
 		@Override
 		protected boolean canEqual(Object other) {
 			return other instanceof BoxTest;
 		}
 	}
 
-	class BoxTest2 extends BoxForFigures {
+	class BoxTest2 extends BoxDB {
 		@Override
 		protected boolean canEqual(Object other) {
-			return other instanceof BoxForFigures;
+			return other instanceof BoxDB;
 		}
 	}
 }
