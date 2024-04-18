@@ -10,6 +10,7 @@ import lombok.ToString;
 
 /**
  * @author Jorge Medina
+ * @param <S>
  *
  */
 @NoArgsConstructor
@@ -17,7 +18,7 @@ import lombok.ToString;
 @Data
 @Builder
 @ToString
-public class FigureOperation<T extends Figure> {
+public class FigureOperation<S extends Box, T extends Figure<S>> {
 
 	private FigureOperationEnumeration operation;
 	private T figure;

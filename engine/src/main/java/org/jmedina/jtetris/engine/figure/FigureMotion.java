@@ -21,20 +21,20 @@ import lombok.ToString;
 @NoArgsConstructor
 @Data
 @ToString
-public class FigureMotion implements Figure, Cloneable {
+public class FigureMotion<T extends BoxMotion> implements Figure<T>, Cloneable {
 
 	@JsonIgnore
 	@ToString.Exclude
 	private final Logger logger = LogManager.getLogger(this.getClass());
 
-	private List<BoxMotion> boxes = new ArrayList<>();
+	private List<T> boxes = new ArrayList<>();
 	public Point center;
 	public int numRotations;
 
 	@JsonIgnore
 	public int rotation = 0;
 
-	public FigureMotion(List<BoxMotion> boxes, Point center, int numRotations, int rotation) {
+	public FigureMotion(List<T> boxes, Point center, int numRotations, int rotation) {
 		this.boxes = boxes;
 		this.center = center;
 		this.numRotations = numRotations;
@@ -60,10 +60,10 @@ public class FigureMotion implements Figure, Cloneable {
 	}
 
 	@Override
-	public FigureMotion clone() {
+	public FigureMotion<BoxMotion> clone() {
 		List<BoxMotion> list = this.boxes.stream().map(b -> b.clone()).collect(Collectors.toList());
 		Point center = new Point(this.center.x, this.center.y);
-		return new FigureMotion(list, center, numRotations, rotation);
+		return new FigureMotion<>(list, center, numRotations, rotation);
 	}
 
 }

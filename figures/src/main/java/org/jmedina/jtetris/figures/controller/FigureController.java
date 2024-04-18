@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.common.model.FigureOperation;
+import org.jmedina.jtetris.figures.figure.BoxDB;
 import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.model.Message;
 import org.jmedina.jtetris.figures.publisher.FigurePublisher;
@@ -73,14 +74,14 @@ public class FigureController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<FigureOperation<FigureDB>> getFigureConversation(ServerWebExchange exchange) {
+	public Flux<FigureOperation<BoxDB,FigureDB<BoxDB>>> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> FigureController.getFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		if (this.showHeaders) {
 			printHeaders(exchange);
 		}
-		Flux<FigureOperation<FigureDB>> fluxOfFigures = null;
+		Flux<FigureOperation<BoxDB,FigureDB<BoxDB>>> fluxOfFigures = null;
 		try {
 			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
 				this.logger.debug("===> FIGURES - Flux.from.figurePublisher - NEXT = " + figure);
@@ -94,12 +95,12 @@ public class FigureController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Flux.<FigureOperation<FigureDB>>empty();
+				return Flux.<FigureOperation<BoxDB,FigureDB<BoxDB>>>empty();
 			});
 			return fluxOfFigures.timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Flux.<FigureOperation<FigureDB>>empty();
+			return Flux.<FigureOperation<BoxDB,FigureDB<BoxDB>>>empty();
 		}
 	}
 

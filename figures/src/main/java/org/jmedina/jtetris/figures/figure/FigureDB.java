@@ -2,12 +2,12 @@ package org.jmedina.jtetris.figures.figure;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmedina.jtetris.common.model.Box;
 import org.jmedina.jtetris.common.model.Figure;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 import org.jmedina.jtetris.figures.service.FigureTemplateOperations;
@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
 @Setter
 @ToString
 @EqualsAndHashCode
-public abstract class FigureDB implements Figure {
+public abstract class FigureDB<T extends BoxDB> implements Figure<T> {
 
 	@JsonIgnore
 	@ToString.Exclude
@@ -43,7 +43,7 @@ public abstract class FigureDB implements Figure {
 	@ToString.Exclude
 	protected int id;
 
-	protected List<? extends Box> boxes;
+	protected List<T> boxes;
 	protected Point2D.Double center = new Point2D.Double();
 	public int numRotations;
 
@@ -52,13 +52,14 @@ public abstract class FigureDB implements Figure {
 		this.id = type.getId();
 	}
 
-	public Mono<FigureDB> load(FigureTemplateOperations template) {
+	@SuppressWarnings("unchecked")
+	public Mono<FigureDB<T>> load(FigureTemplateOperations template) {
 		this.logger.debug("==> load = " + this.type.name());
 		return template.findByName(this.type.name()).map(fig -> {
 			this.logger.debug("==> loading... " + fig);
 			this.type.loadFigura(fig);
 			this.boxes = new ArrayList<>(
-					this.type.getTuplas().stream().map(t -> new BoxDB(t)).collect(Collectors.toList()));
+					(Collection<? extends T>) this.type.getTuplas().stream().map(t -> new BoxDB(t)).collect(Collectors.toList()));
 			this.logger.debug("==> boxes... " + this.boxes);
 			this.center = type.getCenter();
 			this.numRotations = type.getNumRotations();

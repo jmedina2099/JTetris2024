@@ -26,19 +26,22 @@ public class SerializeUtil {
 	private final ObjectMapper mapper = new ObjectMapper();
 	private final SimpleModule module = new SimpleModule();
 
-	public Optional<FigureOperation<FigureMotion>> convertStringToFigureOperation(String message) {
+	public Optional<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> convertStringToFigureOperation(
+			String message) {
 		try {
 			module.addDeserializer(FigureOperation.class, new FigureDeserializer());
 			mapper.registerModule(module);
-			return Optional.of(this.mapper.readValue(message, new TypeReference<FigureOperation<FigureMotion>>() {
-			}));
+			return Optional.of(this.mapper.readValue(message,
+					new TypeReference<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>>() {
+					}));
 		} catch (JsonProcessingException e) {
 			this.logger.error("==> Error trying to convert JSON to figure operation!!!", e);
 		}
 		return Optional.empty();
 	}
 
-	public Optional<String> convertFigureOperationToString(FigureOperation<FigureMotion> figureOperation) {
+	public Optional<String> convertFigureOperationToString(
+			FigureOperation<BoxMotion, FigureMotion<BoxMotion>> figureOperation) {
 		try {
 			return Optional.of(this.mapper.writeValueAsString(figureOperation));
 		} catch (JsonProcessingException e) {

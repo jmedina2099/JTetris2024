@@ -43,7 +43,7 @@ public class GridSupportServiceImpl implements GridSupportService {
 	}
 
 	@Override
-	public void addToGrid(FigureMotion figure) {
+	public void addToGrid(FigureMotion<BoxMotion> figure) {
 		figure.getBoxes().stream().forEach(b -> {
 			int x = (int) Math.round(b.getX() / BoxMotion.SIZE);
 			int y = (int) Math.round(b.getY() / BoxMotion.SIZE);
@@ -52,7 +52,7 @@ public class GridSupportServiceImpl implements GridSupportService {
 	}
 
 	@Override
-	public void removeFromGrid(FigureMotion figure) {
+	public void removeFromGrid(FigureMotion<BoxMotion> figure) {
 		figure.getBoxes().stream().forEach(b -> {
 			int x = (int) Math.round(b.getX() / BoxMotion.SIZE);
 			int y = (int) Math.round(b.getY() / BoxMotion.SIZE);
@@ -72,7 +72,7 @@ public class GridSupportServiceImpl implements GridSupportService {
 	}
 
 	@Override
-	public boolean noHit(FigureMotion figure, int offsetX, int offsetY) {
+	public boolean noHit(FigureMotion<BoxMotion> figure, int offsetX, int offsetY) {
 		return figure.getBoxes().stream().allMatch(b -> {
 			int x = (int) Math.round(b.getX() / BoxMotion.SIZE);
 			int y = (int) Math.round(b.getY() / BoxMotion.SIZE);

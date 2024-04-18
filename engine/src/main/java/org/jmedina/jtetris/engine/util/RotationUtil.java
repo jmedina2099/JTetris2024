@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RotationUtil {
 
-	public void rotateFigure(FigureMotion figure, int direction) {
+	public void rotateFigure(FigureMotion<BoxMotion> figure, int direction) {
 		List<BoxMotion> boxes = figure.getBoxes();
 
 		List<Point2D.Double> listCoords = boxes.stream().map(box -> new Point2D.Double(box.getX(), box.getY()))

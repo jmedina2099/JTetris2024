@@ -3,6 +3,7 @@ package org.jmedina.jtetris.figures.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.common.model.FigureOperation;
+import org.jmedina.jtetris.figures.figure.BoxDB;
 import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
 import org.jmedina.jtetris.figures.service.impl.KafkaServiceImpl;
@@ -44,7 +45,7 @@ class KafkaServiceTest extends KafkaHelperTesting {
 	@DisplayName("Test for sendMessage to kafka")
 	void testSendMessage() throws Exception {
 		this.logger.debug("==> KafkaServiceTest.testSendMessage()");
-		this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(new FigureOperation<FigureDB>()),
+		this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(new FigureOperation<BoxDB,FigureDB<BoxDB>>()),
 				nextFigureTopic);
 		super.assertMessageListenerLatch();
 		super.assertMessageCaja();

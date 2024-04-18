@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.exception.ServiceException;
+import org.jmedina.jtetris.figures.figure.BoxDB;
 import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
 import org.jmedina.jtetris.figures.service.impl.KafkaServiceImpl;
@@ -71,7 +72,7 @@ class KafkaServiceExceptionTest extends KafkaHelperTesting {
 			throw new NullPointerException();
 		});
 		when(this.kafkaTemplate.send(anyString(), anyString())).thenReturn(future);
-		this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(new FigureOperation<FigureDB>()),
+		this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(new FigureOperation<BoxDB,FigureDB<BoxDB>>()),
 				nextFigureTopic);
 		AssertUtilTesting.assertLatch(this.kafkaService.getLatchForTesting());
 	}
@@ -82,7 +83,7 @@ class KafkaServiceExceptionTest extends KafkaHelperTesting {
 	void testSendMessageWithException2() throws Exception {
 		this.logger.debug("==> KafkaServiceExceptionTest.testSendMessageWithException2()");
 		when(this.kafkaTemplate.send(anyString(), anyString())).thenThrow(new ServiceException(new Exception("ERROR")));
-		String jsonCaja = this.serializeUtil.convertFigureOperationToString(new FigureOperation<FigureDB>());
+		String jsonCaja = this.serializeUtil.convertFigureOperationToString(new FigureOperation<BoxDB,FigureDB<BoxDB>>());
 		ServiceException exception = assertThrows(ServiceException.class, () -> {
 			this.kafkaService.sendMessage(jsonCaja, nextFigureTopic);
 		});

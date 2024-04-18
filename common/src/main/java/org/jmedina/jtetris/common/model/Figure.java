@@ -6,9 +6,9 @@ import java.util.List;
  * @author Jorge Medina
  *
  */
-public interface Figure {
+public interface Figure<T extends Box> {
 
-	public List<? extends Box> getBoxes();
+	public List<T> getBoxes();
 
 	public String toString();
 }

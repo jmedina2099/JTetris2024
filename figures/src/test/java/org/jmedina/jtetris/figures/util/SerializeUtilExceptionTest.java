@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.exception.ServiceException;
+import org.jmedina.jtetris.figures.figure.BoxDB;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.helper.KafkaHelperTesting;
@@ -64,7 +65,7 @@ class SerializeUtilExceptionTest extends KafkaHelperTesting {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		FigureOperation<FigureDB> caja = new FigureOperation<FigureDB>();
+		FigureOperation<BoxDB,FigureDB<BoxDB>> caja = new FigureOperation<BoxDB,FigureDB<BoxDB>>();
 		ServiceException exception = assertThrows(ServiceException.class, () -> {
 			this.serializeUtil.convertFigureOperationToString(caja);
 		});

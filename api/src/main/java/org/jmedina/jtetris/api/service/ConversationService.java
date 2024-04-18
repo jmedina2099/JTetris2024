@@ -9,7 +9,7 @@ import reactor.core.publisher.Flux;
 
 public interface ConversationService {
 
-	public Flux<FigureOperation<FigureDTO>> getFigureConversation();
+	public Flux<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> getFigureConversation();
 
 	public Flux<BoardOperation<BoxDTO>> getBoardConversation();
 }

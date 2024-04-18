@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.jmedina.jtetris.common.enumeration.FigureOperationEnumeration;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
+import org.jmedina.jtetris.figures.figure.BoxDB;
 import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.model.NextFigureOperation;
 import org.jmedina.jtetris.figures.service.FigureService;
@@ -20,7 +21,7 @@ import reactor.core.publisher.Flux;
  *
  */
 @Service
-public class FigurePublisher extends CustomPublisher<FigureOperation<FigureDB>> {
+public class FigurePublisher extends CustomPublisher<FigureOperation<BoxDB,FigureDB<BoxDB>>> {
 
 	@Autowired
 	private FigureService figureService;
@@ -33,7 +34,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation<FigureDB>> 
 	}
 
 	@Override
-	public void subscribe(Subscriber<? super FigureOperation<FigureDB>> subscriber) {
+	public void subscribe(Subscriber<? super FigureOperation<BoxDB,FigureDB<BoxDB>>> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
 		askAndSendForNextFigureOperation(); // first figure.

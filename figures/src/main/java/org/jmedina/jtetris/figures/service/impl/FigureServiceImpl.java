@@ -12,6 +12,7 @@ import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.figures.domain.Figura;
 import org.jmedina.jtetris.figures.enumeration.FiguraEnumeration;
 import org.jmedina.jtetris.figures.exception.ServiceException;
+import org.jmedina.jtetris.figures.figure.BoxDB;
 import org.jmedina.jtetris.figures.figure.Caja;
 import org.jmedina.jtetris.figures.figure.Ele;
 import org.jmedina.jtetris.figures.figure.FigureDB;
@@ -66,11 +67,11 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 	}
 
 	@Override
-	public Mono<FigureOperation<FigureDB>> askForNextFigureOperation() throws ServiceException {
+	public Mono<FigureOperation<BoxDB,FigureDB<BoxDB>>> askForNextFigureOperation() throws ServiceException {
 		this.logger.debug("==> FigureService.askForNextFigureOperation()");
-		Mono<FigureOperation<FigureDB>> monoOperation = null;
+		Mono<FigureOperation<BoxDB,FigureDB<BoxDB>>> monoOperation = null;
 		try {
-			FigureDB figure = null;
+			FigureDB<BoxDB> figure = null;
 			int value = this.random.nextInt(FiguraEnumeration.values().length);
 			switch (value) {
 			case 0:
@@ -88,10 +89,10 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 			default:
 				throw new ServiceException(new IllegalArgumentException("Unexpected value: " + value));
 			}
-			Mono<FigureDB> mono = figure.load(this.figureTemplateOperations);
+			Mono<FigureDB<BoxDB>> mono = figure.load(this.figureTemplateOperations);
 			monoOperation = mono.map(fig -> {
 				long nanos;
-				FigureOperation<FigureDB> figureOperation = FigureOperation.<FigureDB>builder()
+				FigureOperation<BoxDB,FigureDB<BoxDB>> figureOperation = FigureOperation.<BoxDB,FigureDB<BoxDB>>builder()
 						.operation(FigureOperationEnumeration.NEW_OPERATION).figure(fig)
 						.initialTimeStamp(nanos = System.nanoTime()).timeStamp(nanos).build();
 				sendFigureOperationToKafka(figureOperation);
@@ -117,7 +118,7 @@ public class FigureServiceImpl implements FigureService, ApplicationListener<Con
 		this.logger.debug("==> FigureService.loadFigurasFromDB() ==> DONE");
 	}
 
-	private void sendFigureOperationToKafka(FigureOperation<FigureDB> op) {
+	private void sendFigureOperationToKafka(FigureOperation<BoxDB,FigureDB<BoxDB>> op) {
 		this.logger.debug("==> FigureService.sendFigureOperationToKafka() = " + op);
 		if (this.useKafka) {
 			this.kafkaService.sendMessage(this.serializeUtil.convertFigureOperationToString(op), this.nextFigureTopic);

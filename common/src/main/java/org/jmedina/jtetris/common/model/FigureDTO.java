@@ -16,8 +16,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @Data
 @ToString
-public class FigureDTO implements Figure {
+public class FigureDTO<T extends BoxDTO> implements Figure<T> {
 
-	private List<BoxDTO> boxes = new ArrayList<>();
+	private List<T> boxes = new ArrayList<>();
 
 }

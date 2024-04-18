@@ -72,8 +72,8 @@ public class ConversationServiceImpl implements ConversationService {
 				.exchangeStrategies(exchangeStrategies).build();
 	}
 
-	public Flux<FigureOperation<FigureDTO>> getFigureConversation() {
-		ParameterizedTypeReference<FigureOperation<FigureDTO>> ref = new ParameterizedTypeReference<>() {
+	public Flux<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> getFigureConversation() {
+		ParameterizedTypeReference<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> ref = new ParameterizedTypeReference<>() {
 		};
 		return this.clientForConversations.get().uri("/getFigureConversation").retrieve().bodyToFlux(ref);
 	}

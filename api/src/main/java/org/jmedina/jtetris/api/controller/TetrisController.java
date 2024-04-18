@@ -80,14 +80,14 @@ public class TetrisController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public ResponseEntity<Flux<FigureOperation<FigureDTO>>> getFigureConversation(ServerWebExchange exchange) {
+	public ResponseEntity<Flux<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>>> getFigureConversation(ServerWebExchange exchange) {
 		this.logger.debug("===> TetrisController.getFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		if (this.showHeaders) {
 			printHeaders(exchange);
 		}
-		Flux<FigureOperation<FigureDTO>> fluxOfFigures = null;
+		Flux<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> fluxOfFigures = null;
 		try {
 			fluxOfFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
 				this.logger.debug("===> API - Flux.from.figurePublisher - NEXT = " + figure);
@@ -101,12 +101,12 @@ public class TetrisController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Flux.<FigureOperation<FigureDTO>>empty();
+				return Flux.<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>>empty();
 			});
 			return ResponseEntity.status(HttpStatus.OK).body(fluxOfFigures.timeout(Duration.ofHours(1)));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return ResponseEntity.internalServerError().body(Flux.<FigureOperation<FigureDTO>>empty());
+			return ResponseEntity.internalServerError().body(Flux.<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>>empty());
 		}
 	}
 

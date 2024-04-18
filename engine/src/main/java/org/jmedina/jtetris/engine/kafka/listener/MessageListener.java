@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.common.model.FigureOperation;
+import org.jmedina.jtetris.engine.figure.BoxMotion;
 import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
@@ -32,7 +33,7 @@ public class MessageListener {
 	@KafkaListener(topics = "${engine.topic.nextFigure}", groupId = "${engine.groupId.message}")
 	public void listenGroupFigureMessage(String message) {
 		this.logger.debug("==> MessageListener.listenGroupFigureMessage() = {} ", message);
-		Optional<FigureOperation<FigureMotion>> optional = this.serializeUtil.convertStringToFigureOperation(message);
+		Optional<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> optional = this.serializeUtil.convertStringToFigureOperation(message);
 		if (optional.isPresent() && Objects.nonNull(optional.get().getFigure())
 				&& !ObjectUtils.isEmpty(optional.get().getFigure().getBoxes())) {
 			this.engineService.addFigureOperation(optional.get());
