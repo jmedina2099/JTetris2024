@@ -52,7 +52,7 @@ public class ConversationServiceImpl implements ConversationService {
 
 		int timeout = 3600000;
 		ConnectionProvider connProvider = ConnectionProvider.builder("connectionProviderForConversationsEngine")
-				.maxConnections(1).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
+				.maxConnections(200).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
 				.maxIdleTime(Duration.ofHours(1)).maxLifeTime(Duration.ofHours(1)).build();
 		HttpClient httpClient = HttpClient.create(connProvider).baseUrl(this.figuresBaseUrl)
 				.option(ChannelOption.AUTO_CLOSE, false).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout)
@@ -69,10 +69,11 @@ public class ConversationServiceImpl implements ConversationService {
 				.exchangeStrategies(exchangeStrategies).build();
 	}
 
-	public Flux<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> getFigureConversation() {
-		ParameterizedTypeReference<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> ref = new ParameterizedTypeReference<>() {
+	public Flux<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> getFigureConversation(String auth) {
+		ParameterizedTypeReference<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> ref = new ParameterizedTypeReference<>() {
 		};
-		return this.clientForConversations.get().uri("/getFigureConversation").retrieve().bodyToFlux(ref);
+		return this.clientForConversations.get().uri("/getFigureConversation")
+				.headers(h -> h.addIfAbsent("authorization", auth)).retrieve().bodyToFlux(ref);
 	}
 
 }

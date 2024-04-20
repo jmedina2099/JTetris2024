@@ -21,8 +21,8 @@ public class FigureServiceImpl implements FigureService {
 	private final FiguresClient figuresClient;
 
 	@Override
-	public Mono<Boolean> stop() {
+	public Mono<Boolean> stop(String auth) {
 		this.logger.debug("==> FigureService.stop()");
-		return this.figuresClient.stop();
+		return this.figuresClient.stop(auth);
 	}
 }

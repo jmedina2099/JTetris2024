@@ -126,7 +126,11 @@ export class VentanaPrincipalComponent implements OnInit, OnDestroy {
     this.reset();
     this.isRunning = true;
     this.route.snapshot.data['game'].isRunning = true;
-    this.getConversations();
+    this.fetchService.start().subscribe(value => {
+      if (value === true) {
+        this.getConversations();
+      }
+    });
     this.startTime = Date.now();
     window.setInterval(() => {
       this.secondsEllapsed =

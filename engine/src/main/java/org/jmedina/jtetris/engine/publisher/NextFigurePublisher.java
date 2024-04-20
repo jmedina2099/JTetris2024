@@ -4,13 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.jmedina.jtetris.engine.model.NextFigureOperation;
 import org.reactivestreams.Subscriber;
-import org.springframework.stereotype.Service;
 
 /**
  * @author Jorge Medina
  *
  */
-@Service
 public class NextFigurePublisher extends CustomPublisher<NextFigureOperation> {
 
 	public NextFigurePublisher() {

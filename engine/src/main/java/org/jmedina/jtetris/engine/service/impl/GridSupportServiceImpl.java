@@ -13,30 +13,23 @@ import org.apache.logging.log4j.Logger;
 import org.jmedina.jtetris.engine.figure.BoxMotion;
 import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.service.GridSupportService;
-import org.springframework.stereotype.Service;
-
-import jakarta.annotation.PostConstruct;
-import lombok.NoArgsConstructor;
 
 /**
  * @author Jorge Medina
  *
  */
-@NoArgsConstructor
-@Service
 public class GridSupportServiceImpl implements GridSupportService {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
 	private Map<Integer, boolean[]> gridBoxes = new HashMap<>();
 
-	@PostConstruct
-	private void init() {
-		this.logger.debug("==> GridSupportService.init()");
+	public GridSupportServiceImpl() {
 		initializeGrid();
 	}
 
 	@Override
 	public void initializeGrid() {
+		this.logger.debug("==> GridSupportService.initializeGrid()");
 		Stream.iterate(0, x -> x + 1).limit(EngineServiceImpl.HEIGHT).forEach(i -> {
 			this.gridBoxes.put(i, new boolean[EngineServiceImpl.WIDTH]);
 		});

@@ -8,6 +8,6 @@ import reactor.core.publisher.Flux;
 
 public interface ConversationService {
 
-	public Flux<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> getFigureConversation();
+	public Flux<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> getFigureConversation(String auth);
 
 }

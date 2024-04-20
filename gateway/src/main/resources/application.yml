@@ -26,8 +26,7 @@ spring:
           type: elastic
       filter:
         remove-hop-by-hop.headers:
-          - Proxy-Authenticate
-          - Proxy-Authorization
+          - test
       httpserver:
         wiretap: false
       globalcors:

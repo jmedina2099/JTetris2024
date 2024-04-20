@@ -1,12 +1,17 @@
 package org.jmedina.jtetris.engine.controller;
 
+import java.security.Principal;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.javatuples.Quintet;
 import org.jmedina.jtetris.common.model.BoardOperation;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.client.FiguresClient;
@@ -18,10 +23,13 @@ import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.FigurePublisher;
 import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
+import org.jmedina.jtetris.engine.service.ConversationService;
 import org.jmedina.jtetris.engine.service.EngineService;
+import org.jmedina.jtetris.engine.service.impl.EngineServiceImpl;
+import org.jmedina.jtetris.engine.util.RotationUtil;
+import org.jmedina.jtetris.engine.util.SerializeUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,19 +45,18 @@ import reactor.core.publisher.Mono;
  *
  */
 @RequiredArgsConstructor
-@CrossOrigin(origins = { "http://localhost:9081", "http://localhost:9082", "http://localhost:9083" })
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class EngineController {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
-	private final EngineService engineService;
-	private final EnginePublisher enginePublisher;
-	private final FigurePublisher figurePublisher;
-	private final BoardPublisher boardPublisher;
-	private final NextFigurePublisher nextFigurePublisher;
+	private final ConversationService conversationService;
 	private final FiguresClient figuresClient;
+	private final RotationUtil rotationUtil;
+	private final SerializeUtil serializeUtil;
 	private final boolean showHeaders = false;
+
+	private final Map<String, Quintet<FigurePublisher, EnginePublisher, BoardPublisher, NextFigurePublisher, EngineService>> mapSession = new HashMap<>();
 
 	@GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<Message> hello() {
@@ -63,26 +70,54 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/isUp", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> isUp() {
+	public Mono<Boolean> isUp(Principal user, ServerWebExchange exchange) {
 		this.logger.debug("===> TetrisController.isUp()");
+		this.logger.debug("===> ENGINE - USERNAME = {}", Objects.nonNull(user) ? user.getName() : user);
+		if (this.showHeaders) {
+			printHeaders(exchange);
+		}
 		try {
-			return this.figuresClient.isUp().timeout(Duration.ofSeconds(3));
+			return this.figuresClient.isUp(getAuthHeader(exchange)).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.empty();
 		}
 	}
 
+	@PostMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<Boolean> start(Principal user, ServerWebExchange exchange) {
+		this.logger.debug("===> EngineController.start()");
+		String auth = getAuthHeader(exchange);
+		try {
+			if (Objects.nonNull(user)) {
+				EngineService engineService = new EngineServiceImpl(this.rotationUtil, this.serializeUtil);
+				mapSession.put(user.getName(),
+						Quintet.with(new FigurePublisher(auth, engineService, this.conversationService),
+								new EnginePublisher(), new BoardPublisher(), new NextFigurePublisher(), engineService));
+			}
+			return this.figuresClient.start(auth).timeout(Duration.ofSeconds(3));
+		} catch (Exception e) {
+			this.logger.error("=*=> ERROR: ", e);
+			return Mono.just(false).timeout(Duration.ofSeconds(3));
+		}
+	}
+
 	@PostMapping(value = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> stop() {
+	public Mono<Boolean> stop(Principal user, ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.stop()");
 		try {
-			this.figurePublisher.stop();
-			this.enginePublisher.stop();
-			this.boardPublisher.stop();
-			this.nextFigurePublisher.stop();
-			this.engineService.stop();
-			return this.figuresClient.stop().timeout(Duration.ofSeconds(3));
+			if (Objects.nonNull(user)) {
+				Quintet<FigurePublisher, EnginePublisher, BoardPublisher, NextFigurePublisher, EngineService> session = mapSession
+						.get(user.getName());
+				if (Objects.nonNull(session)) {
+					session.getValue0().stop();
+					session.getValue1().stop();
+					session.getValue2().stop();
+					session.getValue3().stop();
+					session.getValue4().stop();
+				}
+			}
+			return this.figuresClient.stop(getAuthHeader(exchange)).timeout(Duration.ofSeconds(3));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false).timeout(Duration.ofSeconds(3));
@@ -90,18 +125,36 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> getFigureConversation(ServerWebExchange exchange) {
+	public Flux<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> getFigureConversation(Principal user,
+			ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getFigureConversation()");
-		this.engineService.start(this.nextFigurePublisher, this.enginePublisher);
+		this.logger.debug("===> ENGINE - USERNAME = {}", Objects.nonNull(user) ? user.getName() : "");
+		FigurePublisher figurePublisher = null;
+		EnginePublisher enginePublisher = null;
+		BoardPublisher boardPublisher = null;
+		NextFigurePublisher nextFigurePublisher = null;
+		EngineService engineService = null;
+		if (Objects.nonNull(user)) {
+			Quintet<FigurePublisher, EnginePublisher, BoardPublisher, NextFigurePublisher, EngineService> session = mapSession
+					.get(user.getName());
+			if (Objects.nonNull(session)) {
+				figurePublisher = session.getValue0();
+				enginePublisher = session.getValue1();
+				boardPublisher = session.getValue2();
+				nextFigurePublisher = session.getValue3();
+				engineService = session.getValue4();
+			}
+		}
+		engineService.start(nextFigurePublisher, enginePublisher, boardPublisher);
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		if (this.showHeaders) {
 			printHeaders(exchange);
 		}
-		Flux<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> fluxFromFigures = null;
-		Flux<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> fluxFromEngine = null;
+		Flux<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> fluxFromFigures = null;
+		Flux<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> fluxFromEngine = null;
 		try {
-			fluxFromFigures = Flux.from(this.figurePublisher).doOnNext(figure -> {
+			fluxFromFigures = Flux.from(figurePublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - NEXT = " + figure);
 			}).doOnComplete(() -> {
 				this.logger.debug("===> ENGINE - Flux.from.figurePublisher - COMPLETE!");
@@ -113,9 +166,9 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.figurePublisher =", e);
-				return Flux.<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>>empty();
+				return Flux.<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>>empty();
 			});
-			fluxFromEngine = Flux.from(this.enginePublisher).doOnNext(figure -> {
+			fluxFromEngine = Flux.from(enginePublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - NEXT = " + figure);
 			}).doOnComplete(() -> {
 				this.logger.debug("===> ENGINE - Flux.from.enginePublisher - COMPLETE!");
@@ -127,23 +180,31 @@ public class EngineController {
 				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
 			}).onErrorResume(e -> {
 				this.logger.error("==*=> ERROR - Flux.from.enginePublisher =", e);
-				return Flux.<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>>empty();
+				return Flux.<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>>empty();
 			});
 			return fluxFromFigures.mergeWith(fluxFromEngine).timeout(Duration.ofHours(1));
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
-			return Flux.<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>>empty();
+			return Flux.<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>>empty();
 		}
 	}
 
 	@GetMapping(value = "/getBoardConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<BoardOperation<BoxMotion>> getBoardConversation(ServerWebExchange exchange) {
+	public Flux<BoardOperation<BoxMotion>> getBoardConversation(Principal user, ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getBoardConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
+		BoardPublisher boardPublisher = null;
+		if (Objects.nonNull(user)) {
+			Quintet<FigurePublisher, EnginePublisher, BoardPublisher, NextFigurePublisher, EngineService> session = mapSession
+					.get(user.getName());
+			if (Objects.nonNull(session)) {
+				boardPublisher = session.getValue2();
+			}
+		}
 		Flux<BoardOperation<BoxMotion>> fluxOfBoards = null;
 		try {
-			fluxOfBoards = Flux.from(this.boardPublisher).doOnNext(figure -> {
+			fluxOfBoards = Flux.from(boardPublisher).doOnNext(figure -> {
 				this.logger.debug("===> ENGINE - Flux.from.boardPublisher - NEXT = " + figure);
 			}).doOnComplete(() -> {
 				this.logger.debug("===> ENGINE - Flux.from.boardPublisher - COMPLETE!");
@@ -165,16 +226,24 @@ public class EngineController {
 	}
 
 	@GetMapping(value = "/getNextFigureConversation", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<NextFigureOperation> getNextFigureConversation(ServerWebExchange exchange) {
+	public Flux<NextFigureOperation> getNextFigureConversation(Principal user, ServerWebExchange exchange) {
 		this.logger.debug("===> EngineController.getNextFigureConversation()");
 		exchange.getResponse().getHeaders().addIfAbsent("Connection", "keep-alive");
 		exchange.getResponse().getHeaders().addIfAbsent("Keep-Alive", "timeout=3600");
 		if (this.showHeaders) {
 			printHeaders(exchange);
 		}
+		NextFigurePublisher nextFigurePublisher = null;
+		if (Objects.nonNull(user)) {
+			Quintet<FigurePublisher, EnginePublisher, BoardPublisher, NextFigurePublisher, EngineService> session = mapSession
+					.get(user.getName());
+			if (Objects.nonNull(session)) {
+				nextFigurePublisher = session.getValue3();
+			}
+		}
 		Flux<NextFigureOperation> fluxOfNextFigure = null;
 		try {
-			fluxOfNextFigure = Flux.from(this.nextFigurePublisher).doOnNext(value -> {
+			fluxOfNextFigure = Flux.from(nextFigurePublisher).doOnNext(value -> {
 				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - NEXT = " + value);
 			}).doOnComplete(() -> {
 				this.logger.debug("===> ENGINE - Flux.from.nextFigurePublisher - COMPLETE!");
@@ -196,10 +265,10 @@ public class EngineController {
 	}
 
 	@PostMapping(value = "/moveRight", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> moveRight() {
+	public Mono<Boolean> moveRight(Principal user) {
 		this.logger.debug("===> EngineController.moveRight()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.moveRight());
+			return convertOptionalToMonoBoolean(getEngineService(user).moveRight());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false).timeout(Duration.ofSeconds(3));
@@ -207,10 +276,10 @@ public class EngineController {
 	}
 
 	@PostMapping(value = "/moveLeft", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> moveLeft() {
+	public Mono<Boolean> moveLeft(Principal user) {
 		this.logger.debug("===> EngineController.moveLeft()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.moveLeft());
+			return convertOptionalToMonoBoolean(getEngineService(user).moveLeft());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false).timeout(Duration.ofSeconds(3));
@@ -218,10 +287,10 @@ public class EngineController {
 	}
 
 	@PostMapping(value = "/rotateRight", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> rotateRight() {
+	public Mono<Boolean> rotateRight(Principal user) {
 		this.logger.debug("===> EngineController.rotateRight()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.rotateRight());
+			return convertOptionalToMonoBoolean(getEngineService(user).rotateRight());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false).timeout(Duration.ofSeconds(3));
@@ -229,10 +298,10 @@ public class EngineController {
 	}
 
 	@PostMapping(value = "/rotateLeft", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> rotateLeft() {
+	public Mono<Boolean> rotateLeft(Principal user) {
 		this.logger.debug("===> EngineController.rotateLeft()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.rotateLeft());
+			return convertOptionalToMonoBoolean(getEngineService(user).rotateLeft());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false).timeout(Duration.ofSeconds(3));
@@ -240,10 +309,10 @@ public class EngineController {
 	}
 
 	@PostMapping(value = "/bottomDown", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<Boolean> bottomDown() {
+	public Mono<Boolean> bottomDown(Principal user) {
 		this.logger.debug("===> EngineController.bottomDown()");
 		try {
-			return convertOptionalToMonoBoolean(this.engineService.bottomDown());
+			return convertOptionalToMonoBoolean(getEngineService(user).bottomDown());
 		} catch (Exception e) {
 			this.logger.error("=*=> ERROR: ", e);
 			return Mono.just(false).timeout(Duration.ofSeconds(3));
@@ -256,17 +325,38 @@ public class EngineController {
 	}
 
 	private void printHeaders(ServerWebExchange exchange) {
-		this.logger.debug("=========> HEADERS!!!");
+		this.logger.info("=========> HEADERS!!!");
 		HttpHeaders headers = exchange.getRequest().getHeaders();
 		Set<String> keys = headers.keySet();
 		keys.stream().forEach(key -> {
 			List<String> values = headers.get(key);
 			if (values != null) {
 				values.stream().forEach(v -> {
-					this.logger.debug("=========> header= {}: {}", key, v);
+					this.logger.info("=========> header= {}: {}", key, v);
 				});
 			}
 		});
-		this.logger.debug("=========> END HEADERS!!!");
+		this.logger.info("=========> END HEADERS!!!");
 	}
+
+	private String getAuthHeader(ServerWebExchange exchange) {
+		List<String> values = exchange.getRequest().getHeaders().get("authorization");
+		if (Objects.nonNull(values) && !values.isEmpty()) {
+			return values.get(0);
+		}
+		return null;
+	}
+
+	private EngineService getEngineService(Principal user) {
+		EngineService engineService = null;
+		if (Objects.nonNull(user)) {
+			Quintet<FigurePublisher, EnginePublisher, BoardPublisher, NextFigurePublisher, EngineService> session = mapSession
+					.get(user.getName());
+			if (Objects.nonNull(session)) {
+				engineService = session.getValue4();
+			}
+		}
+		return engineService;
+	}
+
 }

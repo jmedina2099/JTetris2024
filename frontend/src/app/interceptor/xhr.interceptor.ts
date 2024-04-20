@@ -21,7 +21,7 @@ export class XhrInterceptor implements HttpInterceptor {
     const auth = sessionStorage.getItem('authorization');
     if (auth !== null) {
       const xhr = req.clone({
-        headers: req.headers.set('Authorization', auth),
+        headers: req.headers.set('authorization', auth),
       });
       return next.handle(xhr);
     }

@@ -10,8 +10,6 @@ import org.jmedina.jtetris.engine.figure.FigureMotion;
 import org.jmedina.jtetris.engine.service.ConversationService;
 import org.jmedina.jtetris.engine.service.EngineService;
 import org.reactivestreams.Subscriber;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 
@@ -19,21 +17,21 @@ import reactor.core.publisher.Flux;
  * @author Jorge Medina
  *
  */
-@Service
-public class FigurePublisher extends CustomPublisher<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> {
+public class FigurePublisher extends CustomPublisher<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> {
 
-	@Autowired
 	private EngineService engineService;
-
-	@Autowired
 	private ConversationService conversationService;
+	private String auth;
 
-	public FigurePublisher() {
+	public FigurePublisher(String auth, EngineService engineService, ConversationService conversationService) {
 		super(LogManager.getLogger(FigurePublisher.class));
+		this.auth = auth;
+		this.engineService = engineService;
+		this.conversationService = conversationService;
 	}
 
 	@Override
-	public void subscribe(Subscriber<? super FigureOperation<BoxMotion,FigureMotion<BoxMotion>>> subscriber) {
+	public void subscribe(Subscriber<? super FigureOperation<BoxMotion, FigureMotion<BoxMotion>>> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
 		getFigureConversation();
@@ -42,7 +40,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation<BoxMotion,F
 	private void getFigureConversation() {
 		this.logger.debug("===> FigurePublisher.getFigureConversation()");
 		try {
-			super.disposable = this.conversationService.getFigureConversation().timeout(Duration.ofHours(1))
+			super.disposable = this.conversationService.getFigureConversation(this.auth).timeout(Duration.ofHours(1))
 					.doOnNext(figure -> {
 						this.logger.debug("===> ENGINE - getFigureConversation - NEXT = " + figure);
 					}).doOnComplete(() -> {
@@ -55,7 +53,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation<BoxMotion,F
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
 					}).onErrorResume(e -> {
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
-						return Flux.<FigureOperation<BoxMotion,FigureMotion<BoxMotion>>>empty();
+						return Flux.<FigureOperation<BoxMotion, FigureMotion<BoxMotion>>>empty();
 					}).subscribe(figure -> {
 						this.logger.debug("===> getFigureConversation.subscribe = " + figure);
 						this.engineService.addFigureOperation(figure);

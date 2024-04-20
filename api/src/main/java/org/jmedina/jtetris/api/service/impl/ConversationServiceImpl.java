@@ -55,7 +55,7 @@ public class ConversationServiceImpl implements ConversationService {
 
 		int timeout = 3600000;
 		ConnectionProvider connProvider = ConnectionProvider.builder("connectionProviderForConversationsApi")
-				.maxConnections(2).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
+				.maxConnections(200).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
 				.maxIdleTime(Duration.ofHours(1)).maxLifeTime(Duration.ofHours(1)).build();
 		HttpClient httpClient = HttpClient.create(connProvider).baseUrl(this.engineBaseUrl)
 				.option(ChannelOption.AUTO_CLOSE, false).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout)
@@ -72,15 +72,17 @@ public class ConversationServiceImpl implements ConversationService {
 				.exchangeStrategies(exchangeStrategies).build();
 	}
 
-	public Flux<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> getFigureConversation() {
-		ParameterizedTypeReference<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> ref = new ParameterizedTypeReference<>() {
+	public Flux<FigureOperation<BoxDTO, FigureDTO<BoxDTO>>> getFigureConversation(String auth) {
+		ParameterizedTypeReference<FigureOperation<BoxDTO, FigureDTO<BoxDTO>>> ref = new ParameterizedTypeReference<>() {
 		};
-		return this.clientForConversations.get().uri("/getFigureConversation").retrieve().bodyToFlux(ref);
+		return this.clientForConversations.get().uri("/getFigureConversation")
+				.headers(h -> h.addIfAbsent("authorization", auth)).retrieve().bodyToFlux(ref);
 	}
 
-	public Flux<BoardOperation<BoxDTO>> getBoardConversation() {
+	public Flux<BoardOperation<BoxDTO>> getBoardConversation(String auth) {
 		ParameterizedTypeReference<BoardOperation<BoxDTO>> ref = new ParameterizedTypeReference<>() {
 		};
-		return this.clientForConversations.get().uri("/getBoardConversation").retrieve().bodyToFlux(ref);
+		return this.clientForConversations.get().uri("/getBoardConversation")
+				.headers(h -> h.addIfAbsent("authorization", auth)).retrieve().bodyToFlux(ref);
 	}
 }

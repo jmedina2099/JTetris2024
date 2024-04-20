@@ -26,7 +26,7 @@ export class EventSourceService {
           withCredentials: true,
           lastEventIdQueryParameterName: 'Last-Event-Id',
           headers: {
-            Authorization: auth,
+            authorization: auth,
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
             Connection: 'keep-alive',
@@ -63,7 +63,7 @@ export class EventSourceService {
           withCredentials: true,
           lastEventIdQueryParameterName: 'Last-Event-Id',
           headers: {
-            Authorization: auth,
+            authorization: auth,
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
             Connection: 'keep-alive',

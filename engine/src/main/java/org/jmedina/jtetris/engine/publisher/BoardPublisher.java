@@ -5,13 +5,11 @@ import org.jmedina.jtetris.common.model.BoardOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.jmedina.jtetris.engine.figure.BoxMotion;
 import org.reactivestreams.Subscriber;
-import org.springframework.stereotype.Service;
 
 /**
  * @author Jorge Medina
  *
  */
-@Service
 public class BoardPublisher extends CustomPublisher<BoardOperation<BoxMotion>> {
 
 	public BoardPublisher() {

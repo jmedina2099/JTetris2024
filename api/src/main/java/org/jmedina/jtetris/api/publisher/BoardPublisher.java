@@ -8,8 +8,6 @@ import org.jmedina.jtetris.common.model.BoardOperation;
 import org.jmedina.jtetris.common.model.BoxDTO;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.reactivestreams.Subscriber;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 
@@ -17,14 +15,15 @@ import reactor.core.publisher.Flux;
  * @author Jorge Medina
  *
  */
-@Service
 public class BoardPublisher extends CustomPublisher<BoardOperation<BoxDTO>> {
 
-	@Autowired
 	private ConversationService conversationService;
+	private String auth;
 
-	public BoardPublisher() {
+	public BoardPublisher(String auth, ConversationService conversationService) {
 		super(LogManager.getLogger(BoardPublisher.class));
+		this.auth = auth;
+		this.conversationService = conversationService;
 	}
 
 	@Override
@@ -37,7 +36,7 @@ public class BoardPublisher extends CustomPublisher<BoardOperation<BoxDTO>> {
 	private void getBoardConversation() {
 		this.logger.debug("===> FigurePublisher.getBoardConversation()");
 		try {
-			super.disposable = this.conversationService.getBoardConversation().timeout(Duration.ofHours(1))
+			super.disposable = this.conversationService.getBoardConversation(this.auth).timeout(Duration.ofHours(1))
 					.doOnNext(figure -> {
 						this.logger.debug("===> API - getBoardConversation - NEXT = " + figure);
 					}).doOnComplete(() -> {

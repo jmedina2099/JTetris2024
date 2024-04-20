@@ -35,7 +35,7 @@ public class ConversationServiceImpl implements ConversationService {
 	private void init() {
 		int timeout = 3600000;
 		ConnectionProvider connProvider = ConnectionProvider.builder("connectionProviderForConversationsFigures")
-				.maxConnections(1).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
+				.maxConnections(200).pendingAcquireMaxCount(-1).pendingAcquireTimeout(Duration.ofHours(1))
 				.maxIdleTime(Duration.ofHours(1)).maxLifeTime(Duration.ofHours(1)).build();
 		HttpClient httpClient = HttpClient.create(connProvider).baseUrl(this.engineBaseUrl)
 				.option(ChannelOption.AUTO_CLOSE, false).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout)
@@ -52,9 +52,9 @@ public class ConversationServiceImpl implements ConversationService {
 				.build();
 	}
 
-	public Flux<NextFigureOperation> getNextFigureConversation() {
-		return this.clientForConversations.get().uri("/getNextFigureConversation").retrieve()
-				.bodyToFlux(NextFigureOperation.class);
+	public Flux<NextFigureOperation> getNextFigureConversation(String auth) {
+		return this.clientForConversations.get().uri("/getNextFigureConversation")
+				.headers(h -> h.addIfAbsent("authorization", auth)).retrieve().bodyToFlux(NextFigureOperation.class);
 	}
 
 }

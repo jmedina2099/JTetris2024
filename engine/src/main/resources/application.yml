@@ -108,6 +108,8 @@ management:
         include: health,info,beans,env
 # Engine App
 engine:
+  cors:
+    origin: http://localhost:9081,http://localhost:9082,http://localhost:9083
   topic:
     nextFigure: nextFigureTopic
     figure: figureTopic

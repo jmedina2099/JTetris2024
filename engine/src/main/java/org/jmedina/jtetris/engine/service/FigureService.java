@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono;
  */
 public interface FigureService {
 
-	public Mono<Boolean> stop();
+	public Mono<Boolean> stop(String auth);
 }

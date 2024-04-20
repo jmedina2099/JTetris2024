@@ -110,7 +110,7 @@ public class CustomPublisher<T> implements Publisher<T>, Subscription {
 	}
 
 	@EventListener({ ContextClosedEvent.class })
-	private void onApplicationEvent(ContextClosedEvent event) {
+	protected void onApplicationEvent(ContextClosedEvent event) {
 		this.logger.debug("===> CustomPublisher.onApplicationEvent() - ContextClosedEvent");
 		stop();
 	}

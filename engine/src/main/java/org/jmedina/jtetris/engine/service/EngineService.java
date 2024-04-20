@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.engine.figure.BoxMotion;
 import org.jmedina.jtetris.engine.figure.FigureMotion;
+import org.jmedina.jtetris.engine.publisher.BoardPublisher;
 import org.jmedina.jtetris.engine.publisher.EnginePublisher;
 import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
 
@@ -14,11 +15,12 @@ import org.jmedina.jtetris.engine.publisher.NextFigurePublisher;
  */
 public interface EngineService {
 
-	public void start(NextFigurePublisher nextFigurePublisher, EnginePublisher enginePublisher);
+	public void start(NextFigurePublisher nextFigurePublisher, EnginePublisher enginePublisher,
+			BoardPublisher boardPublisher);
 
 	public void stop();
 
-	public void addFigureOperation(FigureOperation<BoxMotion,FigureMotion<BoxMotion>> figureOperation);
+	public void addFigureOperation(FigureOperation<BoxMotion, FigureMotion<BoxMotion>> figureOperation);
 
 	public Optional<Boolean> moveRight();
 

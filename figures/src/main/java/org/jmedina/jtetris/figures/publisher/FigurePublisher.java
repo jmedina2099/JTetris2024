@@ -11,8 +11,6 @@ import org.jmedina.jtetris.figures.figure.FigureDB;
 import org.jmedina.jtetris.figures.model.NextFigureOperation;
 import org.jmedina.jtetris.figures.service.FigureService;
 import org.reactivestreams.Subscriber;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 
@@ -20,21 +18,19 @@ import reactor.core.publisher.Flux;
  * @author Jorge Medina
  *
  */
-@Service
-public class FigurePublisher extends CustomPublisher<FigureOperation<BoxDB,FigureDB<BoxDB>>> {
+public class FigurePublisher extends CustomPublisher<FigureOperation<BoxDB, FigureDB<BoxDB>>> {
 
-	@Autowired
 	private FigureService figureService;
-
-	@Autowired
 	private NextFigurePublisher nextFigurePublisher;
 
-	public FigurePublisher() {
+	public FigurePublisher(FigureService figureService, NextFigurePublisher nextFigurePublisher) {
 		super(LogManager.getLogger(FigurePublisher.class));
+		this.figureService = figureService;
+		this.nextFigurePublisher = nextFigurePublisher;
 	}
 
 	@Override
-	public void subscribe(Subscriber<? super FigureOperation<BoxDB,FigureDB<BoxDB>>> subscriber) {
+	public void subscribe(Subscriber<? super FigureOperation<BoxDB, FigureDB<BoxDB>>> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
 		askAndSendForNextFigureOperation(); // first figure.

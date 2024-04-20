@@ -7,8 +7,6 @@ import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.jmedina.jtetris.figures.model.NextFigureOperation;
 import org.jmedina.jtetris.figures.service.ConversationService;
 import org.reactivestreams.Subscriber;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 
@@ -16,14 +14,15 @@ import reactor.core.publisher.Flux;
  * @author Jorge Medina
  *
  */
-@Service
 public class NextFigurePublisher extends CustomPublisher<NextFigureOperation> {
 
-	@Autowired
 	private ConversationService conversationService;
+	private String auth;
 
-	public NextFigurePublisher() {
+	public NextFigurePublisher(String auth, ConversationService conversationService) {
 		super(LogManager.getLogger(NextFigurePublisher.class));
+		this.auth = auth;
+		this.conversationService = conversationService;
 	}
 
 	@Override
@@ -36,8 +35,8 @@ public class NextFigurePublisher extends CustomPublisher<NextFigureOperation> {
 	private void getNextFigureConversation() {
 		this.logger.debug("===> FigurePublisher.getNextFigureConversation()");
 		try {
-			super.disposable = this.conversationService.getNextFigureConversation().timeout(Duration.ofHours(1))
-					.doOnNext(op -> {
+			super.disposable = this.conversationService.getNextFigureConversation(this.auth)
+					.timeout(Duration.ofHours(1)).doOnNext(op -> {
 						this.logger.debug("===> ENGINE - getNextFigureConversation - NEXT = " + op);
 					}).doOnComplete(() -> {
 						this.logger.debug("===> ENGINE - getNextFigureConversation - COMPLETE!");

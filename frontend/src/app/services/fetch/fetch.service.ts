@@ -21,6 +21,10 @@ export class FetchService {
     return this.http.get<boolean>(this.fetchUrl + '/isUp');
   }
 
+  public start(): Observable<boolean> {
+    return this.http.post<boolean>(this.fetchUrl + '/start', null);
+  }
+
   public stop(): Observable<boolean> {
     return this.http.post<boolean>(this.fetchUrl + '/stop', null);
   }

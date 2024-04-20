@@ -6,6 +6,6 @@ import reactor.core.publisher.Flux;
 
 public interface ConversationService {
 
-	public Flux<NextFigureOperation> getNextFigureConversation();
+	public Flux<NextFigureOperation> getNextFigureConversation(String auth);
 
 }

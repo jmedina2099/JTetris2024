@@ -29,7 +29,6 @@ import org.jmedina.jtetris.engine.util.RotationUtil;
 import org.jmedina.jtetris.engine.util.SerializeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,20 +37,19 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor
-@Service
 public class EngineServiceImpl implements EngineService {
 
 	private final Logger logger = LogManager.getLogger(this.getClass());
-	private final BoardPublisher boardPublisher;
-	private final GridSupportService gridSupport;
 	private final RotationUtil rotationUtil;
 	private final SerializeUtil serializeUtil;
+	private GridSupportService gridSupport = new GridSupportServiceImpl();
 	private FigureMotion<BoxMotion> fallingFigure;
 	private long initialTimeStamp;
 	private List<BoxMotion> falledBoxes;
 	private ReentrantLock lock = new ReentrantLock();
 	private NextFigurePublisher nextFigurePublisher;
 	private EnginePublisher enginePublisher;
+	private BoardPublisher boardPublisher;
 
 	@Autowired(required = false)
 	private KafkaService kafkaService;
@@ -65,11 +63,13 @@ public class EngineServiceImpl implements EngineService {
 	public static final int HEIGHT = 20;
 
 	@Override
-	public void start(NextFigurePublisher nextFigurePublisher, EnginePublisher enginePublisher) {
+	public void start(NextFigurePublisher nextFigurePublisher, EnginePublisher enginePublisher,
+			BoardPublisher boardPublisher) {
 		this.logger.debug("==> Engine.start()");
 		this.isRunning = true;
 		this.nextFigurePublisher = nextFigurePublisher;
 		this.enginePublisher = enginePublisher;
+		this.boardPublisher = boardPublisher;
 		reset();
 	}
 
@@ -82,7 +82,7 @@ public class EngineServiceImpl implements EngineService {
 	}
 
 	@Override
-	public void addFigureOperation(FigureOperation<BoxMotion,FigureMotion<BoxMotion>> figureOperation) {
+	public void addFigureOperation(FigureOperation<BoxMotion, FigureMotion<BoxMotion>> figureOperation) {
 		this.logger.debug("==> Engine.addFigureOperation() = " + figureOperation);
 		if (this.isRunning
 				&& (this.fallingFigure == null || this.initialTimeStamp < figureOperation.getInitialTimeStamp())) {
@@ -171,7 +171,7 @@ public class EngineServiceImpl implements EngineService {
 		this.falledBoxes = new ArrayList<>();
 	}
 
-	private void sendFigureOperationToKafka(FigureOperation<BoxMotion,FigureMotion<BoxMotion>> op) {
+	private void sendFigureOperationToKafka(FigureOperation<BoxMotion, FigureMotion<BoxMotion>> op) {
 		this.logger.debug("==> Engine.sendFigureOperationToKafka() = " + this.kafkaService);
 		if (this.useKafka) {
 			this.serializeUtil.convertFigureOperationToString(op).ifPresent(this.kafkaService::sendMessageFigure);
@@ -213,7 +213,8 @@ public class EngineServiceImpl implements EngineService {
 		return Optional.of(false);
 	}
 
-	private void sendAsyncEventsForFigureOperation(FigureOperation<BoxMotion,FigureMotion<BoxMotion>> figureOperation) {
+	private void sendAsyncEventsForFigureOperation(
+			FigureOperation<BoxMotion, FigureMotion<BoxMotion>> figureOperation) {
 		this.enginePublisher.sendFigureOperation(figureOperation);
 		sendFigureOperationToKafka(figureOperation);
 	}
@@ -223,14 +224,18 @@ public class EngineServiceImpl implements EngineService {
 		sendBoardToKafka(board);
 	}
 
-	private FigureOperation<BoxMotion,FigureMotion<BoxMotion>> getFigureOperationForMovement(FigureMotion<BoxMotion> figure) {
-		return FigureOperation.<BoxMotion,FigureMotion<BoxMotion>>builder().operation(FigureOperationEnumeration.MOVEMENT_OPERATION)
-				.figure(figure).initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
+	private FigureOperation<BoxMotion, FigureMotion<BoxMotion>> getFigureOperationForMovement(
+			FigureMotion<BoxMotion> figure) {
+		return FigureOperation.<BoxMotion, FigureMotion<BoxMotion>>builder()
+				.operation(FigureOperationEnumeration.MOVEMENT_OPERATION).figure(figure)
+				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
 	}
 
-	private FigureOperation<BoxMotion,FigureMotion<BoxMotion>> getFigureOperationForRotation(FigureMotion<BoxMotion> figure) {
-		return FigureOperation.<BoxMotion,FigureMotion<BoxMotion>>builder().operation(FigureOperationEnumeration.ROTATION_OPERATION)
-				.figure(figure).initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
+	private FigureOperation<BoxMotion, FigureMotion<BoxMotion>> getFigureOperationForRotation(
+			FigureMotion<BoxMotion> figure) {
+		return FigureOperation.<BoxMotion, FigureMotion<BoxMotion>>builder()
+				.operation(FigureOperationEnumeration.ROTATION_OPERATION).figure(figure)
+				.initialTimeStamp(this.initialTimeStamp).timeStamp(System.nanoTime()).build();
 	}
 
 	private BoardOperation<BoxMotion> getBoardOperation(List<BoxMotion> boxes, BoardOperationEnumeration op) {

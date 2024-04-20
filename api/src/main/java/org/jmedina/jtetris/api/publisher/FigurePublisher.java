@@ -9,8 +9,6 @@ import org.jmedina.jtetris.common.model.FigureDTO;
 import org.jmedina.jtetris.common.model.FigureOperation;
 import org.jmedina.jtetris.common.publisher.CustomPublisher;
 import org.reactivestreams.Subscriber;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 
@@ -18,18 +16,19 @@ import reactor.core.publisher.Flux;
  * @author Jorge Medina
  *
  */
-@Service
-public class FigurePublisher extends CustomPublisher<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> {
+public class FigurePublisher extends CustomPublisher<FigureOperation<BoxDTO, FigureDTO<BoxDTO>>> {
 
-	@Autowired
 	private ConversationService conversationService;
+	private String auth;
 
-	public FigurePublisher() {
+	public FigurePublisher(String auth, ConversationService conversationService) {
 		super(LogManager.getLogger(FigurePublisher.class));
+		this.auth = auth;
+		this.conversationService = conversationService;
 	}
 
 	@Override
-	public void subscribe(Subscriber<? super FigureOperation<BoxDTO,FigureDTO<BoxDTO>>> subscriber) {
+	public void subscribe(Subscriber<? super FigureOperation<BoxDTO, FigureDTO<BoxDTO>>> subscriber) {
 		this.logger.debug("===> FigurePublisher.subscribe()");
 		super.subscribe(subscriber);
 		getFigureConversation();
@@ -38,7 +37,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation<BoxDTO,Figu
 	private void getFigureConversation() {
 		this.logger.debug("===> FigurePublisher.getFigureConversation()");
 		try {
-			super.disposable = this.conversationService.getFigureConversation().timeout(Duration.ofHours(1))
+			super.disposable = this.conversationService.getFigureConversation(this.auth).timeout(Duration.ofHours(1))
 					.doOnNext(figure -> {
 						this.logger.debug("===> API - getFigureConversation - NEXT = " + figure);
 					}).doOnComplete(() -> {
@@ -51,7 +50,7 @@ public class FigurePublisher extends CustomPublisher<FigureOperation<BoxDTO,Figu
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
 					}).onErrorResume(e -> {
 						this.logger.error("==*=> ERROR - getFigureConversation =", e);
-						return Flux.<FigureOperation<BoxDTO,FigureDTO<BoxDTO>>>empty();
+						return Flux.<FigureOperation<BoxDTO, FigureDTO<BoxDTO>>>empty();
 					}).subscribe(figure -> {
 						this.logger.debug("===> getFigureConversation.subscribe = " + figure);
 						super.addToQueue(figure);

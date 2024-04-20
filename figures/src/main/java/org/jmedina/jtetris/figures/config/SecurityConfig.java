@@ -1,13 +1,10 @@
-package org.jmedina.jtetris.api.config;
+package org.jmedina.jtetris.figures.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +23,6 @@ import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 import org.springframework.security.web.server.authentication.logout.HttpStatusReturningServerLogoutSuccessHandler;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -47,14 +43,8 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class SecurityConfig {
 
-	@Value("${api.cors.origin}")
+	@Value("${figures.cors.origin}")
 	private String[] corsOrigin;
-
-	private String[] securePages = new String[] { "/api", "/api/", "/api/index.html", "/api/user/resource" };
-	private String[] secureTypes = new String[] { ".js", ".css", ".ico" };
-
-	private List<String> securePagesList = Arrays.asList(securePages);
-	private List<String> secureTypesList = Arrays.asList(secureTypes);
 
 	@Bean
 	MapReactiveUserDetailsService userDetailsService() {
@@ -72,7 +62,6 @@ public class SecurityConfig {
 		//return http.cors(cors -> cors.disable()).csrf(csrf -> csrf.disable()).build();
 		return http.cors(withDefaults()).formLogin(formLogin -> formLogin.disable())
 				.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-				.authorizeExchange(exchanges -> exchanges.matchers(this::blockUnsecured).permitAll())
 				.authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
 				.httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(new NoPopupBasicAuthenticationEntryPoint()))
 				.exceptionHandling(
@@ -94,14 +83,16 @@ public class SecurityConfig {
 		return new CorsWebFilter(source);
 	}
 
-	private Mono<MatchResult> blockUnsecured(final ServerWebExchange exchange) {
-		URI uri = exchange.getRequest().getURI();
-
-		boolean valid = secureTypesList.stream().anyMatch(type -> StringUtils.endsWith(uri.getPath(), type))
-				|| securePagesList.stream().anyMatch(p -> p.equalsIgnoreCase(uri.getPath()));
-
-		return valid ? MatchResult.match() : MatchResult.notMatch();
-	}
+	/**
+	 * private Mono<MatchResult> blockUnsecured(final ServerWebExchange exchange) {
+	 * URI uri = exchange.getRequest().getURI();
+	 * 
+	 * boolean valid = secureTypesList.stream().anyMatch(type ->
+	 * StringUtils.endsWith(uri.getPath(), type)) ||
+	 * securePagesList.stream().anyMatch(p -> p.equalsIgnoreCase(uri.getPath()));
+	 * 
+	 * return valid ? MatchResult.match() : MatchResult.notMatch(); }
+	 */
 
 	public class NoPopupBasicAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 

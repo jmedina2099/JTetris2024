@@ -67,6 +67,8 @@ management:
         include: health,info,beans,env
 # Figures App
 figures:
+  cors:
+    origin: http://localhost:9084,http://localhost:9083
   engine:
     base-url: http://localhost:9083/service-engine/engine # gateway node
 #    base-url: http://localhost:9084/engine # engine node

@@ -1,6 +1,7 @@
 package org.jmedina.jtetris.api.client;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import reactor.core.publisher.Mono;
 
@@ -11,36 +12,40 @@ import reactor.core.publisher.Mono;
 @Component
 public class EngineFallback implements EngineClient {
 
-	public Mono<Boolean> isUp() {
+	public Mono<Boolean> isUp(@RequestHeader("authorization") String auth) {
 		return Mono.just(false);
 	}
 
-	public Mono<Boolean> stop() {
+	public Mono<Boolean> start(@RequestHeader("authorization") String auth) {
 		return Mono.just(false);
 	}
 
-	@Override
-	public Mono<Boolean> moveRight() {
-		return Mono.just(false);
-	}
-
-	@Override
-	public Mono<Boolean> moveLeft() {
+	public Mono<Boolean> stop(@RequestHeader("authorization") String auth) {
 		return Mono.just(false);
 	}
 
 	@Override
-	public Mono<Boolean> rotateRight() {
+	public Mono<Boolean> moveRight(@RequestHeader("authorization") String auth) {
 		return Mono.just(false);
 	}
 
 	@Override
-	public Mono<Boolean> rotateLeft() {
+	public Mono<Boolean> moveLeft(@RequestHeader("authorization") String auth) {
 		return Mono.just(false);
 	}
 
 	@Override
-	public Mono<Boolean> bottomDown() {
+	public Mono<Boolean> rotateRight(@RequestHeader("authorization") String auth) {
+		return Mono.just(false);
+	}
+
+	@Override
+	public Mono<Boolean> rotateLeft(@RequestHeader("authorization") String auth) {
+		return Mono.just(false);
+	}
+
+	@Override
+	public Mono<Boolean> bottomDown(@RequestHeader("authorization") String auth) {
 		return Mono.empty();
 	}
 }
