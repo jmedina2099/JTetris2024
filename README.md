@@ -67,7 +67,9 @@ mvn clean
 
 #########################################################
 # ENTRY URL
-# Username: user
+# Username: user1
+# Password: s3cr3t!!!
+# Username: user2
 # Password: s3cr3t!!!
 #########################################################
 
